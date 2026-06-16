@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(Get-ChildItem \"d:\\\\Projects\\\\landing-tehspec\" -Recurse | Where-Object { !$_.PSIsContainer } | Select-Object Name, FullName)"
+    ]
+  }
+}
