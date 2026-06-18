@@ -24,10 +24,15 @@ $RECYCLE.BIN/
 *.swo
 *~
 
-# Переменные окружения
+# Переменные окружения и секреты
 .env
 .env.*
 !.env.example
+*.key
+*.pem
+credentials.json
+*.crt
+*.p12
 
 # Логи
 *.log
