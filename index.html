@@ -34,6 +34,7 @@
       --accent:        #2E7D52;
       --accent-hover:  #236641;
       --accent-light:  #E6F3EC;
+      --accent-soft:   #5FC98F;
       --accent2:       #E8A800;
       --accent2-hover: #C48900;
       --accent2-light: #FFF8E0;
@@ -139,12 +140,23 @@
       border: none;
     }
     .btn--primary {
-      background: var(--accent);
+      background: linear-gradient(120deg, var(--accent), var(--accent-soft), var(--accent));
+      background-size: 200% 100%;
+      animation: btn-flow 7s ease-in-out infinite;
       color: #fff;
     }
     .btn--primary:hover {
-      background: var(--accent-hover);
+      background: linear-gradient(120deg, var(--accent-hover), var(--accent-soft), var(--accent-hover));
+      background-size: 200% 100%;
       transform: translateY(-1px);
+    }
+    @keyframes btn-flow {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .btn--primary { animation: none; }
     }
     .btn--outline {
       background: transparent;
