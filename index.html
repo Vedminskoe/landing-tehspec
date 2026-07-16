@@ -365,14 +365,95 @@
       letter-spacing: 0.02em;
       margin-bottom: 2px;
     }
+    /* ===== Чёрный бархат из текстуры + искристый блик «снег на солнце» ===== */
     .hero__name {
+      position: relative;
       font-family: var(--font-heading);
       font-size: clamp(60px, 9vw, 116px);
       line-height: 0.85;
       letter-spacing: 0.02em;
-      color: var(--text);
       margin-bottom: 18px;
       margin-left: -5px;
+      color: transparent;
+      /* реальная фактура crushed velvet заливает буквы */
+      background-color: #0b0b0f;
+      background-image: url('velvet.jpg');
+      background-size: 140% auto;
+      background-position: 50% 40%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      /* мягкий ворсистый ореол по краям */
+      filter: drop-shadow(0 1px 1px rgba(0,0,0,.55))
+              drop-shadow(0 0 5px rgba(120,110,150,.2));
+    }
+    /* ::before — бегущий диагональный блик (свет по бархату) */
+    /* ::after — россыпь искр, вспыхивают как снег на солнце */
+    .hero__name::before,
+    .hero__name::after {
+      content: attr(data-text);
+      position: absolute;
+      left: 0; top: 0;
+      pointer-events: none;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: transparent;
+      background-repeat: no-repeat;
+    }
+    .hero__name::before {
+      /* та же механика, что у .btn--primary (btn-flow): градиент 200% перетекает 0→100→0 */
+      background-image: linear-gradient(120deg,
+        rgba(255,255,255,0)   35%,
+        rgba(210,205,235,.18) 47%,
+        rgba(255,255,255,.4)  50%,
+        rgba(210,205,235,.18) 53%,
+        rgba(255,255,255,0)   65%);
+      background-size: 200% 100%;
+      background-position: 0% 50%;
+      mix-blend-mode: screen;
+      animation: velvetGlint 7s ease-in-out infinite;
+    }
+    .hero__name::after {
+      background-image:
+        radial-gradient(circle, #fff 0%, rgba(255,255,255,0) 55%),
+        radial-gradient(circle, #eaf3ff 0%, rgba(234,243,255,0) 55%),
+        radial-gradient(circle, #fff 0%, rgba(255,255,255,0) 55%),
+        radial-gradient(circle, #fff 0%, rgba(255,255,255,0) 55%),
+        radial-gradient(circle, #d9e6ff 0%, rgba(217,230,255,0) 55%),
+        radial-gradient(circle, #fff 0%, rgba(255,255,255,0) 55%),
+        radial-gradient(circle, #fff 0%, rgba(255,255,255,0) 55%),
+        radial-gradient(circle, #fff 0%, rgba(255,255,255,0) 55%),
+        radial-gradient(circle, #eaf3ff 0%, rgba(234,243,255,0) 55%),
+        radial-gradient(circle, #fff 0%, rgba(255,255,255,0) 55%),
+        radial-gradient(circle, #d9e6ff 0%, rgba(217,230,255,0) 55%),
+        radial-gradient(circle, #fff 0%, rgba(255,255,255,0) 55%),
+        radial-gradient(circle, #fff 0%, rgba(255,255,255,0) 55%),
+        radial-gradient(circle, #fff 0%, rgba(255,255,255,0) 55%);
+      background-size:
+        4px 4px, 3px 3px, 5px 5px, 3px 3px, 4px 4px, 3px 3px, 5px 5px,
+        3px 3px, 4px 4px, 5px 5px, 3px 3px, 4px 4px, 3px 3px, 5px 5px;
+      background-position:
+        10% 32%, 24% 68%, 40% 22%, 55% 60%, 68% 40%, 82% 72%, 92% 30%,
+        6% 78%, 18% 15%, 33% 50%, 48% 85%, 62% 18%, 76% 55%, 88% 88%;
+      mix-blend-mode: screen;
+      animation: velvetSnow 2s steps(1) infinite;
+    }
+    @keyframes velvetGlint {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    @keyframes velvetSnow {
+      0%, 100% { opacity: .2; }
+      25%      { opacity: 1; }
+      50%      { opacity: .35; }
+      75%      { opacity: .85; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .hero__name::before,
+      .hero__name::after { animation: none; }
+      .hero__name::before { opacity: 0; }
     }
     .hero__caption {
       font-family: var(--font-script);
@@ -951,7 +1032,7 @@
       <div class="hero__left">
         <div class="hero__badge">Открыта к новым проектам</div>
         <p class="hero__greeting">Привет, я</p>
-        <h1 class="hero__name" id="hero-title">КАТЕРИНА</h1>
+        <h1 class="hero__name" id="hero-title" data-text="КАТЕРИНА">КАТЕРИНА</h1>
         <p class="hero__desc">
           Помогаю экспертам и онлайн-школам выглядеть профессионально в интернете:
           создаю лендинги, настраиваю ботов, связываю сервисы.<br />
