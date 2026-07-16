@@ -843,6 +843,15 @@
       display: none;
     }
     .field__error--visible { display: block; }
+    /* honeypot: убираем из виду и из потока, но оставляем доступным ботам */
+    .field__honeypot {
+      position: absolute;
+      left: -9999px;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      pointer-events: none;
+    }
     .booking-form__submit {
       width: 100%;
       justify-content: center;
@@ -1291,6 +1300,8 @@
           <label class="field__label" for="fieldTask">Опишите задачу <span class="field__optional">(необязательно)</span></label>
           <textarea class="field__input field__textarea" id="fieldTask" name="task" placeholder="Расскажите, что нужно сделать — в двух словах"></textarea>
         </div>
+        <!-- honeypot: скрыто от людей, заполняют только боты -->
+        <input class="field__honeypot" type="text" id="fieldWebsite" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" />
         <label class="field__consent">
           <input type="checkbox" id="fieldConsent" name="consent" />
           <span>Я соглашаюсь с <a href="privacy.html" target="_blank" rel="noopener">Политикой обработки персональных данных</a></span>
@@ -1366,13 +1377,18 @@
   // Форма консультации
   const bookingForm = document.getElementById('bookingForm');
   const bookingSuccess = document.getElementById('bookingSuccess');
+  const bookingSubmit = bookingForm.querySelector('.booking-form__submit');
 
-  bookingForm.addEventListener('submit', (e) => {
+  // Куда уходит заявка. Тот же домен, что и сайт → nginx проксирует на бота.
+  const LEAD_ENDPOINT = '/lead';
+
+  bookingForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const nameVal = bookingForm.elements.name.value.trim();
     const tgVal   = bookingForm.elements.telegram.value.trim();
     const taskVal = bookingForm.elements.task.value.trim();
+    const hpVal   = bookingForm.elements.website.value.trim();
 
     const nameInput = document.getElementById('fieldName');
     const nameError = document.getElementById('nameError');
@@ -1410,10 +1426,28 @@
 
     if (!valid) return;
 
-    console.log({ name: nameVal, telegram: tgVal, task: taskVal });
+    const originalBtnText = bookingSubmit.textContent;
+    bookingSubmit.disabled = true;
+    bookingSubmit.textContent = 'Отправляю…';
 
-    bookingForm.style.display = 'none';
-    bookingSuccess.classList.add('booking-success--visible');
+    try {
+      const res = await fetch(LEAD_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: nameVal, telegram: tgVal, task: taskVal, website: hpVal }),
+      });
+      if (!res.ok) throw new Error('Bad response: ' + res.status);
+
+      bookingForm.style.display = 'none';
+      bookingSuccess.classList.add('booking-success--visible');
+    } catch (err) {
+      console.error('Не удалось отправить заявку:', err);
+      bookingSubmit.disabled = false;
+      bookingSubmit.textContent = originalBtnText;
+      alert(
+        'Не получилось отправить заявку. Напишите, пожалуйста, напрямую в Telegram @vedminskoe или на почту vedminskoe@yandex.ru'
+      );
+    }
   });
 
   ['fieldName', 'fieldTg'].forEach((id) => {
