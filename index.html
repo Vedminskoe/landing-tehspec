@@ -167,6 +167,29 @@
       background: var(--accent2-light);
       border-color: var(--accent2-hover);
     }
+    /* Магнитные кнопки: плавный «пружинистый» возврат при уходе курсора */
+    .magnetic {
+      transition: transform .35s cubic-bezier(.2, .8, .3, 1);
+      will-change: transform;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .magnetic { transition: none; }
+    }
+    /* Плавное появление блоков при прокрутке */
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity .7s ease, transform .7s ease;
+      transition-delay: var(--reveal-delay, 0s);
+      will-change: opacity, transform;
+    }
+    .reveal.is-visible {
+      opacity: 1;
+      transform: none;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { opacity: 1; transform: none; transition: none; }
+    }
 
     /* ── Header ── */
     .header {
@@ -1337,6 +1360,96 @@
       menuToggle.setAttribute('aria-expanded', false);
     }
   });
+
+  // Плавное появление блоков при прокрутке
+  (function () {
+    // что анимируем: заголовки секций, карточки, шаги, форма, контакты
+    const selectors = [
+      '.section-label', '.section-title', '.section-desc',
+      '.service-card', '.process-step', '.case-card',
+      '.booking__inner', '.contacts__inner'
+    ];
+    const items = document.querySelectorAll(selectors.join(','));
+    if (!items.length) return;
+
+    items.forEach(el => el.classList.add('reveal'));
+
+    // лёгкая каскадная задержка для соседних карточек одной группы
+    document.querySelectorAll(
+      '.services__grid, .process__steps, .cases__grid'
+    ).forEach(group => {
+      group.querySelectorAll('.reveal').forEach((el, i) => {
+        el.style.setProperty('--reveal-delay', (i * 0.09) + 's');
+      });
+    });
+
+    if (!('IntersectionObserver' in window)) {
+      items.forEach(el => el.classList.add('is-visible'));
+      return;
+    }
+
+    const io = new IntersectionObserver((entries, obs) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          obs.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+
+    items.forEach(el => io.observe(el));
+  })();
+
+  // Магнитные кнопки: притягиваются к курсору на подлёте и следуют за ним
+  (function () {
+    // только точный указатель (мышь), не тач; уважаем reduce-motion
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    const STRENGTH = 0.3;   // доля смещения кнопки к курсору
+    const RADIUS   = 90;    // «поле притяжения» вокруг кнопки, px
+
+    const buttons = document.querySelectorAll('.hero__actions .btn, .booking-form__submit');
+    if (!buttons.length) return;
+    buttons.forEach(btn => btn.classList.add('magnetic'));
+
+    let ticking = false;
+    let lastX = 0, lastY = 0;
+
+    const update = () => {
+      ticking = false;
+      buttons.forEach(btn => {
+        const r = btn.getBoundingClientRect();
+        const cx = r.left + r.width / 2;
+        const cy = r.top + r.height / 2;
+        const dx = lastX - cx;
+        const dy = lastY - cy;
+        // расстояние от курсора до края кнопки (0 внутри кнопки)
+        const ox = Math.max(Math.abs(dx) - r.width / 2, 0);
+        const oy = Math.max(Math.abs(dy) - r.height / 2, 0);
+        if (Math.hypot(ox, oy) < RADIUS) {
+          // магнит только по вертикали — кнопки не наезжают друг на друга
+          let strength = STRENGTH;
+          // у кнопки «Записаться на консультацию» тяга вверх слабее в 3 раза
+          if (dy < 0 && btn.classList.contains('booking-form__submit')) {
+            strength = STRENGTH / 3;
+          }
+          btn.style.transform = `translateY(${dy * strength}px)`;
+        } else {
+          btn.style.transform = '';
+        }
+      });
+    };
+
+    window.addEventListener('pointermove', (e) => {
+      lastX = e.clientX;
+      lastY = e.clientY;
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(update);
+      }
+    }, { passive: true });
+  })();
 </script>
 
 </body>
