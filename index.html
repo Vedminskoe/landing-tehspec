@@ -846,9 +846,71 @@
     .booking-form__submit {
       width: 100%;
       justify-content: center;
-      margin-top: 8px;
+      margin-top: 24px;
       padding: 16px 28px;
       font-size: 15px;
+    }
+    /* Согласие на обработку ПД */
+    .field__consent {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-top: 16px;
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+    .field__consent input {
+      flex: 0 0 auto;
+      width: 18px;
+      height: 18px;
+      margin-top: 1px;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+    .field__consent a {
+      color: var(--accent);
+      text-decoration: underline;
+    }
+    .field__consent a:hover { color: var(--accent-hover); }
+    /* Cookie-баннер */
+    .cookie-banner {
+      position: fixed;
+      left: 16px;
+      right: 16px;
+      bottom: 16px;
+      z-index: 1000;
+      max-width: 620px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 18px 22px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-md);
+    }
+    .cookie-banner[hidden] { display: none; }
+    .cookie-banner p {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--text-muted);
+    }
+    .cookie-banner a {
+      color: var(--accent);
+      text-decoration: underline;
+    }
+    .cookie-banner .btn {
+      flex: 0 0 auto;
+      padding: 10px 26px;
+      font-size: 14px;
+    }
+    @media (max-width: 560px) {
+      .cookie-banner { flex-direction: column; align-items: stretch; text-align: left; }
+      .cookie-banner .btn { width: 100%; justify-content: center; }
     }
     .booking-success {
       display: none;
@@ -1229,6 +1291,11 @@
           <label class="field__label" for="fieldTask">Опишите задачу <span class="field__optional">(необязательно)</span></label>
           <textarea class="field__input field__textarea" id="fieldTask" name="task" placeholder="Расскажите, что нужно сделать — в двух словах"></textarea>
         </div>
+        <label class="field__consent">
+          <input type="checkbox" id="fieldConsent" name="consent" />
+          <span>Я соглашаюсь с <a href="privacy.html" target="_blank" rel="noopener">Политикой обработки персональных данных</a></span>
+        </label>
+        <p class="field__error" id="consentError">Нужно согласие на обработку персональных данных</p>
         <button type="submit" class="btn btn--primary booking-form__submit">Записаться на консультацию</button>
       </form>
       <div class="booking-success" id="bookingSuccess" aria-live="polite">
@@ -1283,10 +1350,17 @@
       <div class="footer__links">
         <a href="https://t.me/vedminskoe" target="_blank" rel="noopener">Telegram</a>
         <a href="mailto:vedminskoe@yandex.ru">Email</a>
+        <a href="privacy.html" target="_blank" rel="noopener">Политика ПД</a>
       </div>
     </div>
   </div>
 </footer>
+
+<!-- Cookie-уведомление -->
+<div class="cookie-banner" id="cookieBanner" hidden>
+  <p>Мы используем cookie для корректной работы сайта. Продолжая пользоваться сайтом, вы соглашаетесь с <a href="privacy.html" target="_blank" rel="noopener">Политикой обработки персональных данных</a>.</p>
+  <button type="button" class="btn btn--primary" id="cookieAccept">OK</button>
+</div>
 
 <script>
   // Форма консультации
@@ -1304,6 +1378,8 @@
     const nameError = document.getElementById('nameError');
     const tgInput   = document.getElementById('fieldTg');
     const tgError   = document.getElementById('tgError');
+    const consentInput = document.getElementById('fieldConsent');
+    const consentError = document.getElementById('consentError');
 
     let valid = true;
 
@@ -1325,6 +1401,13 @@
       tgError.classList.remove('field__error--visible');
     }
 
+    if (!consentInput.checked) {
+      consentError.classList.add('field__error--visible');
+      valid = false;
+    } else {
+      consentError.classList.remove('field__error--visible');
+    }
+
     if (!valid) return;
 
     console.log({ name: nameVal, telegram: tgVal, task: taskVal });
@@ -1339,6 +1422,26 @@
       this.nextElementSibling.classList.remove('field__error--visible');
     });
   });
+
+  document.getElementById('fieldConsent').addEventListener('change', function () {
+    if (this.checked) {
+      document.getElementById('consentError').classList.remove('field__error--visible');
+    }
+  });
+
+  // Cookie-баннер: показываем один раз, до согласия
+  (function () {
+    const banner = document.getElementById('cookieBanner');
+    const accept = document.getElementById('cookieAccept');
+    if (!banner || !accept) return;
+    let accepted = false;
+    try { accepted = localStorage.getItem('cookieAccepted') === '1'; } catch (e) {}
+    if (!accepted) banner.hidden = false;
+    accept.addEventListener('click', () => {
+      banner.hidden = true;
+      try { localStorage.setItem('cookieAccepted', '1'); } catch (e) {}
+    });
+  })();
 
   // Выпадающее меню «Менюшка»
   const headerMenu = document.getElementById('headerMenu');
