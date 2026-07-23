@@ -178,6 +178,7 @@
       border-bottom: 1px solid var(--border);
     }
     .header__inner {
+      position: relative;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -202,6 +203,20 @@
       transition: color var(--transition);
     }
     .header__logo:hover { color: var(--accent); }
+    /* Подпись по центру шапки — рукописный шрифт, крупнее, некликабельно */
+    .header__tagline {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      font-family: var(--font-script);
+      font-size: 32px;
+      line-height: 1;
+      color: var(--text);
+      white-space: nowrap;
+      pointer-events: none;
+      user-select: none;
+    }
     .header__logo::after {
       content: '';
       width: 6px;
@@ -1118,6 +1133,7 @@
     }
 
     @media (max-width: 768px) {
+      .header__tagline { font-size: 22px; }
       .section { padding: 60px 0; }
       .hero { padding: 72px 0 60px; }
       .nav { display: none; }
@@ -1149,6 +1165,7 @@
     }
 
     @media (max-width: 480px) {
+      .header__tagline { display: none; }
       .process__steps { grid-template-columns: 1fr; }
       .hero__actions { flex-direction: column; align-items: flex-start; }
       .booking-form__grid { grid-template-columns: 1fr; }
@@ -1171,6 +1188,7 @@
           <a href="#contacts">Контакты</a>
         </nav>
       </div>
+      <span class="header__tagline" aria-hidden="true">техспец &amp; граф.дизайнер</span>
       <a href="https://t.me/vedminskoe" target="_blank" rel="noopener" class="header__contact-link">Связаться</a>
     </div>
   </div>
