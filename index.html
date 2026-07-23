@@ -671,17 +671,54 @@
       gap: 16px;
       position: relative;
     }
-    /* «Провод автоматизации» — связь с зелёным роботом из блока услуг */
+    /* «Провод автоматизации» — связь с зелёным роботом из блока услуг.
+       ::before — сам пунктир, рисуется слева направо при появлении блока
+       ::after  — импульс, бегущий по проводу от шага к шагу */
     .process__steps::before {
       content: '';
       position: absolute;
       top: 56px;
       left: 9%;
       right: 9%;
-      height: 0;
-      border-top: 2px dashed var(--accent);
+      height: 2px;
+      background: repeating-linear-gradient(
+        to right,
+        var(--accent) 0 8px,
+        transparent 8px 16px
+      );
       opacity: 0.4;
       z-index: 0;
+      transform: scaleX(0);
+      transform-origin: left center;
+      transition: transform 1.1s cubic-bezier(.4,0,.2,1);
+    }
+    .process__steps.is-wired::before { transform: scaleX(1); }
+    .process__steps::after {
+      content: '';
+      position: absolute;
+      top: 52px;
+      left: 9%;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 4px rgba(46,125,82,0.15);
+      opacity: 0;
+      z-index: 0;
+    }
+    /* стартует после того, как провод дорисовался */
+    .process__steps.is-wired::after {
+      animation: wire-pulse 3.2s linear 1.1s infinite;
+    }
+    /* left в процентах от контейнера — импульс идёт ровно по длине провода */
+    @keyframes wire-pulse {
+      0%       { left: 9%;  opacity: 0; }
+      8%, 82%  { opacity: 1; }
+      100%     { left: 91%; opacity: 0; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .process__steps::before { transform: scaleX(1); transition: none; }
+      .process__steps::after { animation: none; }
     }
     .process-step {
       display: flex;
@@ -716,7 +753,15 @@
       margin-bottom: 18px;
       flex-shrink: 0;
       box-shadow: 0 0 0 5px rgba(46,125,82,0.08);
-      transition: background var(--transition), color var(--transition), box-shadow var(--transition);
+      transition: background var(--transition), color var(--transition), box-shadow var(--transition),
+                  transform .5s cubic-bezier(.34,1.56,.64,1);
+      /* «щелчок»: цифра выпрыгивает, когда шаг появляется в поле зрения */
+      transform: scale(.5);
+      transition-delay: 0s, 0s, 0s, calc(var(--reveal-delay, 0s) + .18s);
+    }
+    .process-step.is-visible .process-step__num { transform: scale(1); }
+    @media (prefers-reduced-motion: reduce) {
+      .process-step__num { transform: none; transition: none; }
     }
     .process-step:hover .process-step__num {
       background: var(--accent);
@@ -1195,7 +1240,8 @@
       .burger { display: flex; }
       .hero__scroll { display: none; }
       .process__steps { grid-template-columns: repeat(2, 1fr); }
-      .process__steps::before { display: none; }
+      .process__steps::before,
+      .process__steps::after { display: none; }
       .footer__inner { flex-direction: column; align-items: flex-end; text-align: right; }
       /* Ящик: сцена целиком мельче, подсказка уезжает под неё, стрелка прячется */
       .drawer { --s: 0.72; height: 340px; }
@@ -1687,6 +1733,7 @@
 
     if (!('IntersectionObserver' in window)) {
       items.forEach(el => el.classList.add('is-visible'));
+      document.querySelector('.process__steps')?.classList.add('is-wired');
       return;
     }
 
@@ -1700,6 +1747,20 @@
     }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
 
     items.forEach(el => io.observe(el));
+
+    // Провод в блоке «Как я работаю» рисуется, когда блок попадает в кадр
+    const steps = document.querySelector('.process__steps');
+    if (steps) {
+      const wireIo = new IntersectionObserver((entries, obs) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-wired');
+            obs.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.25 });
+      wireIo.observe(steps);
+    }
   })();
 
   // Скролл: полоска прогресса в шапке + скрытие стрелки-подсказки
