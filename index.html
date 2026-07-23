@@ -176,7 +176,7 @@
       transition-delay: var(--in-delay, 0s);
       will-change: opacity, transform;
     }
-    body.is-loaded .hero-in {
+    .hero-in.is-in {
       opacity: 1;
       transform: none;
     }
@@ -828,6 +828,13 @@
       z-index: 1;
       overflow: hidden;
       transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+    }
+    /* Контент поднят над слоем подсветки — свет идёт сзади, не по тексту */
+    .process-step__num,
+    .process-step__title,
+    .process-step__desc {
+      position: relative;
+      z-index: 1;
     }
     /* Пятно света, которое проезжает по карточке — «волна» вместо мигания */
     .process-step::before {
@@ -1662,10 +1669,25 @@
 </div>
 
 <script>
-  // Каскадное вступление hero — запускаем на первом же кадре, без ожидания load
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => document.body.classList.add('is-loaded'));
-  });
+  // Каскадное вступление hero. Играет при загрузке и заново каждый раз,
+  // когда возвращаешься к первому экрану
+  (function () {
+    const parts = document.querySelectorAll('.hero-in');
+    if (!parts.length) return;
+
+    if (!('IntersectionObserver' in window)) {
+      parts.forEach(el => el.classList.add('is-in'));
+      return;
+    }
+
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        entry.target.classList.toggle('is-in', entry.isIntersecting);
+      });
+    }, { threshold: 0.2 });
+
+    parts.forEach(el => io.observe(el));
+  })();
 
   // Форма консультации
   const bookingForm = document.getElementById('bookingForm');
@@ -1848,26 +1870,23 @@
       return;
     }
 
-    const io = new IntersectionObserver((entries, obs) => {
+    // Не отписываемся: ушёл блок из кадра — снимаем класс, вернулся — анимация
+    // проигрывается заново. Так каждое возвращение к блоку выглядит живым
+    const io = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('is-visible');
-          obs.unobserve(entry.target);
-        }
+        entry.target.classList.toggle('is-visible', entry.isIntersecting);
       });
     }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
 
     items.forEach(el => io.observe(el));
 
-    // Провод в блоке «Как я работаю» рисуется, когда блок попадает в кадр
+    // Провод в блоке «Как я работаю» рисуется, когда блок попадает в кадр.
+    // Снятие класса обнуляет и волну подсветки — при возврате она стартует с первого шага
     const steps = document.querySelector('.process__steps');
     if (steps) {
-      const wireIo = new IntersectionObserver((entries, obs) => {
+      const wireIo = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('is-wired');
-            obs.unobserve(entry.target);
-          }
+          entry.target.classList.toggle('is-wired', entry.isIntersecting);
         });
       }, { threshold: 0.25 });
       wireIo.observe(steps);
