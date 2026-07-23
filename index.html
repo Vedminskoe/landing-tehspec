@@ -525,6 +525,15 @@
       filter: drop-shadow(-8px 8px 10px rgba(26,26,26,0.3));
       z-index: 3;
       pointer-events: none;
+      /* парение: плавно покачивается вверх-вниз, будто висит в воздухе */
+      animation: robot-float 4.5s ease-in-out infinite;
+    }
+    @keyframes robot-float {
+      0%, 100% { transform: scaleX(-1) translateY(0); }
+      50%      { transform: scaleX(-1) translateY(-16px); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .services__robot { animation: none; }
     }
     .services__grid {
       display: grid;
