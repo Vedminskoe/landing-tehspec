@@ -666,75 +666,160 @@
         rgba(247,248,246,0.72) 78%,
         rgba(255,255,255,0.97) 100%
       ), url('8.jpg') center calc(25% - 100px) / cover no-repeat;
+      padding-bottom: 200px;   /* выше блок, куб на месте */
     }
     .cases__header { margin-bottom: 48px; }
-    .cases__grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
+    /* ── Ящик-папка: клик → вдавливание → карточки вылетают по инерции ── */
+    .drawer {
+      position: relative;
+      height: 620px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      perspective: 1300px;
     }
-    .case-card {
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow: hidden;
-      background: rgba(255,255,255,0.90);
-      backdrop-filter: blur(4px);
-      transition: box-shadow var(--transition), transform var(--transition);
+    /* Мягкая тень под ящиком */
+    .drawer__shadow {
+      position: absolute;
+      left: 50%;
+      bottom: 40px;
+      z-index: 1;
+      width: 320px;
+      height: 40px;
+      border-radius: 50%;
+      transform: translateX(-50%);
+      background: radial-gradient(ellipse at center, rgba(26,26,26,0.22), rgba(26,26,26,0) 70%);
+      filter: blur(8px);
+      transition: width .5s ease, opacity .5s ease;
     }
-    .case-card:hover {
-      box-shadow: 0 8px 32px rgba(0,0,0,0.08);
-      transform: translateY(-2px);
+    .drawer.is-open .drawer__shadow { width: 420px; opacity: 0.9; }
+    /* Сцена: общее 3D-пространство для граней ящика и карточек.
+       Габариты коробки-куба: 360 (Ш) × 340 (В) × 200 (Г) */
+    .drawer__scene {
+      position: relative;
+      z-index: 2;
+      width: 360px;
+      height: 340px;
+      margin-bottom: 48px;
+      transform-style: preserve-3d;
+      transform: rotateX(15deg) scale(var(--s, 1));
+      transition: transform .22s cubic-bezier(.34,1.56,.64,1);
     }
-    .case-card__image {
-      height: 180px;
-      background: var(--bg-alt);
+    /* Вдавливание: класс вешает JS на mousedown и держит после клика — «щелчок» */
+    .drawer.is-pressing .drawer__scene {
+      transform: rotateX(15deg) scale(calc(var(--s, 1) * 0.955));
+    }
+    .drawer__box {
+      position: absolute;
+      inset: 0;
+      transform-style: preserve-3d;
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+    }
+    /* Слой карточек — тот же 3D-контекст, без своих трансформаций */
+    .drawer__cards {
+      position: absolute;
+      inset: 0;
+      transform-style: preserve-3d;
+    }
+    .drawer__box:focus-visible { outline: 2px solid var(--accent); outline-offset: 10px; }
+    /* Передняя стенка — картинка-текстура с белёсым фильтром, как фон блока */
+    .drawer__face {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+    }
+    .drawer__face--front { width: 440px; height: 420px; }
+    .drawer__face--front {
+      /* rotateX(-15deg) гасит наклон сцены — папка стоит прямо, без перспективы */
+      transform: translate(-50%, -50%) translateZ(100px) rotateX(-15deg);
+      /* тот же белёсый фильтр, что на фото фона блока, поверх текстуры */
+      background:
+        linear-gradient(
+          to bottom,
+          rgba(255,255,255,0.82) 0%,
+          rgba(247,248,246,0.58) 22%,
+          rgba(247,248,246,0.58) 78%,
+          rgba(255,255,255,0.82) 100%
+        ),
+        url('00.png') center / cover no-repeat;
+      border-radius: 40px;
+      box-shadow:
+        0 26px 44px rgba(26,26,26,0.15),
+        0 60px 90px rgba(26,26,26,0.13);
       display: flex;
       align-items: center;
       justify-content: center;
-      color: var(--text-muted);
-      font-size: 13px;
-      border-bottom: 1px solid var(--border);
     }
-    .case-card__body { padding: 22px; }
-    .case-card__tag {
-      display: inline-block;
-      padding: 4px 10px;
-      background: var(--accent-light);
-      color: var(--accent);
-      border-radius: 6px;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      margin-bottom: 12px;
+    .drawer__icon {
+      width: 200px;
+      height: auto;
+      pointer-events: none;
     }
-    .case-card__title {
-      font-family: var(--font-heading);
-      font-size: 22px;
-      letter-spacing: 0.03em;
-      line-height: 1;
-      margin-bottom: 10px;
-    }
-    .case-card__desc {
-      font-size: 13px;
-      color: var(--text-muted);
-      line-height: 1.6;
-    }
-    .case-card__result {
+    /* Карточки живут в той же 3D-сцене — передняя стенка перекрывает их низ.
+       Стоят стопкой вглубь: ближняя ниже, дальние выше и глубже — как в картотеке */
+    .drawer__card {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 420px;
+      height: 230px;
+      margin: 0;
+      padding: 22px 14px 0;
       display: flex;
       align-items: flex-start;
-      gap: 8px;
-      margin-top: 14px;
-      padding-top: 14px;
-      border-top: 1px solid var(--border);
-      font-size: 13px;
-      color: var(--text-muted);
+      justify-content: center;
+      background: linear-gradient(180deg, #FFFFFF, #EDEEEA);
+      border: 1px solid rgba(26,26,26,0.10);
+      border-radius: 18px 18px 5px 5px;
+      box-shadow: 0 -8px 20px rgba(26,26,26,0.10);
+      font-family: var(--font-script);
+      font-size: 30px;
+      line-height: 1;
+      letter-spacing: 0.04em;
+      color: var(--text);
+      text-align: center;
+      white-space: nowrap;
+      cursor: pointer;
+      /* лёгкий наклон назад, вложены в общий наклон сцены;
+         в закрытом виде подняты выше дна, чтобы не торчали снизу из-за стенки */
+      transform: translate(-50%, -50%) translate3d(var(--jx, 0px), -20px, var(--z)) rotateX(-7deg);
+      transition: transform .42s cubic-bezier(.4,0,.7,.5);
+      transition-delay: calc((3 - var(--i)) * 55ms);
     }
-    .case-card__result::before {
-      content: '→';
-      color: var(--accent2);
-      font-weight: 600;
-      flex-shrink: 0;
+    /* открытое: выдвигаются вверх стопкой, с перелётом и осадкой — та самая инерция */
+    .drawer.is-open .drawer__card {
+      transform: translate(-50%, -50%) translate3d(var(--jx, 0px), var(--y), var(--z)) rotateX(-7deg);
+      transition: transform .55s cubic-bezier(.34,1.56,.64,1);
+      transition-delay: calc(var(--i) * 70ms);
+    }
+    .drawer.is-open .drawer__card:hover {
+      transform: translate(-50%, -50%) translate3d(var(--jx, 0px), calc(var(--y) - 18px), var(--z)) rotateX(-7deg);
+    }
+    .drawer__card:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+    /* front → back: ближняя (Дизайн) ниже и спереди, дальняя (Сайты) выше и глубже.
+       Шаг по высоте ровный, глубина небольшая — рядки не сбиваются в кучу */
+    .drawer__card:nth-child(1) { --i: 0; --y: -200px; --z:  18px; --jx: -4px; }
+    .drawer__card:nth-child(2) { --i: 1; --y: -276px; --z:   6px; --jx:  5px; }
+    .drawer__card:nth-child(3) { --i: 2; --y: -352px; --z:  -6px; --jx: -5px; }
+    .drawer__card:nth-child(4) { --i: 3; --y: -428px; --z: -18px; --jx:  4px; }
+    /* Подсказка «тык-тык»: стрелка + надпись + курсор-рука */
+    .drawer__hint {
+      position: absolute;
+      left: 50%;
+      bottom: 400px;
+      z-index: 4;
+      width: 320px;
+      height: auto;
+      transform: translateX(330px);
+      transition: opacity .3s ease;
+      pointer-events: none;
+    }
+    .drawer.is-open .drawer__hint { opacity: 0; }
+    @media (prefers-reduced-motion: reduce) {
+      .drawer__scene, .drawer__card, .drawer__shadow { transition: none; }
     }
 
     /* ── Booking ── */
@@ -1010,7 +1095,6 @@
       .hero__right { order: 5; max-width: 300px; margin: 20px auto 0; }
       .hero__actions { order: 6; margin-top: 20px; }
 
-      .cases__grid { grid-template-columns: 1fr; }
       .services__grid { grid-template-columns: 1fr; }
       /* Робот сидит на карточке «Telegram-боты», как на ПК */
       .service-card--bot { position: relative; }
@@ -1032,6 +1116,15 @@
       .process__steps { grid-template-columns: repeat(2, 1fr); }
       .process__steps::before { display: none; }
       .footer__inner { flex-direction: column; align-items: flex-end; text-align: right; }
+      /* Ящик: сцена целиком мельче, подсказка уезжает под неё, стрелка прячется */
+      .drawer { --s: 0.72; height: 340px; }
+      .drawer__hint {
+        left: 50%;
+        bottom: 8px;
+        transform: translateX(-50%);
+      }
+      .drawer__hint-arrow { display: none; }
+      .drawer__hint-text { font-size: 26px; }
       /* Консультация: цветок поднят вверх */
       #booking {
         background:
@@ -1064,7 +1157,7 @@
         <nav class="header__dropdown" aria-label="Навигация по сайту">
           <a href="#services">Услуги</a>
           <a href="#process">Как я работаю</a>
-          <a href="#cases">Примеры работ</a>
+          <a href="#cases">Портфолио</a>
           <a href="#booking">Консультация</a>
           <a href="#contacts">Контакты</a>
         </nav>
@@ -1196,37 +1289,31 @@
   <div class="container">
     <div class="cases__header">
       <p class="section-label">Кейсы</p>
-      <h2 class="section-title" id="cases-title">Примеры работ</h2>
-      <p class="section-desc">Реальные проекты с реальными результатами. Скоро здесь появятся подробные кейсы.</p>
+      <h2 class="section-title" id="cases-title">Портфолио</h2>
+      <p class="section-desc">Реальные проекты с реальными результатами.</p>
     </div>
-    <div class="cases__grid">
-      <article class="case-card">
-        <div class="case-card__image">[Скриншот или превью]</div>
-        <div class="case-card__body">
-          <span class="case-card__tag">Лендинг</span>
-          <h3 class="case-card__title">[Название проекта или задачи]</h3>
-          <p class="case-card__desc">[Краткое описание: что было, что нужно было сделать]</p>
-          <p class="case-card__result">[Результат: что получилось в итоге]</p>
+    <div class="drawer" id="drawer">
+      <div class="drawer__shadow" aria-hidden="true"></div>
+
+      <!-- Общая 3D-сцена: карточки стоят внутри коробки, передняя стенка их перекрывает -->
+      <div class="drawer__scene">
+        <!-- порядок спереди назад: ближняя ниже, дальняя выше -->
+        <div class="drawer__cards">
+          <button type="button" class="drawer__card" data-cat="design" tabindex="-1">Дизайн</button>
+          <button type="button" class="drawer__card" data-cat="bots"   tabindex="-1">Боты</button>
+          <button type="button" class="drawer__card" data-cat="integr" tabindex="-1">Интеграции</button>
+          <button type="button" class="drawer__card" data-cat="sites"  tabindex="-1">Сайты</button>
         </div>
-      </article>
-      <article class="case-card">
-        <div class="case-card__image">[Скриншот или превью]</div>
-        <div class="case-card__body">
-          <span class="case-card__tag">[Ниша]</span>
-          <h3 class="case-card__title">[Название проекта или задачи]</h3>
-          <p class="case-card__desc">[Краткое описание: что было, что нужно было сделать]</p>
-          <p class="case-card__result">[Результат: что получилось в итоге]</p>
-        </div>
-      </article>
-      <article class="case-card">
-        <div class="case-card__image">[Скриншот или превью]</div>
-        <div class="case-card__body">
-          <span class="case-card__tag">[Ниша]</span>
-          <h3 class="case-card__title">[Название проекта или задачи]</h3>
-          <p class="case-card__desc">[Краткое описание: что было, что нужно было сделать]</p>
-          <p class="case-card__result">[Результат: что получилось в итоге]</p>
-        </div>
-      </article>
+
+        <button type="button" class="drawer__box" id="drawerBox" aria-expanded="false" aria-label="Открыть портфолио">
+          <div class="drawer__face drawer__face--front">
+            <img class="drawer__icon" src="01.png" alt="" />
+          </div>
+        </button>
+      </div>
+
+      <!-- Подсказка «тык-тык» со стрелкой — картинкой, остриё указывает на куб -->
+      <img class="drawer__hint" src="1.png" alt="" aria-hidden="true" />
     </div>
   </div>
 </section>
@@ -1434,6 +1521,35 @@
     });
   })();
 
+  // Ящик-папка: клик — вдавливание, затем карточки вылетают по инерции
+  (function () {
+    const drawer = document.getElementById('drawer');
+    if (!drawer) return;
+    const box = document.getElementById('drawerBox');
+    const cards = Array.from(drawer.querySelectorAll('.drawer__card'));
+
+    // вдавливание начинается сразу по нажатию, а не после отпускания
+    box.addEventListener('pointerdown', () => drawer.classList.add('is-pressing'));
+
+    box.addEventListener('click', () => {
+      // «щелчок» — держим вдавленным чуть дольше самого клика
+      drawer.classList.add('is-pressing');
+      setTimeout(() => drawer.classList.remove('is-pressing'), 140);
+
+      const open = drawer.classList.toggle('is-open');
+      box.setAttribute('aria-expanded', open);
+      // в закрытом состоянии карточки не должны ловить фокус
+      cards.forEach(c => { c.tabIndex = open ? 0 : -1; });
+    });
+
+    // Клик по карточке — лист с проектами делаем следующим шагом
+    cards.forEach(card => {
+      card.addEventListener('click', () => {
+        // TODO: открыть лист проектов категории card.dataset.cat
+      });
+    });
+  })();
+
   // Выпадающее меню «Менюшка»
   const headerMenu = document.getElementById('headerMenu');
   const menuToggle = document.getElementById('menuToggle');
@@ -1460,7 +1576,7 @@
     // что анимируем: заголовки секций, карточки, шаги, форма, контакты
     const selectors = [
       '.section-label', '.section-title', '.section-desc',
-      '.service-card', '.process-step', '.case-card',
+      '.service-card', '.process-step', '.drawer',
       '.booking__inner', '.contacts__inner'
     ];
     const items = document.querySelectorAll(selectors.join(','));
@@ -1470,7 +1586,7 @@
 
     // лёгкая каскадная задержка для соседних карточек одной группы
     document.querySelectorAll(
-      '.services__grid, .process__steps, .cases__grid'
+      '.services__grid, .process__steps'
     ).forEach(group => {
       group.querySelectorAll('.reveal').forEach((el, i) => {
         el.style.setProperty('--reveal-delay', (i * 0.09) + 's');
