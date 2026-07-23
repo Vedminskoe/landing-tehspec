@@ -217,6 +217,8 @@
       pointer-events: none;
       user-select: none;
     }
+    /* амперсанд мельче — не выглядит жирным рядом с буквами */
+    .header__amp { font-size: 0.7em; }
     .header__logo::after {
       content: '';
       width: 6px;
@@ -1188,7 +1190,7 @@
           <a href="#contacts">Контакты</a>
         </nav>
       </div>
-      <span class="header__tagline" aria-hidden="true">техспец &amp; граф.дизайнер</span>
+      <span class="header__tagline" aria-hidden="true">техспец <span class="header__amp">&amp;</span> граф.дизайнер</span>
       <a href="https://t.me/vedminskoe" target="_blank" rel="noopener" class="header__contact-link">Связаться</a>
     </div>
   </div>
