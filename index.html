@@ -210,6 +210,18 @@
       position: relative;
       display: inline-block;
     }
+    /* Полоска прогресса прокрутки — золотая линия по нижнему краю шапки */
+    .header__progress {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -1px;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent2), var(--accent2-hover));
+      transform: scaleX(var(--p, 0));
+      transform-origin: left center;
+      pointer-events: none;
+    }
     .header__logo {
       display: inline-flex;
       align-items: center;
@@ -526,6 +538,25 @@
       display: flex;
       align-items: stretch;
       gap: 14px;
+    }
+    /* Подсказка прокрутки — пульсирующий шеврон под hero */
+    .hero__scroll {
+      display: flex;
+      justify-content: center;
+      margin-top: 40px;
+      color: var(--text-muted);
+      opacity: 1;
+      transition: opacity .4s ease;
+    }
+    .hero__scroll svg { animation: scroll-bob 2s ease-in-out infinite; }
+    .hero__scroll:hover { color: var(--accent); }
+    body.is-scrolled .hero__scroll { opacity: 0; pointer-events: none; }
+    @keyframes scroll-bob {
+      0%, 100% { transform: translateY(0);   opacity: .55; }
+      50%      { transform: translateY(7px); opacity: 1; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .hero__scroll svg { animation: none; }
     }
     .hero__photo {
       flex: 1;
@@ -1162,6 +1193,7 @@
       .hero { padding: 72px 0 60px; }
       .nav { display: none; }
       .burger { display: flex; }
+      .hero__scroll { display: none; }
       .process__steps { grid-template-columns: repeat(2, 1fr); }
       .process__steps::before { display: none; }
       .footer__inner { flex-direction: column; align-items: flex-end; text-align: right; }
@@ -1216,6 +1248,7 @@
       <a href="https://t.me/vedminskoe" target="_blank" rel="noopener" class="header__contact-link">Связаться</a>
     </div>
   </div>
+  <div class="header__progress" id="scrollProgress" aria-hidden="true"></div>
 </header>
 
 <!-- ── Hero ── -->
@@ -1255,6 +1288,9 @@
       </div>
 
     </div>
+    <a href="#services" class="hero__scroll" aria-label="К списку услуг">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </a>
   </div>
 </section>
 
@@ -1664,6 +1700,29 @@
     }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
 
     items.forEach(el => io.observe(el));
+  })();
+
+  // Скролл: полоска прогресса в шапке + скрытие стрелки-подсказки
+  (function () {
+    const bar = document.getElementById('scrollProgress');
+    if (!bar) return;
+    let ticking = false;
+
+    const update = () => {
+      ticking = false;
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      const p = max > 0 ? Math.min(window.scrollY / max, 1) : 0;
+      bar.style.setProperty('--p', p);
+      document.body.classList.toggle('is-scrolled', window.scrollY > 120);
+    };
+
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(update);
+      }
+    }, { passive: true });
+    update();
   })();
 
   // Магнитные кнопки: притягиваются к курсору на подлёте и следуют за ним
