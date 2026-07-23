@@ -756,9 +756,65 @@
       8%, 82%  { opacity: 1; }
       100%     { left: 91%; opacity: 0; }
     }
+    /* Автоподсветка шагов: карточки загораются по очереди, без курсора.
+       Цикл 3.2s = ровно один пробег импульса по проводу, задержки подобраны
+       так, что шаг вспыхивает в момент, когда импульс до него доезжает */
+    .process__steps.is-wired .process-step {
+      animation: step-glow 3.2s ease-in-out infinite;
+    }
+    .process__steps.is-wired .process-step__num {
+      animation: num-glow 3.2s ease-in-out infinite;
+    }
+    .process__steps.is-wired .process-step:nth-child(1),
+    .process__steps.is-wired .process-step:nth-child(1) .process-step__num { animation-delay: 1.02s; }
+    .process__steps.is-wired .process-step:nth-child(2),
+    .process__steps.is-wired .process-step:nth-child(2) .process-step__num { animation-delay: 1.99s; }
+    .process__steps.is-wired .process-step:nth-child(3),
+    .process__steps.is-wired .process-step:nth-child(3) .process-step__num { animation-delay: 2.97s; }
+    .process__steps.is-wired .process-step:nth-child(4),
+    .process__steps.is-wired .process-step:nth-child(4) .process-step__num { animation-delay: 3.94s; }
+    @keyframes step-glow {
+      0%, 100% {
+        transform: translateY(0);
+        border-color: transparent;
+        box-shadow: 0 14px 30px rgba(46,125,82,0);
+      }
+      7%, 20% {
+        transform: translateY(-6px);
+        border-color: var(--accent-light);
+        box-shadow: 0 14px 30px rgba(46,125,82,0.18);
+      }
+      34% {
+        transform: translateY(0);
+        border-color: transparent;
+        box-shadow: 0 14px 30px rgba(46,125,82,0);
+      }
+    }
+    @keyframes num-glow {
+      0%, 100% {
+        background: var(--bg);
+        color: var(--accent);
+        box-shadow: 0 0 0 5px rgba(46,125,82,0.08);
+      }
+      7%, 20% {
+        background: var(--accent);
+        color: #fff;
+        box-shadow: 0 0 0 9px rgba(46,125,82,0.18);
+      }
+      34% {
+        background: var(--bg);
+        color: var(--accent);
+        box-shadow: 0 0 0 5px rgba(46,125,82,0.08);
+      }
+    }
+    /* курсор в блоке — цикл выключаем целиком, чтобы hover снова работал */
+    .process__steps:hover .process-step,
+    .process__steps:hover .process-step__num { animation: none; }
     @media (prefers-reduced-motion: reduce) {
       .process__steps::before { transform: scaleX(1); transition: none; }
       .process__steps::after { animation: none; }
+      .process__steps.is-wired .process-step,
+      .process__steps.is-wired .process-step__num { animation: none; }
     }
     .process-step {
       display: flex;
