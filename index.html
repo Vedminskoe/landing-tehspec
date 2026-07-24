@@ -635,6 +635,22 @@
     .service-card--tilt.is-tilting {
       transition: border-color var(--transition), box-shadow var(--transition), transform .12s ease-out;
     }
+    /* Подсветка, идущая за курсором по карточке услуги */
+    .service-card--tilt::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity .3s ease;
+      background: radial-gradient(
+        260px circle at var(--mx, 50%) var(--my, 50%),
+        rgba(95,201,143,0.22),
+        rgba(95,201,143,0) 70%
+      );
+    }
+    .service-card--tilt.is-tilting::after { opacity: 1; }
     /* Иконки услуг «прочерчиваются» при первом появлении карточки */
     /* .reveal вешает JS — без него иконки просто отрисованы, ничего не прячем */
     .service-card.reveal .service-card__icon svg * {
@@ -646,6 +662,7 @@
     .service-card.is-visible .service-card__icon svg * { stroke-dashoffset: 0; }
     @media (prefers-reduced-motion: reduce) {
       .service-card.reveal .service-card__icon svg * { stroke-dashoffset: 0; transition: none; }
+      .service-card--tilt::after { display: none; }
     }
     .service-card__icon {
       width: 48px; height: 48px;
@@ -779,37 +796,52 @@
       align-items: center;
       text-align: center;
       padding: 28px 20px;
-      /* плотнее прежнего: сквозь полупрозрачный фон свет снизу просвечивал
-         всей карточкой, а нужен только контур */
-      background: rgba(255,255,255,0.95);
-      backdrop-filter: blur(8px);
+      /* фон живёт не здесь, а в ::after — иначе свет из ::before не спрятать
+         за карточкой: .reveal вешает will-change, карточка становится стековым
+         контекстом, и z-index: -1 перестаёт уводить слой за её фон */
+      background: transparent;
       border-radius: 16px;
       border: 1px solid transparent;
       position: relative;
       transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
     }
-    /* Пятно света едет ПОД карточкой: z-index -1 уводит его за собственный фон
-       карточки, а размер чуть больше самой карточки — наружу пробивается
-       только мягкое свечение по контуру. Поэтому у .process-step нет ни
-       z-index, ни overflow: иначе слой либо всплывёт наверх, либо обрежется */
+    /* Слои карточки, снизу вверх:
+       ::before — пятно света, шире карточки, размытое
+       ::after  — непрозрачная поверхность, перекрывает свет по площади
+       контент  — поднят над поверхностью через z-index
+       Наружу пробивается только то, что вылезло за края → свечение по контуру */
     .process-step::before {
       content: '';
       position: absolute;
-      top: -14px;
-      bottom: -14px;
-      left: -14px;
-      width: calc(100% + 28px);
-      z-index: -1;
-      border-radius: 26px;
+      top: -16px;
+      bottom: -16px;
+      left: -16px;
+      width: calc(100% + 32px);
+      border-radius: 28px;
       pointer-events: none;
       opacity: 0;
-      filter: blur(15px);
+      filter: blur(16px);
       background: linear-gradient(
         90deg,
         rgba(46,125,82,0) 12%,
-        rgba(46,125,82,0.85) 50%,
+        rgba(46,125,82,0.8) 50%,
         rgba(46,125,82,0) 88%
       );
+    }
+    .process-step::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: rgba(255,255,255,0.93);
+      backdrop-filter: blur(8px);
+      pointer-events: none;
+    }
+    .process-step__num,
+    .process-step__title,
+    .process-step__desc {
+      position: relative;
+      z-index: 1;
     }
     .process-step:hover {
       transform: translateY(-4px);
@@ -1867,6 +1899,8 @@
         const r = card.getBoundingClientRect();
         const px = (lastX - r.left) / r.width;   // 0..1
         const py = (lastY - r.top) / r.height;
+        card.style.setProperty('--mx', (px * 100) + '%');
+        card.style.setProperty('--my', (py * 100) + '%');
         const ry = (px - 0.5) * 2 * MAX_DEG;
         const rx = (0.5 - py) * 2 * MAX_DEG;
         card.style.transform =
