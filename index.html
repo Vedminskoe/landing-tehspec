@@ -739,7 +739,7 @@
     /* Ореол просто разгорается и гаснет на месте — никакого движения */
     @keyframes step-halo {
       0%          { opacity: 0; }
-      4%, 21%     { opacity: 1; }
+      4%, 21%     { opacity: .55; }
       25%, 100%   { opacity: 0; }
     }
     /* Подъём, рамка и тень идут в такт ореолу */
@@ -750,9 +750,9 @@
         box-shadow: 0 14px 30px rgba(46,125,82,0);
       }
       4%, 21% {
-        transform: translateY(-6px);
+        transform: translateY(-4px);
         border-color: var(--accent-light);
-        box-shadow: 0 14px 30px rgba(46,125,82,0.18);
+        box-shadow: 0 12px 26px rgba(46,125,82,0.10);
       }
     }
     @keyframes num-glow {
@@ -762,9 +762,9 @@
         box-shadow: 0 0 0 5px rgba(46,125,82,0.08);
       }
       4%, 21% {
-        background: var(--accent);
-        color: #fff;
-        box-shadow: 0 0 0 9px rgba(46,125,82,0.18);
+        background: var(--accent-light);
+        color: var(--accent);
+        box-shadow: 0 0 0 7px rgba(46,125,82,0.10);
       }
     }
     /* курсор в блоке — цикл выключаем целиком, чтобы hover снова работал */
@@ -808,7 +808,7 @@
       pointer-events: none;
       opacity: 0;
       filter: blur(18px);
-      background: var(--accent-soft);
+      background: rgba(95,201,143,0.45);
     }
     .process-step::after {
       content: '';
