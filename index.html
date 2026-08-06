@@ -315,13 +315,6 @@
     /* ── Hero ── */
     .hero {
       padding: 72px 0 80px;
-      background: linear-gradient(
-        to bottom,
-        rgba(255,255,255,0.98) 0%,
-        rgba(255,255,255,0.87) 18%,
-        rgba(255,255,255,0.87) 78%,
-        rgba(255,255,255,0.98) 100%
-      ), url('5.jpg') center / cover no-repeat;
     }
     .hero__inner {
       display: grid;
@@ -529,15 +522,6 @@
     }
 
     /* ── Services ── */
-    #services {
-      background: linear-gradient(
-        to bottom,
-        rgba(255,255,255,0.97) 0%,
-        rgba(247,248,246,0.72) 18%,
-        rgba(247,248,246,0.72) 78%,
-        rgba(255,255,255,0.97) 100%
-      ), url('6.jpg') center / cover no-repeat;
-    }
     #services .container { position: relative; overflow: visible; }
     .services__top {
       margin-bottom: 48px;
@@ -654,20 +638,6 @@
     }
 
     /* ── Process ── */
-    #process {
-      background: linear-gradient(
-        to right,
-        rgba(255,255,255,0) 70%,
-        rgba(255,255,255,0.9) 90%,
-        rgba(255,255,255,0.98) 100%
-      ), linear-gradient(
-        to bottom,
-        rgba(255,255,255,0.97) 0%,
-        rgba(255,255,255,0.55) 18%,
-        rgba(255,255,255,0.55) 78%,
-        rgba(255,255,255,0.97) 100%
-      ), url('7.jpg') center / cover no-repeat;
-    }
     .process__header {
       margin-bottom: 52px;
     }
@@ -845,196 +815,21 @@
     }
 
     /* ── Cases ── */
-    #cases {
-      background: linear-gradient(
-        to bottom,
-        rgba(255,255,255,0.97) 0%,
-        rgba(247,248,246,0.72) 18%,
-        rgba(247,248,246,0.72) 78%,
-        rgba(255,255,255,0.97) 100%
-      ), url('8.jpg') center calc(25% - 100px) / cover no-repeat;
-      padding-bottom: 200px;   /* выше блок, куб на месте */
-    }
     .cases__header { margin-bottom: 48px; }
-    /* ── Ящик-папка: клик → вдавливание → карточки вылетают по инерции ── */
-    .drawer {
-      position: relative;
-      height: 620px;
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-      perspective: 1300px;
-    }
-    /* Мягкая тень под ящиком */
-    .drawer__shadow {
-      position: absolute;
-      left: 50%;
-      bottom: 40px;
-      z-index: 1;
-      width: 320px;
-      height: 40px;
-      border-radius: 50%;
-      transform: translateX(-50%);
-      background: radial-gradient(ellipse at center, rgba(26,26,26,0.22), rgba(26,26,26,0) 70%);
-      filter: blur(8px);
-      transition: width .5s ease, opacity .5s ease;
-    }
-    .drawer.is-open .drawer__shadow { width: 420px; opacity: 0.9; }
-    /* Сцена: общее 3D-пространство для граней ящика и карточек.
-       Габариты коробки-куба: 360 (Ш) × 340 (В) × 200 (Г) */
-    .drawer__scene {
-      position: relative;
-      z-index: 2;
-      width: 360px;
-      height: 340px;
-      margin-bottom: 48px;
-      transform-style: preserve-3d;
-      transform: rotateX(15deg) scale(var(--s, 1));
-      transition: transform .22s cubic-bezier(.34,1.56,.64,1);
-    }
-    /* Вдавливание: класс вешает JS на mousedown и держит после клика — «щелчок» */
-    .drawer.is-pressing .drawer__scene {
-      transform: rotateX(15deg) scale(calc(var(--s, 1) * 0.955));
-    }
-    .drawer__box {
-      position: absolute;
-      inset: 0;
-      transform-style: preserve-3d;
-      background: none;
-      border: none;
-      padding: 0;
-      cursor: pointer;
-    }
-    /* Слой карточек — тот же 3D-контекст, без своих трансформаций */
-    .drawer__cards {
-      position: absolute;
-      inset: 0;
-      transform-style: preserve-3d;
-    }
-    .drawer__box:focus-visible { outline: 2px solid var(--accent); outline-offset: 10px; }
-    /* Передняя стенка — картинка-текстура с белёсым фильтром, как фон блока */
-    .drawer__face {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-    }
-    .drawer__face--front { width: 440px; height: 420px; }
-    .drawer__face--front {
-      /* rotateX(-15deg) гасит наклон сцены — папка стоит прямо, без перспективы */
-      transform: translate(-50%, -50%) translateZ(100px) rotateX(-15deg);
-      /* тот же белёсый фильтр, что на фото фона блока, поверх текстуры */
-      background:
-        linear-gradient(
-          to bottom,
-          rgba(255,255,255,0.82) 0%,
-          rgba(247,248,246,0.58) 22%,
-          rgba(247,248,246,0.58) 78%,
-          rgba(255,255,255,0.82) 100%
-        ),
-        url('00.png') center / cover no-repeat;
-      border-radius: 40px;
-      box-shadow:
-        0 26px 44px rgba(26,26,26,0.15),
-        0 60px 90px rgba(26,26,26,0.13);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .drawer__icon {
-      width: 200px;
-      height: auto;
-      pointer-events: none;
-    }
-    /* Карточки живут в той же 3D-сцене — передняя стенка перекрывает их низ.
-       Стоят стопкой вглубь: ближняя ниже, дальние выше и глубже — как в картотеке */
-    .drawer__card {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      width: 420px;
-      height: 230px;
-      margin: 0;
-      padding: 22px 14px 0;
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
-      background: linear-gradient(180deg, #FFFFFF, #EDEEEA);
-      border: 1px solid rgba(26,26,26,0.10);
-      border-radius: 18px 18px 5px 5px;
-      box-shadow: 0 -8px 20px rgba(26,26,26,0.10);
-      font-family: var(--font-script);
-      font-size: 30px;
-      line-height: 1;
-      letter-spacing: 0.04em;
-      color: var(--text);
-      text-align: center;
-      white-space: nowrap;
-      cursor: pointer;
-      /* лёгкий наклон назад, вложены в общий наклон сцены;
-         в закрытом виде подняты выше дна, чтобы не торчали снизу из-за стенки */
-      transform: translate(-50%, -50%) translate3d(var(--jx, 0px), -20px, var(--z)) rotateX(-7deg);
-      transition: transform .42s cubic-bezier(.4,0,.7,.5);
-      transition-delay: calc((3 - var(--i)) * 55ms);
-    }
-    /* открытое: выдвигаются вверх стопкой, с перелётом и осадкой — та самая инерция */
-    .drawer.is-open .drawer__card {
-      transform: translate(-50%, -50%) translate3d(var(--jx, 0px), var(--y), var(--z)) rotateX(-7deg);
-      transition: transform .55s cubic-bezier(.34,1.56,.64,1);
-      transition-delay: calc(var(--i) * 70ms);
-    }
-    .drawer.is-open .drawer__card:hover {
-      transform: translate(-50%, -50%) translate3d(var(--jx, 0px), calc(var(--y) - 18px), var(--z)) rotateX(-7deg);
-    }
-    .drawer__card:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
-    /* front → back: ближняя (Дизайн) ниже и спереди, дальняя (Сайты) выше и глубже.
-       Шаг по высоте ровный, глубина небольшая — рядки не сбиваются в кучу */
-    .drawer__card:nth-child(1) { --i: 0; --y: -200px; --z:  18px; --jx: -4px; }
-    .drawer__card:nth-child(2) { --i: 1; --y: -276px; --z:   6px; --jx:  5px; }
-    .drawer__card:nth-child(3) { --i: 2; --y: -352px; --z:  -6px; --jx: -5px; }
-    .drawer__card:nth-child(4) { --i: 3; --y: -428px; --z: -18px; --jx:  4px; }
-    /* Подсказка «тык-тык»: стрелка + надпись + курсор-рука */
-    .drawer__hint {
-      position: absolute;
-      left: 50%;
-      bottom: 400px;
-      z-index: 4;
-      width: 320px;
-      height: auto;
-      transform: translateX(330px);
-      transition: opacity .3s ease;
-      pointer-events: none;
-    }
-    .drawer.is-open .drawer__hint { opacity: 0; }
-    @media (prefers-reduced-motion: reduce) {
-      .drawer__scene, .drawer__card, .drawer__shadow { transition: none; }
-    }
-
-    /* ── Booking ── */
-    #booking {
-      background: linear-gradient(
-        to bottom,
-        rgba(255,255,255,0.97) 0%,
-        rgba(255,255,255,0.68) 18%,
-        rgba(255,255,255,0.68) 78%,
-        rgba(255,255,255,0.97) 100%
-      ), url('9.jpg') center calc(50% + 100px) / cover no-repeat;
-    }
-    .booking__inner {
-      max-width: 640px;
-      margin: 0 auto;
-    }
-    .booking__header { margin-bottom: 40px; }
+    /* место под будущее портфолио — держит высоту блока */
+    .cases__placeholder { min-height: 480px; }
+    /* ── Форма заявки (живёт в блоке контактов) ── */
     .booking-form__grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 20px;
-      margin-bottom: 20px;
+      gap: 16px;
+      margin-bottom: 16px;
     }
     .field {
       display: flex;
       flex-direction: column;
       gap: 6px;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
     }
     .field:last-of-type { margin-bottom: 0; }
     .field__label {
@@ -1058,7 +853,7 @@
       outline: none;
       appearance: none;
     }
-    .field__input::placeholder { color: var(--text-muted); }
+    .field__input::placeholder { color: #A9AFB8; }
     .field__input:focus {
       border-color: var(--accent);
       box-shadow: 0 0 0 3px rgba(46,125,82,0.12);
@@ -1067,7 +862,11 @@
        после попытки отправить или ухода из поля — пока человек печатает, красного нет */
     .field__input:user-invalid { border-color: #D95252; }
     .field__input:user-invalid:focus { box-shadow: 0 0 0 3px rgba(217,82,82,0.12); }
-    .field__textarea { resize: vertical; min-height: 108px; line-height: 1.6; }
+    .field__textarea { resize: vertical; min-height: 88px; line-height: 1.6; }
+    /* форма занимает всю карточку, поле «Опишите задачу» растёт под её высоту */
+    .booking-form { display: flex; flex-direction: column; flex: 1; }
+    .booking-form > .field { flex: 1; }
+    .booking-form > .field .field__textarea { flex: 1; }
     .field__error {
       font-size: 12px;
       color: #D95252;
@@ -1087,8 +886,8 @@
     .booking-form__submit {
       width: 100%;
       justify-content: center;
-      margin-top: 24px;
-      padding: 16px 28px;
+      margin-top: 18px;
+      padding: 14px 28px;
       font-size: 15px;
     }
     /* Согласие на обработку ПД */
@@ -1219,17 +1018,22 @@
     }
 
     /* ── Contacts ── */
-    .contacts {
-      background: linear-gradient(
-        to bottom,
-        rgba(255,255,255,0.98) 0%,
-        rgba(247,248,246,0.82) 18%,
-        rgba(247,248,246,0.82) 78%,
-        rgba(255,255,255,0.98) 100%
-      ), url('10.jpg') center / cover no-repeat;
-    }
     .contacts__inner { width: 100%; }
-    .contacts__header { max-width: 720px; margin-bottom: 44px; }
+    /* Слева — текст, справа — форма заявки */
+    .contacts__grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: stretch;
+      gap: 64px;
+    }
+    /* Левая колонка: текст сверху, контакты прижаты к низу формы */
+    .contacts__col {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 40px;
+    }
+    .contacts__header { max-width: 560px; }
     .contacts__title {
       font-family: var(--font-heading);
       font-size: clamp(40px, 5vw, 64px);
@@ -1246,25 +1050,23 @@
       color: var(--text-muted);
       line-height: 1.7;
     }
-    /* Нижняя строка — на всю ширину контейнера: кнопки слева, контакты справа */
-    .contacts__bottom {
+    /* Карточка тянется от заголовка (отступ = высота плашки «Контакты»)
+       до нижнего края ссылок слева; лишнюю высоту забирает textarea */
+    .contacts__form {
+      align-self: stretch;
+      margin-top: 40px;
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 28px;
-      padding-top: 32px;
-      border-top: 1px solid var(--border);
-    }
-    .contacts__actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 14px;
+      flex-direction: column;
+      padding: 26px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,0.88);
+      backdrop-filter: blur(4px);
     }
     .contacts__meta {
       display: flex;
       flex-direction: column;
-      align-items: flex-end;
+      align-items: flex-start;
       gap: 10px;
     }
     /* Живая строка статуса: точка мягко пульсирует */
@@ -1308,12 +1110,12 @@
       border-color: var(--accent);
     }
     .contacts__direct span { margin: 0 10px; opacity: .5; }
-    @media (max-width: 720px) {
-      .contacts__bottom { justify-content: flex-start; }
-      .contacts__meta { align-items: flex-start; }
+    @media (max-width: 900px) {
+      .contacts__grid { grid-template-columns: 1fr; gap: 36px; }
+      .contacts__header { max-width: 720px; }
+      .contacts__form { margin-top: 0; }
     }
     @media (max-width: 520px) {
-      .contacts__actions .btn { width: 100%; justify-content: center; }
       .contacts__direct span { display: block; height: 0; margin: 6px 0; overflow: hidden; }
     }
 
@@ -1466,25 +1268,7 @@
       .footer__top { grid-template-columns: 1fr 1fr; gap: 32px; }
       .footer__brand { grid-column: 1 / -1; }
       .footer__bottom { flex-direction: column; align-items: flex-start; }
-      /* Ящик: сцена целиком мельче, подсказка уезжает под неё */
-      .drawer { --s: 0.72; height: 340px; }
-      .drawer__hint {
-        left: 50%;
-        bottom: 8px;
-        transform: translateX(-50%);
-      }
-      /* Консультация: цветок поднят вверх */
-      #booking {
-        background:
-          linear-gradient(
-            to bottom,
-            rgba(255,255,255,0.97) 0%,
-            rgba(255,255,255,0.72) 14%,
-            rgba(255,255,255,0.72) 60%,
-            rgba(255,255,255,0.9) 100%
-          ),
-          url('9.jpg') center top / cover no-repeat;
-      }
+      .cases__placeholder { min-height: 300px; }
     }
 
     @media (max-width: 480px) {
@@ -1507,7 +1291,6 @@
           <a href="#services">Услуги</a>
           <a href="#process">Как я работаю</a>
           <a href="#cases">Портфолио</a>
-          <a href="#booking">Консультация</a>
           <a href="#contacts">Контакты</a>
         </nav>
       </div>
@@ -1648,72 +1431,7 @@
       <h2 class="section-title" id="cases-title">Портфолио</h2>
       <p class="section-desc">Реальные проекты с реальными результатами.</p>
     </div>
-    <div class="drawer" id="drawer">
-      <div class="drawer__shadow" aria-hidden="true"></div>
-
-      <!-- Общая 3D-сцена: карточки стоят внутри коробки, передняя стенка их перекрывает -->
-      <div class="drawer__scene">
-        <!-- порядок спереди назад: ближняя ниже, дальняя выше -->
-        <div class="drawer__cards">
-          <button type="button" class="drawer__card" data-cat="design" tabindex="-1">Дизайн</button>
-          <button type="button" class="drawer__card" data-cat="bots"   tabindex="-1">Боты</button>
-          <button type="button" class="drawer__card" data-cat="integr" tabindex="-1">Интеграции</button>
-          <button type="button" class="drawer__card" data-cat="sites"  tabindex="-1">Сайты</button>
-        </div>
-
-        <button type="button" class="drawer__box" id="drawerBox" aria-expanded="false" aria-label="Открыть портфолио">
-          <div class="drawer__face drawer__face--front">
-            <img class="drawer__icon" src="01.png" alt="" />
-          </div>
-        </button>
-      </div>
-
-      <!-- Подсказка «тык-тык» со стрелкой — картинкой, остриё указывает на куб -->
-      <img class="drawer__hint" src="1.png" alt="" aria-hidden="true" />
-    </div>
-  </div>
-</section>
-
-<!-- ── Booking ── -->
-<section class="section" id="booking" aria-labelledby="booking-title">
-  <div class="container">
-    <div class="booking__inner">
-      <div class="booking__header">
-        <p class="section-label">Консультация</p>
-        <h2 class="section-title" id="booking-title">Запишитесь на консультацию</h2>
-        <p class="section-desc">Оставьте заявку — разберём вашу задачу и обсудим варианты решения.</p>
-      </div>
-      <form class="booking-form" id="bookingForm">
-        <div class="booking-form__grid">
-          <div class="field">
-            <label class="field__label" for="fieldName">Имя <span class="field__required">*</span></label>
-            <input class="field__input" type="text" id="fieldName" name="name" placeholder="Как вас зовут?" autocomplete="given-name" required />
-            <p class="field__error">Пожалуйста, введите ваше имя</p>
-          </div>
-          <div class="field">
-            <label class="field__label" for="fieldTg">Telegram <span class="field__required">*</span></label>
-            <input class="field__input" type="text" id="fieldTg" name="telegram" placeholder="@username" autocomplete="off" required />
-            <p class="field__error">Пожалуйста, укажите ваш Telegram</p>
-          </div>
-        </div>
-        <div class="field">
-          <label class="field__label" for="fieldTask">Опишите задачу <span class="field__optional">(необязательно)</span></label>
-          <textarea class="field__input field__textarea" id="fieldTask" name="task" placeholder="Расскажите, что нужно сделать — в двух словах"></textarea>
-        </div>
-        <!-- honeypot: скрыто от людей, заполняют только боты -->
-        <input class="field__honeypot" type="text" id="fieldWebsite" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" />
-        <label class="field__consent">
-          <input type="checkbox" id="fieldConsent" name="consent" required />
-          <span>Я соглашаюсь с <a href="privacy.html" target="_blank" rel="noopener">Политикой обработки персональных данных</a></span>
-        </label>
-        <p class="field__error">Нужно согласие на обработку персональных данных</p>
-        <button type="submit" class="btn btn--primary booking-form__submit">Записаться на консультацию</button>
-      </form>
-      <div class="booking-success" id="bookingSuccess" aria-live="polite">
-        <div class="booking-success__icon">✓</div>
-        <p class="booking-success__text">Спасибо, я свяжусь с тобой в течение дня</p>
-      </div>
-    </div>
+    <div class="cases__placeholder"></div>
   </div>
 </section>
 
@@ -1721,29 +1439,53 @@
 <section class="section contacts" id="contacts" aria-labelledby="contacts-title">
   <div class="container">
     <div class="contacts__inner">
-      <div class="contacts__header">
-        <p class="section-label">Контакты</p>
-        <h2 class="contacts__title" id="contacts-title">Расскажите,<br /><em>что нужно сделать</em></h2>
-        <p class="contacts__desc">Опишите задачу своими словами — что происходит сейчас и какого результата ждёте. Уточню детали и предложу, как это лучше собрать. Не знаете, с чего начать — разберём, что уже есть, и составим план.</p>
-      </div>
-      <div class="contacts__bottom">
-        <div class="contacts__actions">
-          <a href="https://t.me/vedminskoe" target="_blank" rel="noopener" class="btn btn--primary">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
-            Написать в Telegram
-          </a>
-          <a href="mailto:vedminskoe@yandex.ru" class="btn btn--outline">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-            Написать на почту
-          </a>
+      <div class="contacts__grid">
+        <div class="contacts__col">
+          <div class="contacts__header">
+            <p class="section-label">Контакты</p>
+            <h2 class="contacts__title" id="contacts-title">Расскажите,<br /><em>что нужно сделать</em></h2>
+            <p class="contacts__desc">Опишите задачу своими словами — что происходит сейчас и какого результата ждёте. Уточню детали и предложу, как это лучше собрать. Не знаете, с чего начать — разберём, что уже есть, и составим план.</p>
+          </div>
+          <div class="contacts__meta">
+            <p class="contacts__status">Работаю удалённо, +2 часа к Москве</p>
+            <p class="contacts__direct">
+              <a href="https://t.me/vedminskoe" target="_blank" rel="noopener">@vedminskoe</a>
+              <span>·</span>
+              <a href="mailto:vedminskoe@yandex.ru">vedminskoe@yandex.ru</a>
+            </p>
+          </div>
         </div>
-        <div class="contacts__meta">
-          <p class="contacts__status">Работаю удалённо, +2 часа к Москве</p>
-          <p class="contacts__direct">
-            <a href="https://t.me/vedminskoe" target="_blank" rel="noopener">@vedminskoe</a>
-            <span>·</span>
-            <a href="mailto:vedminskoe@yandex.ru">vedminskoe@yandex.ru</a>
-          </p>
+        <div class="contacts__form">
+          <form class="booking-form" id="bookingForm">
+            <div class="booking-form__grid">
+              <div class="field">
+                <label class="field__label" for="fieldName">Имя <span class="field__required">*</span></label>
+                <input class="field__input" type="text" id="fieldName" name="name" placeholder="Как вас зовут?" autocomplete="given-name" required />
+                <p class="field__error">Пожалуйста, введите ваше имя</p>
+              </div>
+              <div class="field">
+                <label class="field__label" for="fieldTg">Telegram <span class="field__required">*</span></label>
+                <input class="field__input" type="text" id="fieldTg" name="telegram" placeholder="@username" autocomplete="off" required />
+                <p class="field__error">Пожалуйста, укажите ваш Telegram</p>
+              </div>
+            </div>
+            <div class="field">
+              <label class="field__label" for="fieldTask">Опишите задачу <span class="field__optional">(необязательно)</span></label>
+              <textarea class="field__input field__textarea" id="fieldTask" name="task" placeholder="Расскажите, что нужно сделать — в двух словах"></textarea>
+            </div>
+            <!-- honeypot: скрыто от людей, заполняют только боты -->
+            <input class="field__honeypot" type="text" id="fieldWebsite" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" />
+            <label class="field__consent">
+              <input type="checkbox" id="fieldConsent" name="consent" required />
+              <span>Я соглашаюсь с <a href="privacy.html" target="_blank" rel="noopener">Политикой обработки персональных данных</a></span>
+            </label>
+            <p class="field__error">Нужно согласие на обработку персональных данных</p>
+            <button type="submit" class="btn btn--primary booking-form__submit">Записаться на консультацию</button>
+          </form>
+          <div class="booking-success" id="bookingSuccess" aria-live="polite">
+            <div class="booking-success__icon">✓</div>
+            <p class="booking-success__text">Спасибо, я свяжусь с тобой в течение дня</p>
+          </div>
         </div>
       </div>
     </div>
@@ -1768,7 +1510,6 @@
           <a href="#services">Услуги</a>
           <a href="#process">Как я работаю</a>
           <a href="#cases">Портфолио</a>
-          <a href="#booking">Консультация</a>
           <a href="#contacts">Контакты</a>
         </nav>
       </div>
@@ -1900,28 +1641,6 @@
     });
   })();
 
-  // Ящик-папка: клик — вдавливание, затем карточки вылетают по инерции
-  (function () {
-    const drawer = document.getElementById('drawer');
-    if (!drawer) return;
-    const box = document.getElementById('drawerBox');
-    const cards = Array.from(drawer.querySelectorAll('.drawer__card'));
-
-    // вдавливание начинается сразу по нажатию, а не после отпускания
-    box.addEventListener('pointerdown', () => drawer.classList.add('is-pressing'));
-
-    box.addEventListener('click', () => {
-      // «щелчок» — держим вдавленным чуть дольше самого клика
-      drawer.classList.add('is-pressing');
-      setTimeout(() => drawer.classList.remove('is-pressing'), 140);
-
-      const open = drawer.classList.toggle('is-open');
-      box.setAttribute('aria-expanded', open);
-      // в закрытом состоянии карточки не должны ловить фокус
-      cards.forEach(c => { c.tabIndex = open ? 0 : -1; });
-    });
-  })();
-
   // Выпадающее меню «Менюшка»
   const headerMenu = document.getElementById('headerMenu');
   const menuToggle = document.getElementById('menuToggle');
@@ -1948,8 +1667,8 @@
     // что анимируем: заголовки секций, карточки, шаги, форма, контакты
     const selectors = [
       '.section-label', '.section-title', '.section-desc',
-      '.service-card', '.process-step', '.drawer',
-      '.booking__inner', '.contacts__inner'
+      '.service-card', '.process-step',
+      '.contacts__inner'
     ];
     const items = document.querySelectorAll(selectors.join(','));
     if (!items.length) return;
@@ -2061,10 +1780,10 @@
       const p = max > 0 ? Math.min(window.scrollY / max, 1) : 0;
       bar.style.setProperty('--p', p);
       document.body.classList.toggle('is-scrolled', window.scrollY > 120);
-      // кнопка «наверх»: показывается от блока консультации
-      const booking = document.getElementById('booking');
-      const started = booking
-        ? booking.getBoundingClientRect().top < window.innerHeight * 0.5
+      // кнопка «наверх»: показывается от блока контактов
+      const contacts = document.getElementById('contacts');
+      const started = contacts
+        ? contacts.getBoundingClientRect().top < window.innerHeight * 0.5
         : window.scrollY > window.innerHeight;
       document.body.classList.toggle('is-bottom', started);
 
