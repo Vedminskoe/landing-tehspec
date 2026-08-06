@@ -311,59 +311,6 @@
       transition: color var(--transition);
     }
     .header__contact-link:hover { color: var(--accent); }
-    .nav {
-      display: flex;
-      align-items: center;
-      gap: 32px;
-    }
-    .nav a {
-      font-size: 14px;
-      font-weight: 500;
-      letter-spacing: 0.03em;
-      color: var(--text-muted);
-      transition: color var(--transition);
-    }
-    .nav a:hover { color: var(--accent); }
-
-    /* Бургер */
-    .burger {
-      display: none;
-      flex-direction: column;
-      justify-content: center;
-      gap: 5px;
-      width: 36px;
-      height: 36px;
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 4px;
-    }
-    .burger span {
-      display: block;
-      height: 2px;
-      background: var(--text);
-      border-radius: 2px;
-      transition: transform var(--transition), opacity var(--transition);
-    }
-    .burger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-    .burger.open span:nth-child(2) { opacity: 0; }
-    .burger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
-
-    .mobile-menu {
-      display: none;
-      flex-direction: column;
-      background: var(--bg);
-      border-bottom: 1px solid var(--border);
-      padding: 8px 0 16px;
-    }
-    .mobile-menu.open { display: flex; }
-    .mobile-menu a {
-      padding: 12px 24px;
-      font-size: 16px;
-      color: var(--text-muted);
-      transition: color var(--transition);
-    }
-    .mobile-menu a:hover { color: var(--accent); }
 
     /* ── Hero ── */
     .hero {
@@ -1116,15 +1063,18 @@
       border-color: var(--accent);
       box-shadow: 0 0 0 3px rgba(46,125,82,0.12);
     }
-    .field__input--error { border-color: #D95252; }
-    .field__input--error:focus { box-shadow: 0 0 0 3px rgba(217,82,82,0.12); }
+    /* Ошибки показывает браузер по required. :user-invalid загорается только
+       после попытки отправить или ухода из поля — пока человек печатает, красного нет */
+    .field__input:user-invalid { border-color: #D95252; }
+    .field__input:user-invalid:focus { box-shadow: 0 0 0 3px rgba(217,82,82,0.12); }
     .field__textarea { resize: vertical; min-height: 108px; line-height: 1.6; }
     .field__error {
       font-size: 12px;
       color: #D95252;
       display: none;
     }
-    .field__error--visible { display: block; }
+    .field__input:user-invalid + .field__error,
+    .field__consent:has(:user-invalid) + .field__error { display: block; }
     /* honeypot: убираем из виду и из потока, но оставляем доступным ботам */
     .field__honeypot {
       position: absolute;
@@ -1510,23 +1460,19 @@
       .header__tagline { font-size: 22px; }
       .section { padding: 60px 0; }
       .hero { padding: 72px 0 60px; }
-      .nav { display: none; }
-      .burger { display: flex; }
       .hero__scroll { display: none; }
       .process__steps { grid-template-columns: repeat(2, 1fr); }
       .footer { padding: 52px 0 24px; }
       .footer__top { grid-template-columns: 1fr 1fr; gap: 32px; }
       .footer__brand { grid-column: 1 / -1; }
       .footer__bottom { flex-direction: column; align-items: flex-start; }
-      /* Ящик: сцена целиком мельче, подсказка уезжает под неё, стрелка прячется */
+      /* Ящик: сцена целиком мельче, подсказка уезжает под неё */
       .drawer { --s: 0.72; height: 340px; }
       .drawer__hint {
         left: 50%;
         bottom: 8px;
         transform: translateX(-50%);
       }
-      .drawer__hint-arrow { display: none; }
-      .drawer__hint-text { font-size: 26px; }
       /* Консультация: цветок поднят вверх */
       #booking {
         background:
@@ -1737,17 +1683,17 @@
         <h2 class="section-title" id="booking-title">Запишитесь на консультацию</h2>
         <p class="section-desc">Оставьте заявку — разберём вашу задачу и обсудим варианты решения.</p>
       </div>
-      <form class="booking-form" id="bookingForm" novalidate>
+      <form class="booking-form" id="bookingForm">
         <div class="booking-form__grid">
           <div class="field">
             <label class="field__label" for="fieldName">Имя <span class="field__required">*</span></label>
-            <input class="field__input" type="text" id="fieldName" name="name" placeholder="Как вас зовут?" autocomplete="given-name" />
-            <p class="field__error" id="nameError">Пожалуйста, введите ваше имя</p>
+            <input class="field__input" type="text" id="fieldName" name="name" placeholder="Как вас зовут?" autocomplete="given-name" required />
+            <p class="field__error">Пожалуйста, введите ваше имя</p>
           </div>
           <div class="field">
             <label class="field__label" for="fieldTg">Telegram <span class="field__required">*</span></label>
-            <input class="field__input" type="text" id="fieldTg" name="telegram" placeholder="@username" autocomplete="off" />
-            <p class="field__error" id="tgError">Пожалуйста, укажите ваш Telegram</p>
+            <input class="field__input" type="text" id="fieldTg" name="telegram" placeholder="@username" autocomplete="off" required />
+            <p class="field__error">Пожалуйста, укажите ваш Telegram</p>
           </div>
         </div>
         <div class="field">
@@ -1757,10 +1703,10 @@
         <!-- honeypot: скрыто от людей, заполняют только боты -->
         <input class="field__honeypot" type="text" id="fieldWebsite" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" />
         <label class="field__consent">
-          <input type="checkbox" id="fieldConsent" name="consent" />
+          <input type="checkbox" id="fieldConsent" name="consent" required />
           <span>Я соглашаюсь с <a href="privacy.html" target="_blank" rel="noopener">Политикой обработки персональных данных</a></span>
         </label>
-        <p class="field__error" id="consentError">Нужно согласие на обработку персональных данных</p>
+        <p class="field__error">Нужно согласие на обработку персональных данных</p>
         <button type="submit" class="btn btn--primary booking-form__submit">Записаться на консультацию</button>
       </form>
       <div class="booking-success" id="bookingSuccess" aria-live="polite">
@@ -1903,6 +1849,7 @@
   // Куда уходит заявка. Тот же домен, что и сайт → nginx проксирует на бота.
   const LEAD_ENDPOINT = '/lead';
 
+  // Обязательные поля помечены required — до сюда форма доходит уже проверенной браузером
   bookingForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
@@ -1910,42 +1857,6 @@
     const tgVal   = bookingForm.elements.telegram.value.trim();
     const taskVal = bookingForm.elements.task.value.trim();
     const hpVal   = bookingForm.elements.website.value.trim();
-
-    const nameInput = document.getElementById('fieldName');
-    const nameError = document.getElementById('nameError');
-    const tgInput   = document.getElementById('fieldTg');
-    const tgError   = document.getElementById('tgError');
-    const consentInput = document.getElementById('fieldConsent');
-    const consentError = document.getElementById('consentError');
-
-    let valid = true;
-
-    if (!nameVal) {
-      nameInput.classList.add('field__input--error');
-      nameError.classList.add('field__error--visible');
-      valid = false;
-    } else {
-      nameInput.classList.remove('field__input--error');
-      nameError.classList.remove('field__error--visible');
-    }
-
-    if (!tgVal) {
-      tgInput.classList.add('field__input--error');
-      tgError.classList.add('field__error--visible');
-      valid = false;
-    } else {
-      tgInput.classList.remove('field__input--error');
-      tgError.classList.remove('field__error--visible');
-    }
-
-    if (!consentInput.checked) {
-      consentError.classList.add('field__error--visible');
-      valid = false;
-    } else {
-      consentError.classList.remove('field__error--visible');
-    }
-
-    if (!valid) return;
 
     const originalBtnText = bookingSubmit.textContent;
     bookingSubmit.disabled = true;
@@ -1968,19 +1879,6 @@
       alert(
         'Не получилось отправить заявку. Напишите, пожалуйста, напрямую в Telegram @vedminskoe или на почту vedminskoe@yandex.ru'
       );
-    }
-  });
-
-  ['fieldName', 'fieldTg'].forEach((id) => {
-    document.getElementById(id).addEventListener('input', function () {
-      this.classList.remove('field__input--error');
-      this.nextElementSibling.classList.remove('field__error--visible');
-    });
-  });
-
-  document.getElementById('fieldConsent').addEventListener('change', function () {
-    if (this.checked) {
-      document.getElementById('consentError').classList.remove('field__error--visible');
     }
   });
 
@@ -2021,13 +1919,6 @@
       box.setAttribute('aria-expanded', open);
       // в закрытом состоянии карточки не должны ловить фокус
       cards.forEach(c => { c.tabIndex = open ? 0 : -1; });
-    });
-
-    // Клик по карточке — лист с проектами делаем следующим шагом
-    cards.forEach(card => {
-      card.addEventListener('click', () => {
-        // TODO: открыть лист проектов категории card.dataset.cat
-      });
     });
   })();
 
