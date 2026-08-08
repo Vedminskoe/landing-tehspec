@@ -43,6 +43,8 @@
       --text:         #1A1A1A;
       --text-muted:   #6B7280;
       --border:       #E5E7EB;
+      /* плотность фонового рисунка: 0 — выключен, 1 — во всю силу */
+      --bg-art-opacity: 0.12;
 
       /* Радиусы */
       --radius-sm:    4px;
@@ -68,6 +70,19 @@
     }
     a { color: inherit; text-decoration: none; }
     img { display: block; max-width: 100%; }
+
+    /* Единый фон: рисунок тянется от шапки до подвала на всю высоту страницы.
+       auto 100% — высота по странице, пропорции не плывут (края чуть обрезаются).
+       Плотность рисунка регулируется --bg-art-opacity */
+    body { position: relative; }
+    .page-bg {
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background: url('fon-web.jpg') top center / auto 100% no-repeat;
+      opacity: var(--bg-art-opacity, 0.12);
+    }
 
     /* ── Утилиты ── */
     .container {
@@ -814,141 +829,77 @@
       line-height: 1.55;
     }
 
-    /* ── Cases ── */
-    .cases__header { margin-bottom: 48px; }
-    .cases__layout {
-      display: grid;
-      grid-template-columns: minmax(0, 480px) minmax(0, 1fr);
-      gap: 48px;
-      align-items: start;
-    }
-    /* Превью залипает у шапки, пока справа прокручивается список проектов */
-    .cases__stage {
-      position: sticky;
-      top: 88px;
-      aspect-ratio: 4 / 3;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
+    /* ── Cases ──
+       Раскладка по макету: картинка уходит в левый край экрана,
+       плашки лежат лесенкой поверх её правого края */
+    .cases__header { margin-bottom: 18px; }
+    .cases__layout { position: relative; }
+    /* место под превью проекта — картинку положу позже */
+    .cases__shot {
+      width: 54%;
+      aspect-ratio: 7 / 5;
       background: var(--bg-alt);
       overflow: hidden;
     }
-    .cases__cover,
-    .cases__shot {
+    .cases__shot img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    /* Строки занимают всю высоту картинки и прижаты друг к другу:
+       белое поле сливается в одну лесенку с чётким левым краем */
+    .cases__list {
       position: absolute;
       inset: 0;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 24px;
-      transition: opacity .35s ease;
+      list-style: none;
     }
-    .cases__shot { opacity: 0; }
-    .cases__stage.is-shown .cases__cover { opacity: 0; }
-    .cases__stage.is-shown .cases__shot { opacity: 1; }
-    .cases__cover-word {
-      font-family: var(--font-script);
-      font-size: clamp(48px, 7vw, 84px);
-      line-height: 1;
-      color: var(--accent);
-    }
-    .cases__cover-hint {
-      margin-top: 14px;
-      font-size: 13px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-    }
-    .cases__shot-title {
-      font-family: var(--font-heading);
-      font-size: 26px;
-      line-height: 1.15;
-      color: var(--text);
-    }
-    .cases__shot-note {
-      margin-top: 10px;
-      font-size: 13px;
-      color: var(--text-muted);
-    }
-    /* картинка проекта: появится, когда у плашки задан data-img */
-    .cases__shot img {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      background: var(--bg-alt);
-    }
-
-    .cases__list { list-style: none; }
-    .cases__item { margin-bottom: 10px; }
-    .cases__item:last-child { margin-bottom: 0; }
-    /* рваный левый край: у каждой плашки свой отступ */
-    .cases__item:nth-child(1)  { --off: 24px; }
-    .cases__item:nth-child(2)  { --off: 72px; }
-    .cases__item:nth-child(3)  { --off: 8px;  }
-    .cases__item:nth-child(4)  { --off: 96px; }
-    .cases__item:nth-child(5)  { --off: 40px; }
-    .cases__item:nth-child(6)  { --off: 0px;  }
-    .cases__item:nth-child(7)  { --off: 64px; }
-    .cases__item:nth-child(8)  { --off: 16px; }
-    .cases__item:nth-child(9)  { --off: 88px; }
-    .cases__item:nth-child(10) { --off: 32px; }
-    .cases__item:nth-child(11) { --off: 56px; }
-    .cases__item:nth-child(12) { --off: 12px; }
+    .cases__item { display: flex; flex: 1; }
+    .cases__item:nth-child(1 ) { --off: 41.5%; }
+    .cases__item:nth-child(2 ) { --off: 49.7%; }
+    .cases__item:nth-child(3 ) { --off: 46.0%; }
+    .cases__item:nth-child(4 ) { --off: 38.4%; }
+    .cases__item:nth-child(5 ) { --off: 43.2%; }
+    .cases__item:nth-child(6 ) { --off: 52.0%; }
+    .cases__item:nth-child(7 ) { --off: 43.0%; }
+    .cases__item:nth-child(8 ) { --off: 48.5%; }
+    .cases__item:nth-child(9 ) { --off: 35.9%; }
+    .cases__item:nth-child(10) { --off: 45.5%; }
+    .cases__item:nth-child(11) { --off: 51.2%; }
+    .cases__item:nth-child(12) { --off: 46.5%; }
+    .cases__item:nth-child(13) { --off: 49.2%; }
+    .cases__item:nth-child(14) { --off: 44.5%; }
     .case-plate {
-      margin-left: var(--off, 0px);
-      display: inline-flex;
-      align-items: baseline;
-      gap: 14px;
-      max-width: 100%;
-      padding: 11px 22px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      background: #fff;
+      flex: 1;
+      margin-left: var(--off, 0);
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      border: none;
+      /* вправо белое поле растворяется в общем фоне сайта */
+      background: linear-gradient(90deg, #fff 0 170px, rgba(255,255,255,0) 420px);
       font-family: var(--font-body);
-      font-size: 14px;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
+      font-size: 17px;
+      line-height: 1.2;
       color: var(--text);
       text-align: left;
       cursor: pointer;
-      box-shadow: 0 2px 10px rgba(26,26,26,0.05);
-      transition: transform var(--transition), background var(--transition),
-                  color var(--transition), border-color var(--transition), box-shadow var(--transition);
     }
-    .case-plate__num {
-      font-size: 11px;
-      letter-spacing: 0.1em;
-      color: var(--accent2);
-      flex-shrink: 0;
-    }
-    .case-plate:hover {
-      transform: translateX(10px);
-      border-color: var(--accent-soft);
-      box-shadow: var(--shadow-md);
-    }
-    .case-plate:focus-visible {
-      outline: 2px solid var(--accent);
-      outline-offset: 3px;
-    }
-    .case-plate[aria-pressed="true"] {
-      background: var(--accent);
-      border-color: var(--accent);
-      color: #fff;
-      transform: translateX(10px);
-    }
-    .case-plate[aria-pressed="true"] .case-plate__num { color: var(--accent2-light); }
-    @media (prefers-reduced-motion: reduce) {
-      .case-plate, .case-plate:hover, .case-plate[aria-pressed="true"] { transform: none; transition: none; }
-    }
+    /* пустая плашка — разделитель между категориями работ */
+    .cases__item--gap .case-plate { cursor: default; }
     @media (max-width: 900px) {
-      .cases__layout { grid-template-columns: 1fr; gap: 28px; }
-      .cases__stage { top: 72px; }
-      /* на узком экране рваный край съедает ширину — выравниваем плашки */
-      .cases__item { --off: 0px; }
-      .case-plate { width: 100%; }
+      /* на узком экране лесенка не помещается: картинка сверху, плашки под ней */
+      .cases__shot { width: 100%; }
+      .cases__list { position: static; display: block; margin-top: 16px; }
+      .cases__item { display: block; --off: 0; }
+      .cases__item--gap { display: none; }
+      .case-plate {
+        width: 100%;
+        margin-bottom: 6px;
+        padding: 10px 16px;
+        background: #fff;
+      }
     }
     /* ── Форма заявки (живёт в блоке контактов) ── */
     .booking-form__grid {
@@ -1412,6 +1363,8 @@
 </head>
 <body>
 
+<div class="page-bg" aria-hidden="true"></div>
+
 <!-- ── Header ── -->
 <header class="header" id="top">
   <div class="container">
@@ -1562,96 +1515,27 @@
       <h2 class="section-title" id="cases-title">Портфолио</h2>
       <p class="section-desc">Реальные проекты с реальными результатами.</p>
     </div>
-    <div class="cases__layout">
-      <!-- Превью: заставка до выбора, дальше — картинка проекта.
-           Картинка подставится, как только у плашки появится data-img -->
-      <div class="cases__stage" id="casesStage">
-        <div class="cases__cover">
-          <span class="cases__cover-word">Портфолио</span>
-          <span class="cases__cover-hint">Выберите проект</span>
-        </div>
-        <div class="cases__shot" aria-live="polite">
-          <img alt="" hidden />
-          <span class="cases__shot-title"></span>
-          <span class="cases__shot-note">[превью проекта]</span>
-        </div>
-      </div>
+  </div>
 
-      <ul class="cases__list">
-        <li class="cases__item">
-          <button type="button" class="case-plate" aria-pressed="false" data-img="">
-            <span class="case-plate__num">01</span>
-            <span class="case-plate__name">[Лендинг для онлайн-школы]</span>
-          </button>
-        </li>
-        <li class="cases__item">
-          <button type="button" class="case-plate" aria-pressed="false" data-img="">
-            <span class="case-plate__num">02</span>
-            <span class="case-plate__name">[Telegram-бот на Salebot]</span>
-          </button>
-        </li>
-        <li class="cases__item">
-          <button type="button" class="case-plate" aria-pressed="false" data-img="">
-            <span class="case-plate__num">03</span>
-            <span class="case-plate__name">[Сайт-визитка эксперта]</span>
-          </button>
-        </li>
-        <li class="cases__item">
-          <button type="button" class="case-plate" aria-pressed="false" data-img="">
-            <span class="case-plate__num">04</span>
-            <span class="case-plate__name">[Интеграция AmoCRM]</span>
-          </button>
-        </li>
-        <li class="cases__item">
-          <button type="button" class="case-plate" aria-pressed="false" data-img="">
-            <span class="case-plate__num">05</span>
-            <span class="case-plate__name">[Оформление группы ВКонтакте]</span>
-          </button>
-        </li>
-        <li class="cases__item">
-          <button type="button" class="case-plate" aria-pressed="false" data-img="">
-            <span class="case-plate__num">06</span>
-            <span class="case-plate__name">[Автоворонка в Salebot]</span>
-          </button>
-        </li>
-        <li class="cases__item">
-          <button type="button" class="case-plate" aria-pressed="false" data-img="">
-            <span class="case-plate__num">07</span>
-            <span class="case-plate__name">[Верстка альбома]</span>
-          </button>
-        </li>
-        <li class="cases__item">
-          <button type="button" class="case-plate" aria-pressed="false" data-img="">
-            <span class="case-plate__num">08</span>
-            <span class="case-plate__name">[Серия баннеров]</span>
-          </button>
-        </li>
-        <li class="cases__item">
-          <button type="button" class="case-plate" aria-pressed="false" data-img="">
-            <span class="case-plate__num">09</span>
-            <span class="case-plate__name">[Сайт на Tilda]</span>
-          </button>
-        </li>
-        <li class="cases__item">
-          <button type="button" class="case-plate" aria-pressed="false" data-img="">
-            <span class="case-plate__num">10</span>
-            <span class="case-plate__name">[Визитка]</span>
-          </button>
-        </li>
-        <li class="cases__item">
-          <button type="button" class="case-plate" aria-pressed="false" data-img="">
-            <span class="case-plate__num">11</span>
-            <span class="case-plate__name">[Бот записи на консультацию]</span>
-          </button>
-        </li>
-        <li class="cases__item">
-          <button type="button" class="case-plate" aria-pressed="false" data-img="">
-            <span class="case-plate__num">12</span>
-            <span class="case-plate__name">[Обложки для соцсетей]</span>
-          </button>
-        </li>
-      </ul>
-    </div>
+  <!-- выходит за .container: картинка прижата к левому краю экрана -->
+  <div class="cases__layout">
+    <div class="cases__shot"></div>
+    <ul class="cases__list">
+      <li class="cases__item"><button type="button" class="case-plate">название</button></li>
+      <li class="cases__item"><button type="button" class="case-plate">название</button></li>
+      <li class="cases__item cases__item--gap"><span class="case-plate"></span></li>
+      <li class="cases__item"><button type="button" class="case-plate">название</button></li>
+      <li class="cases__item"><button type="button" class="case-plate">название</button></li>
+      <li class="cases__item"><button type="button" class="case-plate">название</button></li>
+      <li class="cases__item cases__item--gap"><span class="case-plate"></span></li>
+      <li class="cases__item"><button type="button" class="case-plate">название</button></li>
+      <li class="cases__item"><button type="button" class="case-plate">название</button></li>
+      <li class="cases__item"><button type="button" class="case-plate">название</button></li>
+      <li class="cases__item"><button type="button" class="case-plate">название</button></li>
+      <li class="cases__item"><button type="button" class="case-plate">название</button></li>
+      <li class="cases__item"><button type="button" class="case-plate">название</button></li>
+      <li class="cases__item"><button type="button" class="case-plate">название</button></li>
+    </ul>
   </div>
 </section>
 
@@ -1897,7 +1781,7 @@
 
     // лёгкая каскадная задержка для соседних карточек одной группы
     document.querySelectorAll(
-      '.services__grid, .process__steps, .cases__list'
+      '.services__grid, .process__steps'
     ).forEach(group => {
       group.querySelectorAll('.reveal').forEach((el, i) => {
         el.style.setProperty('--reveal-delay', (i * 0.09) + 's');
@@ -2032,44 +1916,6 @@
         window.scrollTo({ top: 0, behavior: smooth ? 'smooth' : 'auto' });
       });
     }
-  })();
-
-  // Портфолио: клик по названию проекта показывает его превью слева.
-  // Повторный клик по активной плашке возвращает заставку
-  (function () {
-    const stage = document.getElementById('casesStage');
-    if (!stage) return;
-    const shot   = stage.querySelector('.cases__shot');
-    const img    = shot.querySelector('img');
-    const title  = shot.querySelector('.cases__shot-title');
-    const plates = document.querySelectorAll('.case-plate');
-
-    plates.forEach(plate => {
-      plate.addEventListener('click', () => {
-        const wasActive = plate.getAttribute('aria-pressed') === 'true';
-        plates.forEach(p => p.setAttribute('aria-pressed', 'false'));
-
-        if (wasActive) {
-          stage.classList.remove('is-shown');
-          return;
-        }
-
-        plate.setAttribute('aria-pressed', 'true');
-        const name = plate.querySelector('.case-plate__name').textContent.trim();
-        title.textContent = name;
-
-        const src = plate.dataset.img;
-        if (src) {
-          img.src = src;
-          img.alt = name;
-          img.hidden = false;
-        } else {
-          img.hidden = true;
-          img.removeAttribute('src');
-        }
-        stage.classList.add('is-shown');
-      });
-    });
   })();
 
   // Магнитные кнопки: притягиваются к курсору на подлёте и следуют за ним
