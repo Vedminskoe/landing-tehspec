@@ -31,10 +31,10 @@
       --font-heading: 'Spectral', Georgia, serif;
       --font-body:    'Involve', system-ui, sans-serif;
       --font-script:  'Vasek', cursive;
-      --accent:        #2E7D52;
-      --accent-hover:  #236641;
-      --accent-light:  #E6F3EC;
-      --accent-soft:   #5FC98F;
+      --accent:        #4A6C33;
+      --accent-hover:  #395426;
+      --accent-light:  #EDF4E6;
+      --accent-soft:   #92B771;
       --accent2:       #E8A800;
       --accent2-hover: #C48900;
       --accent2-light: #FFF8E0;
@@ -158,6 +158,17 @@
     .btn--outline:hover {
       background: var(--accent2-light);
       border-color: var(--accent2-hover);
+    }
+    /* «Смотреть портфолио»: залита сразу, как outline при наведении */
+    .btn--gold {
+      background: var(--accent2-light);
+      color: var(--accent2);
+      border: 1.5px solid var(--accent2-hover);
+    }
+    .btn--gold:hover {
+      background: var(--accent2);
+      border-color: var(--accent2);
+      color: #fff;
     }
     /* Магнитные кнопки: плавный «пружинистый» возврат при уходе курсора */
     .magnetic {
@@ -319,13 +330,8 @@
       background: var(--accent-light);
       color: var(--accent);
     }
-    .header__contact-link {
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--text-muted);
-      transition: color var(--transition);
-    }
-    .header__contact-link:hover { color: var(--accent); }
+    /* Меню контактов живёт у правого края — раскрывается влево, а не за экран */
+    .header__menu--right .header__dropdown { left: auto; right: 0; }
 
     /* ── Hero ── */
     .hero {
@@ -584,7 +590,7 @@
     }
     .service-card:hover {
       border-color: var(--accent);
-      box-shadow: 0 8px 32px rgba(46,125,82,0.12);
+      box-shadow: 0 8px 32px rgba(74,108,51,0.12);
       transform: translateY(-2px);
     }
     /* 3D-наклон и подсветка за курсором.
@@ -610,8 +616,8 @@
       transition: opacity .3s ease;
       background: radial-gradient(
         260px circle at var(--mx, 50%) var(--my, 50%),
-        rgba(95,201,143,0.22),
-        rgba(95,201,143,0) 70%
+        rgba(146,183,113,0.22),
+        rgba(146,183,113,0) 70%
       );
     }
     .service-card--tilt.is-tilting::after { opacity: 1; }
@@ -702,26 +708,26 @@
         z-index: 0;
         transform: translateY(0);
         border-color: transparent;
-        box-shadow: 0 14px 30px rgba(46,125,82,0);
+        box-shadow: 0 14px 30px rgba(74,108,51,0);
       }
       4%, 21% {
         z-index: 2;
         transform: translateY(-4px);
         /* тот же насыщенный зелёный контур, что у карточек услуг на наведении */
         border-color: var(--accent);
-        box-shadow: 0 12px 26px rgba(46,125,82,0.10);
+        box-shadow: 0 12px 26px rgba(74,108,51,0.10);
       }
     }
     @keyframes num-glow {
       0%, 25%, 100% {
         background: var(--bg);
         color: var(--accent);
-        box-shadow: 0 0 0 5px rgba(46,125,82,0.08);
+        box-shadow: 0 0 0 5px rgba(74,108,51,0.08);
       }
       4%, 21% {
         background: var(--accent-light);
         color: var(--accent);
-        box-shadow: 0 0 0 7px rgba(46,125,82,0.10);
+        box-shadow: 0 0 0 7px rgba(74,108,51,0.10);
       }
     }
     /* курсор в блоке — цикл выключаем целиком, чтобы hover снова работал */
@@ -765,7 +771,7 @@
       pointer-events: none;
       opacity: 0;
       filter: blur(18px);
-      background: rgba(95,201,143,0.45);
+      background: rgba(146,183,113,0.45);
     }
     .process-step::after {
       content: '';
@@ -785,7 +791,7 @@
     .process-step:hover {
       transform: translateY(-4px);
       border-color: var(--accent-light);
-      box-shadow: 0 14px 30px rgba(46,125,82,0.16);
+      box-shadow: 0 14px 30px rgba(74,108,51,0.16);
     }
     .process-step__num {
       width: 56px; height: 56px;
@@ -800,7 +806,7 @@
       color: var(--accent);
       margin-bottom: 18px;
       flex-shrink: 0;
-      box-shadow: 0 0 0 5px rgba(46,125,82,0.08);
+      box-shadow: 0 0 0 5px rgba(74,108,51,0.08);
       transition: background var(--transition), color var(--transition), box-shadow var(--transition),
                   transform .5s cubic-bezier(.34,1.56,.64,1);
       /* «щелчок»: цифра выпрыгивает, когда шаг появляется в поле зрения */
@@ -814,7 +820,7 @@
     .process-step:hover .process-step__num {
       background: var(--accent);
       color: #fff;
-      box-shadow: 0 0 0 6px rgba(46,125,82,0.15);
+      box-shadow: 0 0 0 6px rgba(74,108,51,0.15);
     }
     .process-step__title {
       font-family: var(--font-heading);
@@ -835,9 +841,12 @@
     .cases__header { margin-bottom: 18px; }
     .cases__layout { position: relative; }
     /* место под превью проекта — картинку положу позже */
+    /* Картинка заходит под всю лесенку (правее самой правой плашки на 59%),
+       поэтому её правым краем работает ступенчатая граница плашек,
+       а собственного прямого обреза не видно: он спрятан под плотным белым */
     .cases__shot {
-      width: 54%;
-      aspect-ratio: 7 / 5;
+      width: 66%;
+      aspect-ratio: 12 / 7;
       background: var(--bg-alt);
       overflow: hidden;
     }
@@ -850,53 +859,156 @@
        белое поле сливается в одну лесенку с чётким левым краем */
     .cases__list {
       position: absolute;
-      inset: 0;
+      /* Снизу бокс уходит на 34px ниже картинки. Маска режет всё, что
+         выходит за границы списка (mask-clip по умолчанию border-box),
+         а там как раз живут нижняя линия рамки последней плашки
+         (она торчит на 1px из-за margin-bottom: -1px) и её тень.
+         Строки этот запас не занимают — его съедает распорка ::after,
+         34px попадают в пустой нижний отступ секции */
+      inset: 0 0 -34px;
       display: flex;
       flex-direction: column;
       list-style: none;
+      /* общий сдвиг всей лесенки вправо — двигается одной цифрой */
+      --shift: 7%;
+      /* Растворение задано маской на весь список, а не на каждую плашку:
+         белое держится плотным до 68% ширины экрана — то есть заведомо
+         дальше правого края картинки (54%), чтобы она нигде не просвечивала */
+      -webkit-mask-image: linear-gradient(90deg, #000 0 68%, transparent 82%);
+              mask-image: linear-gradient(90deg, #000 0 68%, transparent 82%);
     }
+    /* распорка: забирает те самые 34px, чтобы строки делили ровно
+       высоту картинки, как раньше */
+    .cases__list::after { content: ''; flex: none; height: 34px; }
     .cases__item { display: flex; flex: 1; }
-    .cases__item:nth-child(1 ) { --off: 41.5%; }
-    .cases__item:nth-child(2 ) { --off: 49.7%; }
+    /* --off — сдвиг плашки вправо, лесенка; --drift-* — своя длительность
+       и фаза парения текста, чтобы плашки не двигались в такт */
+    .cases__item:nth-child(1 ) { --off: 41.5%; --drift-dur: 5.4s; --drift-delay: -1.2s; }
+    .cases__item:nth-child(2 ) { --off: 49.7%; --drift-dur: 6.3s; --drift-delay: -3.4s; }
     .cases__item:nth-child(3 ) { --off: 46.0%; }
-    .cases__item:nth-child(4 ) { --off: 38.4%; }
-    .cases__item:nth-child(5 ) { --off: 43.2%; }
-    .cases__item:nth-child(6 ) { --off: 52.0%; }
+    .cases__item:nth-child(4 ) { --off: 38.4%; --drift-dur: 5.0s; --drift-delay: -2.1s; }
+    .cases__item:nth-child(5 ) { --off: 43.2%; --drift-dur: 6.7s; --drift-delay: -0.6s; }
+    .cases__item:nth-child(6 ) { --off: 52.0%; --drift-dur: 5.8s; --drift-delay: -4.3s; }
     .cases__item:nth-child(7 ) { --off: 43.0%; }
-    .cases__item:nth-child(8 ) { --off: 48.5%; }
-    .cases__item:nth-child(9 ) { --off: 35.9%; }
-    .cases__item:nth-child(10) { --off: 45.5%; }
-    .cases__item:nth-child(11) { --off: 51.2%; }
-    .cases__item:nth-child(12) { --off: 46.5%; }
-    .cases__item:nth-child(13) { --off: 49.2%; }
-    .cases__item:nth-child(14) { --off: 44.5%; }
+    .cases__item:nth-child(8 ) { --off: 48.5%; --drift-dur: 6.0s; --drift-delay: -1.7s; }
+    .cases__item:nth-child(9 ) { --off: 35.9%; --drift-dur: 4.8s; --drift-delay: -3.9s; }
+    /* низ лесенки чуть левее верха, разброс между соседями 4.5–8%
+       вместо 3–5%: ступени внизу читаются резче, но веером не расходятся */
+    .cases__item:nth-child(10) { --off: 43.5%; --drift-dur: 6.9s; --drift-delay: -2.6s; }
+    .cases__item:nth-child(11) { --off: 50.0%; --drift-dur: 5.2s; --drift-delay: -0.9s; }
+    .cases__item:nth-child(12) { --off: 45.8%; --drift-dur: 6.5s; --drift-delay: -3.1s; }
+    .cases__item:nth-child(13) { --off: 48.5%; --drift-dur: 5.1s; --drift-delay: -1.4s; }
+    .cases__item:nth-child(14) { --off: 40.5%; --drift-dur: 7.1s; --drift-delay: -2.8s; }
     .case-plate {
       flex: 1;
-      margin-left: var(--off, 0);
+      margin-left: calc(var(--off, 0%) + var(--shift, 0%));
+      /* высота строк дробная — плашка на пиксель выше своей строки,
+         иначе на стыках просвечивает картинка */
+      margin-bottom: -1px;
       display: flex;
       align-items: center;
-      padding: 0 10px;
+      padding: 0 15px;
       border: none;
-      /* вправо белое поле растворяется в общем фоне сайта */
-      background: linear-gradient(90deg, #fff 0 170px, rgba(255,255,255,0) 420px);
+      background: #fff;
       font-family: var(--font-body);
       font-size: 17px;
       line-height: 1.2;
       color: var(--text);
       text-align: left;
       cursor: pointer;
+      /* под z-index при наведении и под рамку-псевдоэлемент */
+      position: relative;
+      transition: transform var(--transition), box-shadow var(--transition);
     }
-    /* пустая плашка — разделитель между категориями работ */
+    /* Рамка при наведении — как у карточек услуг, но без правой стенки:
+       border-image с горизонтальным градиентом даёт сплошной акцент слева,
+       а верхнюю и нижнюю линии гасит к правому краю (справа градиент
+       прозрачный — правой стенки не рисуется вовсе).
+       Живёт на ::after: сам border-image не анимируется, а так рамка
+       проявляется плавно и не сдвигает текст на пиксель */
+    .case-plate::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      border: 1px solid transparent;
+      border-image: linear-gradient(90deg, var(--accent) 0 28%, rgba(74,108,51,0) 68%) 1;
+      opacity: 0;
+      transition: opacity var(--transition);
+    }
+    .case-plate:hover::after { opacity: 1; }
+    /* Плашка «выдвигается вперёд»: подрастает от центра и получает объём.
+       z-index обязателен — строки перекрываются на 1px, без подъёма соседка
+       снизу затрёт и нижнюю линию рамки, и тень.
+       Масштаб, а не translateY: сдвиг вверх обнажил бы снизу полоску
+       фотографии, а масштаб только накрывает соседок, зазоров не создаёт */
+    .case-plate:hover {
+      z-index: 1;
+      transform: scale(1.02);
+      box-shadow:
+        0 8px 22px rgba(26,26,26,0.16),      /* вес: отрывает белое от фото */
+        0 0 18px 2px rgba(146,183,113,0.38); /* зелёный ореол, --accent-soft */
+    }
+    /* Названия парят: амплитуда 4–5px, у каждой плашки своя
+       траектория (три набора кадров), своя длительность и фаза. Двигается
+       только текст — белая плашка держит лесенку и стык с картинкой.
+       Отрицательные задержки — чтобы движение уже шло при загрузке,
+       а не стартовало у всех из нуля */
+    .case-plate__text {
+      display: inline-block;
+      animation: case-drift-a var(--drift-dur, 8s) ease-in-out var(--drift-delay, 0s) infinite;
+    }
+    .cases__item:nth-child(3n+2) .case-plate__text { animation-name: case-drift-b; }
+    .cases__item:nth-child(3n)   .case-plate__text { animation-name: case-drift-c; }
+    @keyframes case-drift-a {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      21% { transform: translate(3.8px, -2.6px) rotate(.4deg); }
+      44% { transform: translate(-2.9px, 3.3px) rotate(-.3deg); }
+      67% { transform: translate(4.8px, 1.5px) rotate(.24deg); }
+      85% { transform: translate(-1.8px, -3.7px) rotate(-.45deg); }
+    }
+    @keyframes case-drift-b {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      18% { transform: translate(-4.2px, 2.4px) rotate(-.38deg); }
+      39% { transform: translate(2.6px, 4.0px) rotate(.5deg); }
+      58% { transform: translate(5.3px, -2.0px) rotate(.2deg); }
+      81% { transform: translate(-3.3px, -3.1px) rotate(-.25deg); }
+    }
+    @keyframes case-drift-c {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      26% { transform: translate(2.4px, 3.5px) rotate(.3deg); }
+      48% { transform: translate(-5.1px, -2.2px) rotate(-.5deg); }
+      63% { transform: translate(2.0px, -4.2px) rotate(.35deg); }
+      88% { transform: translate(-3.5px, 2.6px) rotate(-.18deg); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .case-plate__text { animation: none; }
+      /* свечение и рамку оставляем — выделение при наведении не теряется */
+      .case-plate:hover { transform: none; }
+    }
+    /* пустая плашка — разделитель между категориями работ, не подсвечивается */
     .cases__item--gap .case-plate { cursor: default; }
+    .cases__item--gap .case-plate::after { content: none; }
+    .cases__item--gap .case-plate:hover { transform: none; box-shadow: none; }
     @media (max-width: 900px) {
       /* на узком экране лесенка не помещается: картинка сверху, плашки под ней */
       .cases__shot { width: 100%; }
-      .cases__list { position: static; display: block; margin-top: 16px; }
-      .cases__item { display: block; --off: 0; }
+      .cases__list {
+        position: static;
+        display: block;
+        margin-top: 16px;
+        --shift: 0%;
+        -webkit-mask-image: none;
+                mask-image: none;
+      }
+      /* маски нет — запас под тень не нужен */
+      .cases__list::after { display: none; }
+      .cases__item { display: block; --off: 0%; }
       .cases__item--gap { display: none; }
       .case-plate {
         width: 100%;
         margin-bottom: 6px;
+        margin-left: 0;
         padding: 10px 16px;
         background: #fff;
       }
@@ -939,7 +1051,7 @@
     .field__input::placeholder { color: #A9AFB8; }
     .field__input:focus {
       border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(46,125,82,0.12);
+      box-shadow: 0 0 0 3px rgba(74,108,51,0.12);
     }
     /* Ошибки показывает браузер по required. :user-invalid загорается только
        после попытки отправить или ухода из поля — пока человек печатает, красного нет */
@@ -1171,8 +1283,8 @@
       animation: status-pulse 2.4s ease-in-out infinite;
     }
     @keyframes status-pulse {
-      0%, 100% { opacity: 1;   box-shadow: 0 0 0 0 rgba(46,125,82,0.35); }
-      50%      { opacity: .55; box-shadow: 0 0 0 5px rgba(46,125,82,0); }
+      0%, 100% { opacity: 1;   box-shadow: 0 0 0 0 rgba(74,108,51,0.35); }
+      50%      { opacity: .55; box-shadow: 0 0 0 5px rgba(74,108,51,0); }
     }
     @media (prefers-reduced-motion: reduce) {
       .contacts__status::before { animation: none; }
@@ -1379,7 +1491,15 @@
         </nav>
       </div>
       <span class="header__tagline" aria-hidden="true">техспец <span class="header__amp">&amp;</span> граф.дизайнер</span>
-      <a href="https://t.me/vedminskoe" target="_blank" rel="noopener" class="header__contact-link">Связаться</a>
+      <div class="header__menu header__menu--right" id="contactMenu">
+        <button type="button" class="header__logo" id="contactToggle" aria-expanded="false" aria-haspopup="true">Связаться</button>
+        <nav class="header__dropdown" aria-label="Контакты">
+          <a href="https://t.me/vedminskoe" target="_blank" rel="noopener">Telegram — @vedminskoe</a>
+          <!-- href заменить на ссылку группы ВК -->
+          <a href="#" target="_blank" rel="noopener">ВКонтакте</a>
+          <a href="mailto:vedminskoe@yandex.ru">vedminskoe@yandex.ru</a>
+        </nav>
+      </div>
     </div>
   </div>
   <div class="header__progress" id="scrollProgress" aria-hidden="true"></div>
@@ -1405,8 +1525,8 @@
             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
             Написать в Telegram
           </a>
-          <a href="mailto:vedminskoe@yandex.ru" class="btn btn--outline">
-            Написать на почту
+          <a href="#cases" class="btn btn--gold">
+            Смотреть портфолио
           </a>
         </div>
       </div>
@@ -1519,22 +1639,24 @@
 
   <!-- выходит за .container: картинка прижата к левому краю экрана -->
   <div class="cases__layout">
-    <div class="cases__shot"></div>
+    <div class="cases__shot">
+      <img src="port-web.jpg" alt="" />
+    </div>
     <ul class="cases__list">
-      <li class="cases__item"><button type="button" class="case-plate">название</button></li>
-      <li class="cases__item"><button type="button" class="case-plate">название</button></li>
+      <li class="cases__item"><button type="button" class="case-plate"><span class="case-plate__text">название</span></button></li>
+      <li class="cases__item"><button type="button" class="case-plate"><span class="case-plate__text">название</span></button></li>
       <li class="cases__item cases__item--gap"><span class="case-plate"></span></li>
-      <li class="cases__item"><button type="button" class="case-plate">название</button></li>
-      <li class="cases__item"><button type="button" class="case-plate">название</button></li>
-      <li class="cases__item"><button type="button" class="case-plate">название</button></li>
+      <li class="cases__item"><button type="button" class="case-plate"><span class="case-plate__text">название</span></button></li>
+      <li class="cases__item"><button type="button" class="case-plate"><span class="case-plate__text">название</span></button></li>
+      <li class="cases__item"><button type="button" class="case-plate"><span class="case-plate__text">название</span></button></li>
       <li class="cases__item cases__item--gap"><span class="case-plate"></span></li>
-      <li class="cases__item"><button type="button" class="case-plate">название</button></li>
-      <li class="cases__item"><button type="button" class="case-plate">название</button></li>
-      <li class="cases__item"><button type="button" class="case-plate">название</button></li>
-      <li class="cases__item"><button type="button" class="case-plate">название</button></li>
-      <li class="cases__item"><button type="button" class="case-plate">название</button></li>
-      <li class="cases__item"><button type="button" class="case-plate">название</button></li>
-      <li class="cases__item"><button type="button" class="case-plate">название</button></li>
+      <li class="cases__item"><button type="button" class="case-plate"><span class="case-plate__text">название</span></button></li>
+      <li class="cases__item"><button type="button" class="case-plate"><span class="case-plate__text">название</span></button></li>
+      <li class="cases__item"><button type="button" class="case-plate"><span class="case-plate__text">название</span></button></li>
+      <li class="cases__item"><button type="button" class="case-plate"><span class="case-plate__text">название</span></button></li>
+      <li class="cases__item"><button type="button" class="case-plate"><span class="case-plate__text">название</span></button></li>
+      <li class="cases__item"><button type="button" class="case-plate"><span class="case-plate__text">название</span></button></li>
+      <li class="cases__item"><button type="button" class="case-plate"><span class="case-plate__text">название</span></button></li>
     </ul>
   </div>
 </section>
@@ -1551,12 +1673,15 @@
             <p class="contacts__desc">Опишите задачу своими словами — что происходит сейчас и какого результата ждёте. Уточню детали и предложу, как это лучше собрать. Не знаете, с чего начать — разберём, что уже есть, и составим план.</p>
           </div>
           <div class="contacts__meta">
-            <p class="contacts__status">Работаю удалённо, +2 часа к Москве</p>
             <p class="contacts__direct">
               <a href="https://t.me/vedminskoe" target="_blank" rel="noopener">@vedminskoe</a>
               <span>·</span>
+              <!-- href заменить на ссылку группы ВК -->
+              <a href="#" target="_blank" rel="noopener">ВКонтакте</a>
+              <span>·</span>
               <a href="mailto:vedminskoe@yandex.ru">vedminskoe@yandex.ru</a>
             </p>
+            <p class="contacts__status">Работаю удалённо, +2 часа к Москве</p>
           </div>
         </div>
         <div class="contacts__form">
@@ -1624,6 +1749,11 @@
           <a href="https://t.me/vedminskoe" target="_blank" rel="noopener">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
             @vedminskoe
+          </a>
+          <!-- href заменить на ссылку группы ВК -->
+          <a href="#" target="_blank" rel="noopener">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M13.162 18.994c.609 0 .858-.406.851-.915-.031-1.917.714-2.949 2.059-1.604 1.488 1.488 1.796 2.519 3.603 2.519h3.2c.808 0 1.126-.26 1.126-.668 0-.863-1.421-2.386-2.625-3.504-1.686-1.565-1.765-1.602-.313-3.486 1.801-2.339 4.157-5.336 2.073-5.336h-3.981c-.772 0-.828.435-1.103 1.083-.995 2.347-2.886 5.387-3.604 4.922-.751-.485-.407-2.406-.35-5.261.015-.754.011-1.271-1.141-1.539-.629-.145-1.241-.205-1.809-.205-2.273 0-3.841.953-2.95 1.119 1.571.293 1.42 3.692 1.054 5.16-.638 2.556-3.036-2.024-4.035-4.305-.241-.548-.315-.974-1.175-.974h-3.255c-.492 0-.787.16-.787.516 0 .602 2.96 6.72 5.786 9.77 2.756 2.975 5.48 2.808 7.376 2.808z"/></svg>
+            ВКонтакте
           </a>
           <a href="mailto:vedminskoe@yandex.ru">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
@@ -1745,25 +1875,31 @@
     });
   })();
 
-  // Выпадающее меню «Менюшка»
-  const headerMenu = document.getElementById('headerMenu');
-  const menuToggle = document.getElementById('menuToggle');
-  menuToggle.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const open = headerMenu.classList.toggle('open');
-    menuToggle.setAttribute('aria-expanded', open);
-  });
-  headerMenu.querySelectorAll('.header__dropdown a').forEach(link => {
-    link.addEventListener('click', () => {
-      headerMenu.classList.remove('open');
-      menuToggle.setAttribute('aria-expanded', false);
+  // Выпадающие меню шапки: «Менюшка» слева и «Связаться» справа.
+  // Механика одна на оба, открытым может быть только одно
+  const headerMenus = document.querySelectorAll('.header__menu');
+  const closeMenu = (menu) => {
+    menu.classList.remove('open');
+    menu.querySelector('.header__logo').setAttribute('aria-expanded', false);
+  };
+
+  headerMenus.forEach(menu => {
+    const toggle = menu.querySelector('.header__logo');
+    toggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      headerMenus.forEach(other => { if (other !== menu) closeMenu(other); });
+      const open = menu.classList.toggle('open');
+      toggle.setAttribute('aria-expanded', open);
+    });
+    menu.querySelectorAll('.header__dropdown a').forEach(link => {
+      link.addEventListener('click', () => closeMenu(menu));
     });
   });
+
   document.addEventListener('click', (e) => {
-    if (!headerMenu.contains(e.target)) {
-      headerMenu.classList.remove('open');
-      menuToggle.setAttribute('aria-expanded', false);
-    }
+    headerMenus.forEach(menu => {
+      if (!menu.contains(e.target)) closeMenu(menu);
+    });
   });
 
   // Плавное появление блоков при прокрутке
@@ -1771,7 +1907,7 @@
     // что анимируем: заголовки секций, карточки, шаги, форма, контакты
     const selectors = [
       '.section-label', '.section-title', '.section-desc',
-      '.service-card', '.process-step', '.cases__item',
+      '.service-card', '.process-step',
       '.contacts__inner'
     ];
     const items = document.querySelectorAll(selectors.join(','));
