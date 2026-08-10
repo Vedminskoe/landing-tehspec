@@ -100,8 +100,10 @@
       text-transform: uppercase;
       color: var(--accent2);
       background: #fff;
-      border-radius: 6px;
-      padding: 3px 10px;
+      /* овальная рамка — как у бейджа «Открыта к новым проектам» в hero */
+      border: 1px solid rgba(232,168,0,0.3);
+      border-radius: 100px;
+      padding: 4px 14px;
       margin-bottom: 14px;
     }
     .section-title {
@@ -841,10 +843,16 @@
     .cases__header { margin-bottom: 18px; }
     .cases__layout { position: relative; }
     /* место под превью проекта — картинку положу позже */
-    /* Картинка заходит под всю лесенку (правее самой правой плашки на 59%),
+    /* Картинка заходит под всю лесенку (правее самой правой плашки на 64%),
        поэтому её правым краем работает ступенчатая граница плашек,
-       а собственного прямого обреза не видно: он спрятан под плотным белым */
+       а собственного прямого обреза не видно: он спрятан под плотным белым.
+       Ширина — она же и высота блока через aspect-ratio, поэтому трогать её
+       нельзя: 66% держат высоту. Но она обязана быть больше, чем
+       max(--off) + --shift, иначе прямой обрез вылезет в тех строках,
+       где плашка начинается правее края картинки. Отсюда и потолок сдвига */
     .cases__shot {
+      /* relative — под точки слайдера, они лежат прямо на картинке */
+      position: relative;
       width: 66%;
       aspect-ratio: 12 / 7;
       background: var(--bg-alt);
@@ -854,7 +862,40 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
+      /* от левого края: обрезка уходит только вправо, под лесенку плашек,
+         а отступ слева и расположение работ остаются как в макете */
+      object-position: left center;
     }
+    /* Точки слайдера: показывают, на каком снимке проекта мы сейчас.
+       Встают ровно по середине слова «Портфолио». Считаем так:
+       левый край текста = (100% - 1200px) / 2 + 24px (контейнер),
+       плюс половина слова (~176px при кегле 64px) — итого 50% - 400px.
+       Формула точна от 1248px ширины, где контейнер упёрся в max-width,
+       а кегль заголовка перестал расти */
+    .cases__dots {
+      position: absolute;
+      left: calc(50% - 400px);
+      transform: translateX(-50%);
+      bottom: 16px;
+      display: flex;
+      gap: 9px;
+    }
+    /* display: flex перебивает hidden — гасим явно */
+    .cases__dots[hidden] { display: none; }
+    .cases__dot {
+      width: 10px;
+      height: 10px;
+      padding: 0;
+      border: none;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.6);
+      /* на светлом кадре белая точка потерялась бы */
+      box-shadow: 0 1px 4px rgba(26,26,26,0.35);
+      cursor: pointer;
+      transition: background var(--transition), transform var(--transition);
+    }
+    .cases__dot:hover { transform: scale(1.2); }
+    .cases__dot.is-active { background: var(--accent2); }
     /* Строки занимают всю высоту картинки и прижаты друг к другу:
        белое поле сливается в одну лесенку с чётким левым краем */
     .cases__list {
@@ -869,11 +910,14 @@
       display: flex;
       flex-direction: column;
       list-style: none;
-      /* общий сдвиг всей лесенки вправо — двигается одной цифрой */
-      --shift: 7%;
+      /* Общий сдвиг всей лесенки вправо — двигается одной цифрой.
+         Потолок — 14%: самая правая плашка (--off: 52%) не должна вылезти
+         за правый край картинки (66%), иначе покажется её прямой обрез.
+         12% оставляют 2% запаса */
+      --shift: 12%;
       /* Растворение задано маской на весь список, а не на каждую плашку:
          белое держится плотным до 68% ширины экрана — то есть заведомо
-         дальше правого края картинки (54%), чтобы она нигде не просвечивала */
+         дальше правого края картинки (66%), чтобы она нигде не просвечивала */
       -webkit-mask-image: linear-gradient(90deg, #000 0 68%, transparent 82%);
               mask-image: linear-gradient(90deg, #000 0 68%, transparent 82%);
     }
@@ -936,19 +980,24 @@
       opacity: 0;
       transition: opacity var(--transition);
     }
-    .case-plate:hover::after { opacity: 1; }
+    /* .is-active — плашка открытого сейчас проекта, подсветка не гаснет */
+    .case-plate:hover::after,
+    .case-plate.is-active::after { opacity: 1; }
     /* Плашка «выдвигается вперёд»: подрастает от центра и получает объём.
        z-index обязателен — строки перекрываются на 1px, без подъёма соседка
        снизу затрёт и нижнюю линию рамки, и тень.
        Масштаб, а не translateY: сдвиг вверх обнажил бы снизу полоску
        фотографии, а масштаб только накрывает соседок, зазоров не создаёт */
-    .case-plate:hover {
+    .case-plate:hover,
+    .case-plate.is-active {
       z-index: 1;
       transform: scale(1.02);
       box-shadow:
         0 8px 22px rgba(26,26,26,0.16),      /* вес: отрывает белое от фото */
         0 0 18px 2px rgba(146,183,113,0.38); /* зелёный ореол, --accent-soft */
     }
+    /* наведённая перекрывает открытую, если это разные плашки */
+    .case-plate:hover { z-index: 2; }
     /* Названия парят: амплитуда 4–5px, у каждой плашки своя
        траектория (три набора кадров), своя длительность и фаза. Двигается
        только текст — белая плашка держит лесенку и стык с картинкой.
@@ -990,9 +1039,16 @@
     .cases__item--gap .case-plate { cursor: default; }
     .cases__item--gap .case-plate::after { content: none; }
     .cases__item--gap .case-plate:hover { transform: none; box-shadow: none; }
+    /* Снимок, раскрытый прямо под плашкой. Нужен только на узком экране,
+       где общего превью нет; на ПК лежит скрытым */
+    .cases__inline-shot { display: none; }
     @media (max-width: 900px) {
-      /* на узком экране лесенка не помещается: картинка сверху, плашки под ней */
-      .cases__shot { width: 100%; }
+      /* Лесенка не помещается, и постоянное превью убрано совсем:
+         плашки идут простым списком, а снимок проекта раскрывается
+         под той плашкой, которую нажали */
+      .cases__shot { display: none; }
+      /* точки листали общее превью — без него им негде жить */
+      .cases__dots { display: none; }
       .cases__list {
         position: static;
         display: block;
@@ -1011,7 +1067,10 @@
         margin-left: 0;
         padding: 10px 16px;
         background: #fff;
+        justify-content: center;
+        text-align: center;
       }
+      .cases__inline-shot { display: block; width: 100%; margin: 8px 0 14px; }
     }
     /* ── Форма заявки (живёт в блоке контактов) ── */
     .booking-form__grid {
@@ -1307,11 +1366,24 @@
     .contacts__direct span { margin: 0 10px; opacity: .5; }
     @media (max-width: 900px) {
       .contacts__grid { grid-template-columns: 1fr; gap: 36px; }
-      .contacts__header { max-width: 720px; }
-      .contacts__form { margin-top: 0; }
+      /* Колонка разбирается на элементы сетки: только так статус и ссылки
+         можно опустить под форму, а не держать над ней */
+      .contacts__col { display: contents; }
+      .contacts__header { max-width: 720px; order: 1; }
+      .contacts__form { margin-top: 0; order: 2; }
+      .contacts__meta { order: 3; }
     }
     @media (max-width: 520px) {
-      .contacts__direct span { display: block; height: 0; margin: 6px 0; overflow: hidden; }
+      /* Контакты по центру: телеграм и вк остаются в строку через точку,
+         почта уходит вниз — переносом работает только второй разделитель */
+      .contacts__meta { align-items: center; gap: 18px; }
+      .contacts__direct { text-align: center; }
+      .contacts__direct span:nth-of-type(2) {
+        display: block;
+        height: 0;
+        margin: 6px 0;
+        overflow: hidden;
+      }
     }
 
     /* ── Кнопка «наверх» ── */
@@ -1433,22 +1505,25 @@
 
     /* ── Адаптив ── */
     @media (max-width: 960px) {
-      /* Hero: кнопки уходят вниз, под фото */
-      .hero__inner { display: flex; flex-direction: column; }
+      /* Hero: кнопки уходят вниз, под фото.
+         gap: 0 — сетковые 48px в колонке раздували бы каждый стык,
+         расстояния задают margin'ы элементов */
+      .hero__inner { display: flex; flex-direction: column; gap: 0; }
       .hero__left { display: contents; }
       .hero__badge { order: 1; margin-bottom: 14px; }
-      .hero__greeting { order: 2; margin-bottom: 0; }
-      .hero__name { order: 3; margin-bottom: 8px; }
+      /* line-height 1.2 вместо базовых 1.6 — «Привет, я» подтягивается к имени */
+      .hero__greeting { order: 2; margin-bottom: 0; line-height: 1.2; }
+      .hero__name { order: 3; margin-bottom: 10px; }
       .hero__desc { order: 4; max-width: 100%; margin-bottom: 0; }
-      .hero__right { order: 5; max-width: 300px; margin: 20px auto 0; }
-      .hero__actions { order: 6; margin-top: 20px; }
+      .hero__right { order: 5; max-width: 300px; margin: 22px auto 0; }
+      .hero__actions { order: 6; margin-top: 22px; }
 
       .services__grid { grid-template-columns: 1fr; }
       /* Робот вынесен в контейнер — на узком экране ставим его над карточкой
          «Telegram-боты» (вторая в колонке). Значение top подгоняется на глаз */
       .services__robot {
-        top: 440px;
-        right: -50px;
+        top: 470px;
+        right: -22px;
         width: 280px;
       }
     }
@@ -1456,9 +1531,12 @@
     @media (max-width: 768px) {
       .header__tagline { font-size: 22px; }
       .section { padding: 60px 0; }
-      .hero { padding: 72px 0 60px; }
+      /* сверху хватает воздуха шапки — 72px оставляли пустую полосу */
+      .hero { padding: 24px 0 60px; }
       .hero__scroll { display: none; }
       .process__steps { grid-template-columns: repeat(2, 1fr); }
+      /* круглая кнопка «наверх» на телефоне только мешается поверх контента */
+      .to-top { display: none; }
       .footer { padding: 52px 0 24px; }
       .footer__top { grid-template-columns: 1fr 1fr; gap: 32px; }
       .footer__brand { grid-column: 1 / -1; }
@@ -1468,8 +1546,22 @@
     @media (max-width: 480px) {
       .header__tagline { display: none; }
       .process__steps { grid-template-columns: 1fr; }
-      .hero__actions { flex-direction: column; align-items: flex-start; }
+      /* кнопки в столбик во всю ширину экрана */
+      .hero__actions { flex-direction: column; align-items: stretch; gap: 12px; }
+      .hero__actions .btn { width: 100%; justify-content: center; }
       .booking-form__grid { grid-template-columns: 1fr; }
+      /* Подпись подвала в две строки: «техспец & граф.дизайнер» целиком
+         под именем, ровно по его левому краю. Сетка держит вторую строку
+         в той же колонке, что и «Катерина» — отступ не подбирается на глаз */
+      .footer__copy {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        column-gap: 0.35em;
+      }
+      .footer__copy-dash { display: none; }
+      .footer__copy-role { grid-column: 2; white-space: nowrap; }
+      /* «Наверх» в подвале на телефоне не нужна */
+      .footer__up { display: none; }
     }
   </style>
 </head>
@@ -1640,11 +1732,21 @@
   <!-- выходит за .container: картинка прижата к левому краю экрана -->
   <div class="cases__layout">
     <div class="cases__shot">
-      <img src="port-web.jpg" alt="" />
+      <img src="port-web.jpg" alt="" id="casesShot" />
+    </div>
+    <!-- Точки слайдера: появляются вместе с картинкой проекта.
+         Лежат в .cases__layout, а не в .cases__shot — проценты нужны
+         от полной ширины страницы, чтобы встать по центру заголовка -->
+    <div class="cases__dots" id="casesDots" hidden>
+      <button type="button" class="cases__dot is-active" aria-label="Слайд 1"></button>
+      <button type="button" class="cases__dot" aria-label="Слайд 2"></button>
+      <button type="button" class="cases__dot" aria-label="Слайд 3"></button>
+      <button type="button" class="cases__dot" aria-label="Слайд 4"></button>
+      <button type="button" class="cases__dot" aria-label="Слайд 5"></button>
     </div>
     <ul class="cases__list">
       <li class="cases__item"><button type="button" class="case-plate"><span class="case-plate__text">название</span></button></li>
-      <li class="cases__item"><button type="button" class="case-plate"><span class="case-plate__text">название</span></button></li>
+      <li class="cases__item"><button type="button" class="case-plate" data-shot="cup.png"><span class="case-plate__text">Графический дизайн</span></button></li>
       <li class="cases__item cases__item--gap"><span class="case-plate"></span></li>
       <li class="cases__item"><button type="button" class="case-plate"><span class="case-plate__text">название</span></button></li>
       <li class="cases__item"><button type="button" class="case-plate"><span class="case-plate__text">название</span></button></li>
@@ -1768,7 +1870,9 @@
     </div>
 
     <div class="footer__bottom">
-      <div class="footer__copy">© 2026 Катерина Степанова — техспец &amp; граф.дизайнер</div>
+      <!-- разбито на части ради мобильной раскладки: род занятий уходит
+           второй строкой под имя, тире там прячется -->
+      <div class="footer__copy"><span class="footer__copy-year">© 2026</span> <span class="footer__copy-name">Катерина Степанова</span><span class="footer__copy-dash"> — </span><span class="footer__copy-role">техспец &amp; граф.дизайнер</span></div>
       <a href="#top" class="footer__up">
         Наверх
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
@@ -2005,6 +2109,42 @@
         card.classList.remove('is-tilting');
         card.style.transform = '';
       });
+    });
+  })();
+
+  // Портфолио: клик по плашке подставляет картинку проекта и показывает точки
+  (function () {
+    const shot = document.getElementById('casesShot');
+    const dots = document.getElementById('casesDots');
+    if (!shot || !dots) return;
+
+    // На узком экране общего превью нет — снимок раскрывается под плашкой.
+    // Элемент один на всё портфолио: appendChild сам уносит его с прошлого
+    // места, поэтому открытым всегда остаётся ровно один. На ПК он скрыт CSS
+    const inline = document.createElement('img');
+    inline.className = 'cases__inline-shot';
+    inline.alt = '';
+
+    document.querySelectorAll('.case-plate[data-shot]').forEach(plate => {
+      plate.addEventListener('click', () => {
+        // подсветка остаётся на открытой плашке — видно, где мы в портфолио
+        document.querySelectorAll('.case-plate.is-active')
+          .forEach(p => p.classList.remove('is-active'));
+        plate.classList.add('is-active');
+        shot.src = plate.dataset.shot;
+        inline.src = plate.dataset.shot;
+        plate.closest('.cases__item').appendChild(inline);
+        dots.hidden = false;
+      });
+    });
+
+    // пока листаем только точками; когда появятся остальные снимки —
+    // здесь же будет меняться shot.src по индексу точки
+    dots.addEventListener('click', (e) => {
+      const dot = e.target.closest('.cases__dot');
+      if (!dot) return;
+      dots.querySelectorAll('.cases__dot').forEach(d => d.classList.remove('is-active'));
+      dot.classList.add('is-active');
     });
   })();
 
