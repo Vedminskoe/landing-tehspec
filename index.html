@@ -41,7 +41,7 @@
       --bg:           #FFFFFF;
       --bg-alt:       #F7F8F6;
       --text:         #1A1A1A;
-      --text-muted:   #6B7280;
+      --text-muted:   #525C68;
       --border:       #E5E7EB;
       /* плотность фонового рисунка: 0 — выключен, 1 — во всю силу */
       --bg-art-opacity: 0.12;
@@ -479,7 +479,7 @@
       line-height: 0.8;
     }
     .hero__desc {
-      font-size: 14px;
+      font-size: 16px;
       color: var(--text-muted);
       max-width: 420px;
       line-height: 1.8;
@@ -867,16 +867,30 @@
       object-position: left center;
     }
     /* Точки слайдера: показывают, на каком снимке проекта мы сейчас.
-       Встают ровно по середине слова «Портфолио». Считаем так:
-       левый край текста = (100% - 1200px) / 2 + 24px (контейнер),
-       плюс половина слова (~176px при кегле 64px) — итого 50% - 400px.
-       Формула точна от 1248px ширины, где контейнер упёрся в max-width,
-       а кегль заголовка перестал расти */
+       Стоят в строку сразу за остриём белой стрелки «смотреть ещё и описание».
+       Стрелка нарисована прямо в port-web.jpg, поэтому привязка идёт не к
+       ширине страницы, а к боксу картинки в процентах: у .cases__shot жёсткий
+       aspect-ratio 12/7, значит кадр масштабируется равномерно и одна и та же
+       точка рисунка на любой ширине экрана лежит по тем же процентам.
+       --dots-x / --dots-y — якорь, снят на глаз со скриншота;
+       если ряд чуть мимо острия, правится этими двумя числами.
+
+       Якорь стоит на СЕРЕДИНЕ ряда, а не на его левом крае: 54% — левый край
+       ряда из пяти точек, +43px — его половина (5 × 10px + 4 зазора × 9px = 86px).
+       Вместе с translateX(-50%) это значит, что точек можно поставить
+       3, 4, 6 — сколько угодно: ряд разойдётся в обе стороны от той же
+       середины и с места не сдвинется. Количество меняется только в разметке,
+       здесь трогать нечего */
     .cases__dots {
+      --dots-x: calc(54% + 43px);
+      --dots-y: 94.6%;
       position: absolute;
-      left: calc(50% - 400px);
-      transform: translateX(-50%);
-      bottom: 16px;
+      left: var(--dots-x);
+      top: var(--dots-y);
+      transform: translate(-50%, -50%);
+      /* лесенка плашек лежит абсолютом поверх всей раскладки и перехватывала бы
+         клики по точкам — поднимаем их над ней */
+      z-index: 2;
       display: flex;
       gap: 9px;
     }
@@ -1317,11 +1331,17 @@
       background: rgba(255,255,255,0.88);
       backdrop-filter: blur(4px);
     }
+    /* Контакты и статус подняты так, чтобы низ плашки «Работаю удалённо»
+       встал вровень с низом кнопки формы, а не с низом карточки.
+       -27px = padding карточки (26) + её рамка (1).
+       Сдвиг относительный: высоту колонки не меняет, форма не растягивается */
     .contacts__meta {
       display: flex;
       flex-direction: column;
       align-items: flex-start;
       gap: 10px;
+      position: relative;
+      top: -27px;
     }
     /* Живая строка статуса: точка мягко пульсирует */
     .contacts__status {
@@ -1329,7 +1349,9 @@
       align-items: center;
       gap: 10px;
       padding: 8px 16px;
-      background: var(--accent-light);
+      /* заливка и рамка — как у кнопки «Смотреть портфолио» (.btn--gold) */
+      background: var(--accent2-light);
+      border: 1.5px solid var(--accent2-hover);
       border-radius: 999px;
       font-size: 13px;
       color: var(--text-muted);
@@ -1371,7 +1393,8 @@
       .contacts__col { display: contents; }
       .contacts__header { max-width: 720px; order: 1; }
       .contacts__form { margin-top: 0; order: 2; }
-      .contacts__meta { order: 3; }
+      /* top: 0 — в одну колонку выравнивать не с чем, сдвиг снимаем */
+      .contacts__meta { order: 3; top: 0; }
     }
     @media (max-width: 520px) {
       /* Контакты по центру: телеграм и вк остаются в строку через точку,
@@ -1453,7 +1476,8 @@
     .footer__tagline {
       font-size: 13px;
       line-height: 1.7;
-      max-width: 300px;
+      /* по ширине строки копирайта внизу подвала — подгонка на глаз */
+      max-width: 380px;
       color: rgba(255,255,255,0.55);
     }
     .footer__col-title {
@@ -1733,16 +1757,16 @@
   <div class="cases__layout">
     <div class="cases__shot">
       <img src="port-web.jpg" alt="" id="casesShot" />
-    </div>
-    <!-- Точки слайдера: появляются вместе с картинкой проекта.
-         Лежат в .cases__layout, а не в .cases__shot — проценты нужны
-         от полной ширины страницы, чтобы встать по центру заголовка -->
-    <div class="cases__dots" id="casesDots" hidden>
-      <button type="button" class="cases__dot is-active" aria-label="Слайд 1"></button>
-      <button type="button" class="cases__dot" aria-label="Слайд 2"></button>
-      <button type="button" class="cases__dot" aria-label="Слайд 3"></button>
-      <button type="button" class="cases__dot" aria-label="Слайд 4"></button>
-      <button type="button" class="cases__dot" aria-label="Слайд 5"></button>
+      <!-- Точки слайдера: появляются вместе с картинкой проекта.
+           Лежат внутри .cases__shot — проценты нужны от кадра, чтобы
+           держаться острия белой стрелки на любой ширине экрана -->
+      <div class="cases__dots" id="casesDots" hidden>
+        <button type="button" class="cases__dot is-active" aria-label="Слайд 1"></button>
+        <button type="button" class="cases__dot" aria-label="Слайд 2"></button>
+        <button type="button" class="cases__dot" aria-label="Слайд 3"></button>
+        <button type="button" class="cases__dot" aria-label="Слайд 4"></button>
+        <button type="button" class="cases__dot" aria-label="Слайд 5"></button>
+      </div>
     </div>
     <ul class="cases__list">
       <li class="cases__item"><button type="button" class="case-plate"><span class="case-plate__text">название</span></button></li>
