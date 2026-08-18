@@ -957,6 +957,11 @@
     .cases__item:nth-child(12) { --off: 45.8%; --drift-dur: 6.5s; --drift-delay: -3.1s; }
     .cases__item:nth-child(13) { --off: 48.5%; --drift-dur: 5.1s; --drift-delay: -1.4s; }
     .cases__item:nth-child(14) { --off: 40.5%; --drift-dur: 7.1s; --drift-delay: -2.8s; }
+    /* добор до 16 работ: тот же разброс между соседями, 5.5–7.5% */
+    .cases__item:nth-child(15) { --off: 47.0%; --drift-dur: 5.6s; --drift-delay: -3.5s; }
+    .cases__item:nth-child(16) { --off: 39.5%; --drift-dur: 6.2s; --drift-delay: -1.1s; }
+    .cases__item:nth-child(17) { --off: 46.5%; --drift-dur: 4.9s; --drift-delay: -4.0s; }
+    .cases__item:nth-child(18) { --off: 41.0%; --drift-dur: 6.6s; --drift-delay: -2.3s; }
     .case-plate {
       flex: 1;
       margin-left: calc(var(--off, 0%) + var(--shift, 0%));
@@ -969,7 +974,11 @@
       border: none;
       background: #fff;
       font-family: var(--font-body);
-      font-size: 17px;
+      /* Строки делят высоту кадра: строк стало 18 вместо 14 — на узком
+         десктопе строка ужимается до ~21px, и 17px текста в неё не влезают.
+         Поэтому размер резиновый: 17px на широком экране и 13px у границы
+         мобильной вёрстки (900px) */
+      font-size: clamp(13px, 1.18vw, 17px);
       line-height: 1.2;
       color: var(--text);
       text-align: left;
@@ -1083,6 +1092,8 @@
         background: #fff;
         justify-content: center;
         text-align: center;
+        /* лесенки здесь нет, строка не сжата — шрифт полного размера */
+        font-size: 17px;
       }
       .cases__inline-shot { display: block; width: 100%; margin: 8px 0 14px; }
     }
@@ -1776,6 +1787,10 @@
       <li class="cases__item"><button type="button" class="case-plate"><span class="case-plate__text">название</span></button></li>
       <li class="cases__item"><button type="button" class="case-plate"><span class="case-plate__text">название</span></button></li>
       <li class="cases__item cases__item--gap"><span class="case-plate"></span></li>
+      <li class="cases__item"><button type="button" class="case-plate"><span class="case-plate__text">название</span></button></li>
+      <li class="cases__item"><button type="button" class="case-plate"><span class="case-plate__text">название</span></button></li>
+      <li class="cases__item"><button type="button" class="case-plate"><span class="case-plate__text">название</span></button></li>
+      <li class="cases__item"><button type="button" class="case-plate"><span class="case-plate__text">название</span></button></li>
       <li class="cases__item"><button type="button" class="case-plate"><span class="case-plate__text">название</span></button></li>
       <li class="cases__item"><button type="button" class="case-plate"><span class="case-plate__text">название</span></button></li>
       <li class="cases__item"><button type="button" class="case-plate"><span class="case-plate__text">название</span></button></li>
