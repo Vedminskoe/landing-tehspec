@@ -1770,18 +1770,14 @@
       <img src="port-web.jpg" alt="" id="casesShot" />
       <!-- Точки слайдера: появляются вместе с картинкой проекта.
            Лежат внутри .cases__shot — проценты нужны от кадра, чтобы
-           держаться острия белой стрелки на любой ширине экрана -->
-      <div class="cases__dots" id="casesDots" hidden>
-        <button type="button" class="cases__dot is-active" aria-label="Слайд 1"></button>
-        <button type="button" class="cases__dot" aria-label="Слайд 2"></button>
-        <button type="button" class="cases__dot" aria-label="Слайд 3"></button>
-        <button type="button" class="cases__dot" aria-label="Слайд 4"></button>
-        <button type="button" class="cases__dot" aria-label="Слайд 5"></button>
-      </div>
+           держаться острия белой стрелки на любой ширине экрана.
+           Сами точки рисует скрипт: их столько, сколько снимков
+           у нажатого проекта -->
+      <div class="cases__dots" id="casesDots" hidden></div>
     </div>
     <ul class="cases__list">
       <li class="cases__item"><button type="button" class="case-plate"><span class="case-plate__text">название</span></button></li>
-      <li class="cases__item"><button type="button" class="case-plate" data-shot="cup.png"><span class="case-plate__text">Графический дизайн</span></button></li>
+      <li class="cases__item"><button type="button" class="case-plate" data-shots="cup.png"><span class="case-plate__text">Графический дизайн</span></button></li>
       <li class="cases__item"><button type="button" class="case-plate"><span class="case-plate__text">название</span></button></li>
       <li class="cases__item cases__item--gap"><span class="case-plate"></span></li>
       <li class="cases__item"><button type="button" class="case-plate"><span class="case-plate__text">название</span></button></li>
@@ -1792,12 +1788,12 @@
       <li class="cases__item"><button type="button" class="case-plate"><span class="case-plate__text">название</span></button></li>
       <li class="cases__item"><button type="button" class="case-plate"><span class="case-plate__text">название</span></button></li>
       <li class="cases__item cases__item--gap"><span class="case-plate"></span></li>
-      <li class="cases__item"><button type="button" class="case-plate"><span class="case-plate__text">название</span></button></li>
-      <li class="cases__item"><button type="button" class="case-plate"><span class="case-plate__text">название</span></button></li>
-      <li class="cases__item"><button type="button" class="case-plate"><span class="case-plate__text">название</span></button></li>
-      <li class="cases__item"><button type="button" class="case-plate"><span class="case-plate__text">название</span></button></li>
-      <li class="cases__item"><button type="button" class="case-plate"><span class="case-plate__text">название</span></button></li>
-      <li class="cases__item"><button type="button" class="case-plate"><span class="case-plate__text">название</span></button></li>
+      <li class="cases__item"><button type="button" class="case-plate" data-shots="img/bot/1.jpg"><span class="case-plate__text">название</span></button></li>
+      <li class="cases__item"><button type="button" class="case-plate" data-shots="img/bot/2.jpg"><span class="case-plate__text">название</span></button></li>
+      <li class="cases__item"><button type="button" class="case-plate" data-shots="img/bot/3-1.jpg,img/bot/3-2.jpg,img/bot/3-3.jpg,img/bot/3-4.jpg"><span class="case-plate__text">название</span></button></li>
+      <li class="cases__item"><button type="button" class="case-plate" data-shots="img/bot/4-1.jpg,img/bot/4-2.jpg"><span class="case-plate__text">название</span></button></li>
+      <li class="cases__item"><button type="button" class="case-plate" data-shots="img/bot/5.jpg"><span class="case-plate__text">название</span></button></li>
+      <li class="cases__item"><button type="button" class="case-plate" data-shots="img/bot/6-1.jpg,img/bot/6-2.jpg"><span class="case-plate__text">название</span></button></li>
     </ul>
   </div>
 </section>
@@ -2151,11 +2147,15 @@
     });
   })();
 
-  // Портфолио: клик по плашке подставляет картинку проекта и показывает точки
+  // Портфолио: клик по плашке подставляет снимки проекта и собирает точки
   (function () {
     const shot = document.getElementById('casesShot');
     const dots = document.getElementById('casesDots');
     if (!shot || !dots) return;
+
+    // Точек рисуем на две больше, чем снимков: это места под кадры, которые
+    // ещё не отсняты. Такая точка листается, но картинку не меняет — нечего
+    const SPARE = 2;
 
     // На узком экране общего превью нет — снимок раскрывается под плашкой.
     // Элемент один на всё портфолио: appendChild сам уносит его с прошлого
@@ -2164,26 +2164,43 @@
     inline.className = 'cases__inline-shot';
     inline.alt = '';
 
-    document.querySelectorAll('.case-plate[data-shot]').forEach(plate => {
+    const show = (list, i) => {
+      if (i >= list.length) return;
+      shot.src = list[i];
+      inline.src = list[i];
+    };
+
+    document.querySelectorAll('.case-plate[data-shots]').forEach(plate => {
+      const list = plate.dataset.shots.split(',');
       plate.addEventListener('click', () => {
         // подсветка остаётся на открытой плашке — видно, где мы в портфолио
         document.querySelectorAll('.case-plate.is-active')
           .forEach(p => p.classList.remove('is-active'));
         plate.classList.add('is-active');
-        shot.src = plate.dataset.shot;
-        inline.src = plate.dataset.shot;
+        show(list, 0);
         plate.closest('.cases__item').appendChild(inline);
+        // ряд пересобираем под текущий проект: у каждого своё число кадров.
+        // Ряд центрирован по якорю, поэтому от смены количества не съезжает
+        dots.textContent = '';
+        for (let i = 0; i < list.length + SPARE; i++) {
+          const d = document.createElement('button');
+          d.type = 'button';
+          d.className = i ? 'cases__dot' : 'cases__dot is-active';
+          d.setAttribute('aria-label', 'Слайд ' + (i + 1));
+          dots.appendChild(d);
+        }
         dots.hidden = false;
       });
     });
 
-    // пока листаем только точками; когда появятся остальные снимки —
-    // здесь же будет меняться shot.src по индексу точки
     dots.addEventListener('click', (e) => {
       const dot = e.target.closest('.cases__dot');
       if (!dot) return;
-      dots.querySelectorAll('.cases__dot').forEach(d => d.classList.remove('is-active'));
+      const all = [...dots.children];
+      all.forEach(d => d.classList.remove('is-active'));
       dot.classList.add('is-active');
+      const open = document.querySelector('.case-plate.is-active');
+      if (open) show(open.dataset.shots.split(','), all.indexOf(dot));
     });
   })();
 
