@@ -930,10 +930,13 @@
          12% оставляют 2% запаса */
       --shift: 12%;
       /* Растворение задано маской на весь список, а не на каждую плашку:
-         белое держится плотным до 68% ширины экрана — то есть заведомо
-         дальше правого края картинки (66%), чтобы она нигде не просвечивала */
-      -webkit-mask-image: linear-gradient(90deg, #000 0 68%, transparent 82%);
-              mask-image: linear-gradient(90deg, #000 0 68%, transparent 82%);
+         белое держится плотным до 78% ширины экрана — то есть заведомо
+         дальше правого края картинки (66%), чтобы она нигде не просвечивала.
+         Было 68%, но названия работ в это не укладывались: у самого длинного
+         (ячейка 14) хвост приходился на место, где от белого осталась четверть.
+         Границу мерил шрифтом Involve на 17px */
+      -webkit-mask-image: linear-gradient(90deg, #000 0 78%, transparent 92%);
+              mask-image: linear-gradient(90deg, #000 0 78%, transparent 92%);
     }
     /* распорка: забирает те самые 34px, чтобы строки делили ровно
        высоту картинки, как раньше */
@@ -1788,12 +1791,12 @@
       <li class="cases__item"><button type="button" class="case-plate"><span class="case-plate__text">название</span></button></li>
       <li class="cases__item"><button type="button" class="case-plate"><span class="case-plate__text">название</span></button></li>
       <li class="cases__item cases__item--gap"><span class="case-plate"></span></li>
-      <li class="cases__item"><button type="button" class="case-plate" data-shots="img/bot/1.jpg"><span class="case-plate__text">Проверка подписки</span></button></li>
-      <li class="cases__item"><button type="button" class="case-plate" data-shots="img/bot/2.jpg"><span class="case-plate__text">Гадание на метаморфозных картах</span></button></li>
-      <li class="cases__item"><button type="button" class="case-plate" data-shots="img/bot/3-1.jpg,img/bot/3-2.jpg,img/bot/3-3.jpg,img/bot/3-4.jpg"><span class="case-plate__text">Клуб по подписке</span></button></li>
-      <li class="cases__item"><button type="button" class="case-plate" data-shots="img/bot/4-1.jpg,img/bot/4-2.jpg"><span class="case-plate__text">Запись в салон красоты</span></button></li>
-      <li class="cases__item"><button type="button" class="case-plate" data-shots="img/bot/5.jpg"><span class="case-plate__text">Распаковка личности</span></button></li>
-      <li class="cases__item"><button type="button" class="case-plate" data-shots="img/bot/6-1.jpg,img/bot/6-2.jpg"><span class="case-plate__text">Опросник про энергию</span></button></li>
+      <li class="cases__item"><button type="button" class="case-plate" data-shots="img/bot/1.jpg"><span class="case-plate__text">Бот с проверкой подписки</span></button></li>
+      <li class="cases__item"><button type="button" class="case-plate" data-shots="img/bot/2.jpg"><span class="case-plate__text">Бот «Гадание на метаморфозных картах»</span></button></li>
+      <li class="cases__item"><button type="button" class="case-plate" data-shots="img/bot/3-1.jpg,img/bot/3-2.jpg,img/bot/3-3.jpg,img/bot/3-4.jpg"><span class="case-plate__text">Бот клуба по подписке</span></button></li>
+      <li class="cases__item"><button type="button" class="case-plate" data-shots="img/bot/4-1.jpg,img/bot/4-2.jpg"><span class="case-plate__text">Бот для салона красоты</span></button></li>
+      <li class="cases__item"><button type="button" class="case-plate" data-shots="img/bot/5.jpg"><span class="case-plate__text">Бот с подключением AI</span></button></li>
+      <li class="cases__item"><button type="button" class="case-plate" data-shots="img/bot/6-1.jpg,img/bot/6-2.jpg"><span class="case-plate__text">Бот-опросник</span></button></li>
     </ul>
   </div>
 </section>
