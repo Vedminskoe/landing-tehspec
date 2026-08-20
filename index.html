@@ -942,29 +942,28 @@
        высоту картинки, как раньше */
     .cases__list::after { content: ''; flex: none; height: 34px; }
     .cases__item { display: flex; flex: 1; }
-    /* --off — сдвиг плашки вправо, лесенка; --drift-* — своя длительность
-       и фаза парения текста, чтобы плашки не двигались в такт */
-    .cases__item:nth-child(1 ) { --off: 41.5%; --drift-dur: 5.4s; --drift-delay: -1.2s; }
-    .cases__item:nth-child(2 ) { --off: 49.7%; --drift-dur: 6.3s; --drift-delay: -3.4s; }
-    .cases__item:nth-child(3 ) { --off: 46.0%; --drift-dur: 6.1s; --drift-delay: -2.4s; }
-    .cases__item:nth-child(4 ) { --off: 38.4%; --drift-dur: 5.0s; --drift-delay: -2.1s; }
-    .cases__item:nth-child(5 ) { --off: 43.2%; --drift-dur: 6.7s; --drift-delay: -0.6s; }
-    .cases__item:nth-child(6 ) { --off: 52.0%; --drift-dur: 5.8s; --drift-delay: -4.3s; }
-    .cases__item:nth-child(7 ) { --off: 43.0%; --drift-dur: 5.5s; --drift-delay: -3.7s; }
-    .cases__item:nth-child(8 ) { --off: 48.5%; --drift-dur: 6.0s; --drift-delay: -1.7s; }
-    .cases__item:nth-child(9 ) { --off: 35.9%; --drift-dur: 4.8s; --drift-delay: -3.9s; }
+    /* --off — сдвиг плашки вправо, из него и складывается лесенка */
+    .cases__item:nth-child(1 ) { --off: 41.5%; }
+    .cases__item:nth-child(2 ) { --off: 49.7%; }
+    .cases__item:nth-child(3 ) { --off: 46.0%; }
+    .cases__item:nth-child(4 ) { --off: 38.4%; }
+    .cases__item:nth-child(5 ) { --off: 43.2%; }
+    .cases__item:nth-child(6 ) { --off: 52.0%; }
+    .cases__item:nth-child(7 ) { --off: 43.0%; }
+    .cases__item:nth-child(8 ) { --off: 48.5%; }
+    .cases__item:nth-child(9 ) { --off: 35.9%; }
     /* низ лесенки чуть левее верха, разброс между соседями 4.5–8%
        вместо 3–5%: ступени внизу читаются резче, но веером не расходятся */
-    .cases__item:nth-child(10) { --off: 43.5%; --drift-dur: 6.9s; --drift-delay: -2.6s; }
-    .cases__item:nth-child(11) { --off: 50.0%; --drift-dur: 5.2s; --drift-delay: -0.9s; }
-    .cases__item:nth-child(12) { --off: 45.8%; --drift-dur: 6.5s; --drift-delay: -3.1s; }
-    .cases__item:nth-child(13) { --off: 48.5%; --drift-dur: 5.1s; --drift-delay: -1.4s; }
-    .cases__item:nth-child(14) { --off: 40.5%; --drift-dur: 7.1s; --drift-delay: -2.8s; }
+    .cases__item:nth-child(10) { --off: 43.5%; }
+    .cases__item:nth-child(11) { --off: 50.0%; }
+    .cases__item:nth-child(12) { --off: 45.8%; }
+    .cases__item:nth-child(13) { --off: 48.5%; }
+    .cases__item:nth-child(14) { --off: 40.5%; }
     /* добор до 16 работ: тот же разброс между соседями, 5.5–7.5% */
-    .cases__item:nth-child(15) { --off: 47.0%; --drift-dur: 5.6s; --drift-delay: -3.5s; }
-    .cases__item:nth-child(16) { --off: 39.5%; --drift-dur: 6.2s; --drift-delay: -1.1s; }
-    .cases__item:nth-child(17) { --off: 46.5%; --drift-dur: 4.9s; --drift-delay: -4.0s; }
-    .cases__item:nth-child(18) { --off: 41.0%; --drift-dur: 6.6s; --drift-delay: -2.3s; }
+    .cases__item:nth-child(15) { --off: 47.0%; }
+    .cases__item:nth-child(16) { --off: 39.5%; }
+    .cases__item:nth-child(17) { --off: 46.5%; }
+    .cases__item:nth-child(18) { --off: 41.0%; }
     .case-plate {
       flex: 1;
       margin-left: calc(var(--off, 0%) + var(--shift, 0%));
@@ -1031,41 +1030,25 @@
     }
     /* наведённая перекрывает открытую, если это разные плашки */
     .case-plate:hover { z-index: 2; }
-    /* Названия парят: амплитуда 4–5px, у каждой плашки своя
-       траектория (три набора кадров), своя длительность и фаза. Двигается
-       только текст — белая плашка держит лесенку и стык с картинкой.
-       Отрицательные задержки — чтобы движение уже шло при загрузке,
-       а не стартовало у всех из нуля */
-    .case-plate__text {
-      display: inline-block;
-      animation: case-drift-a var(--drift-dur, 8s) ease-in-out var(--drift-delay, 0s) infinite;
+    /* Заливка открытой плашки — тёплый тон кнопки «Смотреть портфолио»
+       (--accent2-light). Растянута теми же стопами, что и зелёная рамка:
+       плотная слева, сходит на нет к 68% ширины плашки, поэтому контур и
+       заливка гаснут в одном месте. Лежит на ::before, чтобы проявляться
+       плавно через opacity — градиент в background переходами не тянется */
+    .case-plate::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(90deg, var(--accent2-light) 0 28%, rgba(255,248,224,0) 68%);
+      opacity: 0;
+      transition: opacity var(--transition);
     }
-    .cases__item:nth-child(3n+2) .case-plate__text { animation-name: case-drift-b; }
-    .cases__item:nth-child(3n)   .case-plate__text { animation-name: case-drift-c; }
-    @keyframes case-drift-a {
-      0%, 100% { transform: translate(0, 0) rotate(0deg); }
-      21% { transform: translate(3.8px, -2.6px) rotate(.4deg); }
-      44% { transform: translate(-2.9px, 3.3px) rotate(-.3deg); }
-      67% { transform: translate(4.8px, 1.5px) rotate(.24deg); }
-      85% { transform: translate(-1.8px, -3.7px) rotate(-.45deg); }
-    }
-    @keyframes case-drift-b {
-      0%, 100% { transform: translate(0, 0) rotate(0deg); }
-      18% { transform: translate(-4.2px, 2.4px) rotate(-.38deg); }
-      39% { transform: translate(2.6px, 4.0px) rotate(.5deg); }
-      58% { transform: translate(5.3px, -2.0px) rotate(.2deg); }
-      81% { transform: translate(-3.3px, -3.1px) rotate(-.25deg); }
-    }
-    @keyframes case-drift-c {
-      0%, 100% { transform: translate(0, 0) rotate(0deg); }
-      26% { transform: translate(2.4px, 3.5px) rotate(.3deg); }
-      48% { transform: translate(-5.1px, -2.2px) rotate(-.5deg); }
-      63% { transform: translate(2.0px, -4.2px) rotate(.35deg); }
-      88% { transform: translate(-3.5px, 2.6px) rotate(-.18deg); }
-    }
+    .case-plate.is-active::before { opacity: 1; }
+    /* ::before спозиционирован и без этого накрыл бы название */
+    .case-plate__text { position: relative; }
     @media (prefers-reduced-motion: reduce) {
-      .case-plate__text { animation: none; }
-      /* свечение и рамку оставляем — выделение при наведении не теряется */
+      /* свечение, рамку и заливку оставляем — выделение не теряется */
       .case-plate:hover { transform: none; }
     }
     /* пустая плашка — разделитель между категориями работ, не подсвечивается */
