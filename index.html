@@ -912,10 +912,12 @@
       animation: cases-crt  var(--crt) cubic-bezier(0.4, 0, 0.2, 1) forwards,
                  cases-flash var(--crt) ease-out forwards;
     }
-    /* точки догоняют кадр, когда полоса уже разошлась — на пустом поле
-       они висели бы сами по себе */
+    /* Точки догоняют кадр, когда до них дошёл нижний край раскрытия.
+       Лежат они на 94.6% высоты, то есть у самого низа: при любой нажатой
+       плашке полоса добирается туда почти в конце анимации, около 1s.
+       Отсюда и задержка — на 0.55s они ещё висели на пустом белом поле */
     .cases__shot.is-playing .cases__dots {
-      animation: cases-dots 0.45s ease 0.55s backwards;
+      animation: cases-dots 0.32s ease 0.92s backwards;
     }
     @keyframes cases-dots { from { opacity: 0; } }
     @media (prefers-reduced-motion: reduce) {
