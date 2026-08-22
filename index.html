@@ -866,9 +866,66 @@
          а отступ слева и расположение работ остаются как в макете */
       object-position: left center;
     }
+    /* До первого клика кадр пустой — место под робота. Картинки тут нет
+       вообще: у img нет src, пока скрипт не подставит первый снимок */
+    .cases__shot:not(.is-open) img { display: none; }
+
+    /* Раскрытие кинескопом. Точка рождается на месте нажатой плашки,
+       вытягивается в горизонтальную полосу во всю ширину кадра, полоса
+       замирает и расходится вверх-вниз.
+       --shot-x / --shot-y ставит скрипт по геометрии плашки, поэтому
+       каждая работа разворачивается из своей строки лесенки, а не из
+       середины картинки. Значения — проценты от бокса кадра */
+    .cases__shot {
+      --shot-x: 88%;
+      --shot-y: 50%;
+      --crt: 1.05s;
+    }
+    /* стартовая щель: 0.5% в ширину и 0.6% в высоту вокруг точки */
+    @keyframes cases-crt {
+      0%   { clip-path: inset(calc(var(--shot-y) - 0.3%)
+                              calc(100% - var(--shot-x) - 0.25%)
+                              calc(100% - var(--shot-y) - 0.3%)
+                              calc(var(--shot-x) - 0.25%)); }
+      /* полоса дотянулась до обоих краёв и держит паузу */
+      38%,
+      52% { clip-path: inset(calc(var(--shot-y) - 0.3%) 0
+                             calc(100% - var(--shot-y) - 0.3%) 0); }
+      100% { clip-path: inset(0); }
+    }
+    @keyframes cases-flash { 0% { opacity: 0; } 40% { opacity: 0.5; } 100% { opacity: 0; } }
+    .cases__shot.is-playing img {
+      animation: cases-crt var(--crt) cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+    /* Свечение повторяет ту же форму: белое горит ровно в раскрывающейся
+       полосе, а не по всему кадру — иначе вспышка засветила бы и пустое поле */
+    .cases__shot::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: #fff;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .cases__shot.is-playing::after {
+      animation: cases-crt  var(--crt) cubic-bezier(0.4, 0, 0.2, 1) forwards,
+                 cases-flash var(--crt) ease-out forwards;
+    }
+    /* точки догоняют кадр, когда полоса уже разошлась — на пустом поле
+       они висели бы сами по себе */
+    .cases__shot.is-playing .cases__dots {
+      animation: cases-dots 0.45s ease 0.55s backwards;
+    }
+    @keyframes cases-dots { from { opacity: 0; } }
+    @media (prefers-reduced-motion: reduce) {
+      .cases__shot.is-playing img,
+      .cases__shot.is-playing::after,
+      .cases__shot.is-playing .cases__dots { animation: none; }
+    }
     /* Точки слайдера: показывают, на каком снимке проекта мы сейчас.
        Стоят в строку сразу за остриём белой стрелки «смотреть ещё и описание».
-       Стрелка нарисована прямо в port-web.jpg, поэтому привязка идёт не к
+       Стрелка нарисована на самих снимках работ, поэтому привязка идёт не к
        ширине страницы, а к боксу картинки в процентах: у .cases__shot жёсткий
        aspect-ratio 12/7, значит кадр масштабируется равномерно и одна и та же
        точка рисунка на любой ширине экрана лежит по тем же процентам.
@@ -1760,7 +1817,8 @@
   <!-- выходит за .container: картинка прижата к левому краю экрана -->
   <div class="cases__layout">
     <div class="cases__shot">
-      <img src="port-web.jpg" alt="" id="casesShot" />
+      <!-- src подставляет скрипт при первом клике по плашке -->
+      <img alt="" id="casesShot" />
       <!-- Точки слайдера: появляются вместе с картинкой проекта.
            Лежат внутри .cases__shot — проценты нужны от кадра, чтобы
            держаться острия белой стрелки на любой ширине экрана.
@@ -2163,6 +2221,29 @@
       inline.src = list[i];
     };
 
+    // Раскрытие кинескопом. Щель рождается у левого края нажатой плашки,
+    // на середине её высоты, и оттуда разворачивается кадр — каждая работа
+    // открывается из своей строки лесенки. Координаты кладём в проценты от
+    // бокса кадра, дальше их разбирает CSS.
+    // Ждём, пока снимок догрузится: иначе полоса развернулась бы по пустому
+    const frame = shot.closest('.cases__shot');
+    const playCrt = (plate) => {
+      frame.classList.add('is-open');
+      const b = frame.getBoundingClientRect();
+      const r = plate.getBoundingClientRect();
+      // на узком экране кадра нет вовсе (display: none) — мерить нечего,
+      // снимок там раскрывается под плашкой и без кинескопа
+      if (!b.width || !b.height) return;
+      const pc = v => Math.min(100, Math.max(0, v)).toFixed(2) + '%';
+      frame.style.setProperty('--shot-x', pc((r.left - b.left) / b.width * 100));
+      frame.style.setProperty('--shot-y', pc((r.top + r.height / 2 - b.top) / b.height * 100));
+      // без сброса и принудительного пересчёта повторный клик по той же
+      // плашке анимацию не переиграет — класс-то уже висит
+      frame.classList.remove('is-playing');
+      void frame.offsetWidth;
+      frame.classList.add('is-playing');
+    };
+
     document.querySelectorAll('.case-plate[data-shots]').forEach(plate => {
       const list = plate.dataset.shots.split(',');
       plate.addEventListener('click', () => {
@@ -2171,6 +2252,11 @@
           .forEach(p => p.classList.remove('is-active'));
         plate.classList.add('is-active');
         show(list, 0);
+        // onload переприсваиваем, а не копим слушателей: если щёлкать по
+        // плашкам быстро, отработает только последняя
+        const start = () => { shot.onload = null; playCrt(plate); };
+        shot.onload = start;
+        if (shot.complete) start();
         plate.closest('.cases__item').appendChild(inline);
         // ряд пересобираем под текущий проект: у каждого своё число кадров.
         // Ряд центрирован по якорю, поэтому от смены количества не съезжает
