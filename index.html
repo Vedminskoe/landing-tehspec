@@ -44,7 +44,7 @@
       --text-muted:   #525C68;
       --border:       #E5E7EB;
       /* плотность фонового рисунка: 0 — выключен, 1 — во всю силу */
-      --bg-art-opacity: 0.12;
+      --bg-art-opacity: 0.5;
 
       /* Радиусы */
       --radius-sm:    4px;
@@ -73,15 +73,15 @@
 
     /* Единый фон: рисунок тянется от шапки до подвала на всю высоту страницы.
        auto 100% — высота по странице, пропорции не плывут (края чуть обрезаются).
-       Плотность рисунка регулируется --bg-art-opacity */
+       Лёгкая бледность — через --bg-art-opacity, подмешивает белый фон body. */
     body { position: relative; }
     .page-bg {
       position: absolute;
       inset: 0;
       z-index: -1;
       pointer-events: none;
-      background: url('fon-web.jpg') top center / auto 100% no-repeat;
-      opacity: var(--bg-art-opacity, 0.12);
+      background: url('fon-web2.jpg') top center / auto 100% no-repeat;
+      opacity: var(--bg-art-opacity, 1);
     }
 
     /* ── Утилиты ── */
