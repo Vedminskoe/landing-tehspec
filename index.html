@@ -855,9 +855,13 @@
       position: relative;
       width: 66%;
       aspect-ratio: 12 / 7;
-      background: var(--bg-alt);
+      /* Подложка нужна только под раскрытие снимка — она подстилает те части
+         кадра, куда кинескоп ещё не дошёл. Пока в кадре робот, её нет вовсе:
+         у робота фон вырезан, и сквозь него виден фон страницы */
+      background: none;
       overflow: hidden;
     }
+    .cases__shot.is-open { background: var(--bg-alt); }
     .cases__shot img {
       width: 100%;
       height: 100%;
@@ -866,63 +870,63 @@
          а отступ слева и расположение работ остаются как в макете */
       object-position: left center;
     }
-    /* До первого клика кадр пустой — место под робота. Картинки тут нет
-       вообще: у img нет src, пока скрипт не подставит первый снимок */
-    .cases__shot:not(.is-open) img { display: none; }
-
-    /* Раскрытие кинескопом. Точка рождается на месте нажатой плашки,
-       вытягивается в горизонтальную полосу во всю ширину кадра, полоса
-       замирает и расходится вверх-вниз.
-       --shot-x / --shot-y ставит скрипт по геометрии плашки, поэтому
-       каждая работа разворачивается из своей строки лесенки, а не из
-       середины картинки. Значения — проценты от бокса кадра */
-    .cases__shot {
-      --shot-x: 88%;
-      --shot-y: 50%;
-      --crt: 1.05s;
-    }
-    /* стартовая щель: 0.5% в ширину и 0.6% в высоту вокруг точки */
-    @keyframes cases-crt {
-      0%   { clip-path: inset(calc(var(--shot-y) - 0.3%)
-                              calc(100% - var(--shot-x) - 0.25%)
-                              calc(100% - var(--shot-y) - 0.3%)
-                              calc(var(--shot-x) - 0.25%)); }
-      /* полоса дотянулась до обоих краёв и держит паузу */
-      38%,
-      52% { clip-path: inset(calc(var(--shot-y) - 0.3%) 0
-                             calc(100% - var(--shot-y) - 0.3%) 0); }
-      100% { clip-path: inset(0); }
-    }
-    @keyframes cases-flash { 0% { opacity: 0; } 40% { opacity: 0.5; } 100% { opacity: 0; } }
-    .cases__shot.is-playing img {
-      animation: cases-crt var(--crt) cubic-bezier(0.4, 0, 0.2, 1) forwards;
-    }
-    /* Свечение повторяет ту же форму: белое горит ровно в раскрывающейся
-       полосе, а не по всему кадру — иначе вспышка засветила бы и пустое поле */
-    .cases__shot::after {
-      content: '';
+    /* До первого клика в кадре стоит робот с табличкой: у #casesShot нет src,
+       пока скрипт не подставит первый снимок. Как только работа открылась,
+       робот уходит и кадр раскрывается кинескопом уже под снимок */
+    .cases__shot:not(.is-open) #casesShot { display: none; }
+    .cases__shot .cases__stub {
+      /* абсолют, чтобы размер и место робота задавались двумя числами и не
+         зависели от пропорций кадра. Фон у картинки вырезан, так что
+         подложка кадра сквозь неё не читается */
       position: absolute;
-      inset: 0;
-      background: #fff;
-      opacity: 0;
-      pointer-events: none;
-      z-index: 1;
+      /* left — это центр робота, а не левый край: от смены width он
+         остаётся на том же месте, двигать надо только этим числом.
+         По центру кадра было бы 50% — стоит чуть левее */
+      left: 45%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 75%;
+      height: auto;
+      /* Маятник: ноги стоят, корпус качается. Точка вращения — ступни робота,
+         а не низ картинки: по альфе он занимает 50.3% ширины и кончается
+         на 97.8% высоты. Темп тот же, что у парящего робота в услугах */
+      transform-origin: 50.3% 97.8%;
+      animation: stub-swing 4.5s ease-in-out infinite;
     }
-    .cases__shot.is-playing::after {
-      animation: cases-crt  var(--crt) cubic-bezier(0.4, 0, 0.2, 1) forwards,
-                 cases-flash var(--crt) ease-out forwards;
+    /* translate повторяем в каждом кадре: анимация transform перебивает
+       свойство целиком, без него робота отбросило бы от своей точки */
+    @keyframes stub-swing {
+      0%, 100% { transform: translate(-50%, -50%) rotate(-3deg); }
+      50%      { transform: translate(-50%, -50%) rotate(3deg); }
     }
-    /* Точки догоняют кадр, когда до них дошёл нижний край раскрытия.
-       Лежат они на 94.6% высоты, то есть у самого низа: при любой нажатой
-       плашке полоса добирается туда почти в конце анимации, около 1s.
-       Отсюда и задержка — на 0.55s они ещё висели на пустом белом поле */
+    @media (prefers-reduced-motion: reduce) {
+      .cases__shot .cases__stub { animation: none; }
+    }
+    .cases__shot.is-open .cases__stub { display: none; }
+
+    /* Появление снимка — «Цвет» (28) из подборки _anim-demo.html: кадр входит
+       обесцвеченным и пересвеченным, за время анимации набирает цвет и
+       плотность. Разворачивается весь кадр разом, поэтому ни точки старта,
+       ни отдельной вспышки тут нет — в отличие от прежнего кинескопа */
+    /* не путать с --reveal-delay: та переменная про выезд блоков при скролле */
+    .cases__shot { --shot-reveal: 1.8s; }
+    @keyframes cases-color {
+      from { opacity: 0; filter: grayscale(1) contrast(1.5) brightness(1.35); }
+      to   { opacity: 1; filter: none; }
+    }
+    .cases__shot.is-playing img {
+      animation: cases-color var(--shot-reveal) ease-out both;
+    }
+    /* Точки догоняют кадр к середине проявления: раньше они висели бы на
+       пустом поле, позже — уже на готовой картинке */
     .cases__shot.is-playing .cases__dots {
-      animation: cases-dots 0.32s ease 0.92s backwards;
+      /* доля от длительности, а не своя секунда: меняешь --shot-reveal —
+         точки остаются на той же половине проявления */
+      animation: cases-dots 0.32s ease calc(var(--shot-reveal) * 0.43) backwards;
     }
     @keyframes cases-dots { from { opacity: 0; } }
     @media (prefers-reduced-motion: reduce) {
       .cases__shot.is-playing img,
-      .cases__shot.is-playing::after,
       .cases__shot.is-playing .cases__dots { animation: none; }
     }
     /* Точки слайдера: показывают, на каком снимке проекта мы сейчас.
@@ -969,6 +973,44 @@
     }
     .cases__dot:hover { transform: scale(1.2); }
     .cases__dot.is-active { background: var(--accent2); }
+    /* Крестик за концом ряда: закрывает открытую работу и возвращает робота.
+       Кружок крупнее точек, чтобы читался как отдельное действие, а не как
+       ещё один кадр.
+       Из потока вынесен нарочно: ряд центрирован по якорю, и будь крестик
+       обычной ячейкой флекса, он растянул бы ряд и сдвинул точки влево —
+       на стрелку. Абсолют от правого края ряда: точки стоят там же, где
+       стояли, при любом их количестве */
+    .cases__close {
+      position: absolute;
+      left: 100%;
+      top: 50%;
+      transform: translateY(-50%);
+      /* отступ от последней точки — вдвое против зазора между точками */
+      margin-left: 18px;
+      width: 36px;
+      height: 36px;
+      padding: 0;
+      border: none;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.6);
+      box-shadow: 0 1px 4px rgba(26,26,26,0.35);
+      cursor: pointer;
+      transition: background var(--transition), transform var(--transition);
+    }
+    .cases__close:hover { background: #fff; transform: translateY(-50%) scale(1.15); }
+    .cases__close::before,
+    .cases__close::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 18px;
+      height: 3px;
+      border-radius: 2px;
+      background: var(--text);
+    }
+    .cases__close::before { transform: translate(-50%, -50%) rotate(45deg); }
+    .cases__close::after  { transform: translate(-50%, -50%) rotate(-45deg); }
     /* Строки занимают всю высоту картинки и прижаты друг к другу:
        белое поле сливается в одну лесенку с чётким левым краем */
     .cases__list {
@@ -1819,6 +1861,8 @@
   <!-- выходит за .container: картинка прижата к левому краю экрана -->
   <div class="cases__layout">
     <div class="cases__shot">
+      <!-- заглушка до первого клика -->
+      <img class="cases__stub" src="port-robot.png" alt="" aria-hidden="true" />
       <!-- src подставляет скрипт при первом клике по плашке -->
       <img alt="" id="casesShot" />
       <!-- Точки слайдера: появляются вместе с картинкой проекта.
@@ -2210,6 +2254,14 @@
     // ещё не отсняты. Такая точка листается, но картинку не меняет — нечего
     const SPARE = 2;
 
+    // Крестик в конце ряда точек. Элемент один: dots.textContent = '' его
+    // выносит вместе с точками, поэтому при каждой сборке ряда дописываем
+    // заново — и всегда последним, чтобы индексы точек не поехали
+    const closeBtn = document.createElement('button');
+    closeBtn.type = 'button';
+    closeBtn.className = 'cases__close';
+    closeBtn.setAttribute('aria-label', 'Закрыть работу');
+
     // На узком экране общего превью нет — снимок раскрывается под плашкой.
     // Элемент один на всё портфолио: appendChild сам уносит его с прошлого
     // места, поэтому открытым всегда остаётся ровно один. На ПК он скрыт CSS
@@ -2223,22 +2275,11 @@
       inline.src = list[i];
     };
 
-    // Раскрытие кинескопом. Щель рождается у левого края нажатой плашки,
-    // на середине её высоты, и оттуда разворачивается кадр — каждая работа
-    // открывается из своей строки лесенки. Координаты кладём в проценты от
-    // бокса кадра, дальше их разбирает CSS.
-    // Ждём, пока снимок догрузится: иначе полоса развернулась бы по пустому
+    // Появление снимка: скрипт только вешает классы, всё остальное делает CSS.
+    // Ждём, пока снимок догрузится, иначе проявляться будет пустое место
     const frame = shot.closest('.cases__shot');
-    const playCrt = (plate) => {
+    const playReveal = () => {
       frame.classList.add('is-open');
-      const b = frame.getBoundingClientRect();
-      const r = plate.getBoundingClientRect();
-      // на узком экране кадра нет вовсе (display: none) — мерить нечего,
-      // снимок там раскрывается под плашкой и без кинескопа
-      if (!b.width || !b.height) return;
-      const pc = v => Math.min(100, Math.max(0, v)).toFixed(2) + '%';
-      frame.style.setProperty('--shot-x', pc((r.left - b.left) / b.width * 100));
-      frame.style.setProperty('--shot-y', pc((r.top + r.height / 2 - b.top) / b.height * 100));
       // без сброса и принудительного пересчёта повторный клик по той же
       // плашке анимацию не переиграет — класс-то уже висит
       frame.classList.remove('is-playing');
@@ -2256,7 +2297,7 @@
         show(list, 0);
         // onload переприсваиваем, а не копим слушателей: если щёлкать по
         // плашкам быстро, отработает только последняя
-        const start = () => { shot.onload = null; playCrt(plate); };
+        const start = () => { shot.onload = null; playReveal(); };
         shot.onload = start;
         if (shot.complete) start();
         plate.closest('.cases__item').appendChild(inline);
@@ -2270,11 +2311,25 @@
           d.setAttribute('aria-label', 'Слайд ' + (i + 1));
           dots.appendChild(d);
         }
+        dots.appendChild(closeBtn);
         dots.hidden = false;
       });
     });
 
+    // Возврат к роботу: снимаем is-open — CSS сам прячет снимок и показывает
+    // заглушку. src не трогаем, чтобы повторное открытие той же работы
+    // не ждало загрузки
+    const closeShot = () => {
+      frame.classList.remove('is-open', 'is-playing');
+      dots.hidden = true;
+      dots.textContent = '';
+      document.querySelectorAll('.case-plate.is-active')
+        .forEach(p => p.classList.remove('is-active'));
+      inline.remove();
+    };
+
     dots.addEventListener('click', (e) => {
+      if (e.target.closest('.cases__close')) { closeShot(); return; }
       const dot = e.target.closest('.cases__dot');
       if (!dot) return;
       const all = [...dots.children];
