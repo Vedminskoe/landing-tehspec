@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Катерина Степанова — техспец для онлайн-школ</title>
-  <meta name="description" content="Верстка сайтов, Telegram-боты, интеграции и графический дизайн для онлайн-школ и экспертов. Тобольск, работаю удалённо." />
+  <title>Катерина Степанова — техспец для онлайн-школ и малого бизнеса</title>
+  <meta name="description" content="Верстка сайтов, Telegram-боты, интеграции и графический дизайн для онлайн-школ, экспертов и малого бизнеса. Тобольск, работаю удалённо." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Spectral:wght@300;400;500;600&display=swap" rel="stylesheet" />
@@ -481,7 +481,9 @@
     .hero__desc {
       font-size: 16px;
       color: var(--text-muted);
-      max-width: 420px;
+      /* 420px не хватало на десяток пикселей: «связываю сервисы.» не влезало
+         в строку и «сервисы.» повисало одно. Порог — 450px, здесь запас */
+      max-width: 460px;
       line-height: 1.8;
       margin-bottom: 36px;
     }
@@ -874,18 +876,22 @@
        пока скрипт не подставит первый снимок. Как только работа открылась,
        робот уходит и кадр раскрывается кинескопом уже под снимок */
     .cases__shot:not(.is-open) #casesShot { display: none; }
-    .cases__shot .cases__stub {
-      /* абсолют, чтобы размер и место робота задавались двумя числами и не
-         зависели от пропорций кадра. Фон у картинки вырезан, так что
-         подложка кадра сквозь неё не читается */
+    /* Робот и его тень лежат в общей обёртке: место и размер задаются тремя
+       числами на ней одной, тень внутри привязана к роботу и едет вместе с
+       ним. Фон у картинки вырезан, подложка кадра сквозь неё не читается */
+    .cases__stub-wrap {
       position: absolute;
-      /* left — это центр робота, а не левый край: от смены width он
-         остаётся на том же месте, двигать надо только этим числом.
-         По центру кадра было бы 50% — стоит чуть левее */
-      left: 45%;
-      top: 50%;
-      transform: translate(-50%, -50%);
+      /* left/top — это центр робота, а не левый верхний угол: от смены
+         width он остаётся на том же месте. По центру кадра было бы 50/50 */
+      left: 38%;
+      top: 54%;
       width: 75%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+    .cases__shot.is-open .cases__stub-wrap { display: none; }
+    .cases__shot .cases__stub {
+      width: 100%;
       height: auto;
       /* Маятник: ноги стоят, корпус качается. Точка вращения — ступни робота,
          а не низ картинки: по альфе он занимает 50.3% ширины и кончается
@@ -893,16 +899,47 @@
       transform-origin: 50.3% 97.8%;
       animation: stub-swing 4.5s ease-in-out infinite;
     }
-    /* translate повторяем в каждом кадре: анимация transform перебивает
-       свойство целиком, без него робота отбросило бы от своей точки */
     @keyframes stub-swing {
-      0%, 100% { transform: translate(-50%, -50%) rotate(-3deg); }
-      50%      { transform: translate(-50%, -50%) rotate(3deg); }
+      0%, 100% { transform: rotate(-3deg); }
+      50%      { transform: rotate(3deg); }
     }
     @media (prefers-reduced-motion: reduce) {
       .cases__shot .cases__stub { animation: none; }
     }
-    .cases__shot.is-open .cases__stub { display: none; }
+    /* Тень отдельным пятном, а не drop-shadow: тот копирует силуэт, и тень
+       поднятой таблички ложилась в просветы между руками и головой — робот
+       выглядел замазанным. Здесь свет падает с верхней правой точки, поэтому
+       тень лежит на полу слева от ступней. Проценты — от обёртки, то есть от
+       самого робота; aspect-ratio вместо height, чтобы вытянутость не зависела
+       от того, как разрешится высота обёртки.
+       Ступни при качании стоят на месте, значит и тень никуда не едет */
+    .cases__stub-shadow {
+      position: absolute;
+      left: 38%;
+      top: 98.1%;
+      width: 56%;
+      aspect-ratio: 16 / 1;
+      transform: translate(-50%, -50%);
+      background: radial-gradient(closest-side,
+                                  rgba(26,26,26,0.20),
+                                  rgba(26,26,26,0));
+    }
+    /* Рукописные «ТЫК» со стрелками: подсказка, что плашки нажимаются.
+       Лежат в .cases__layout, а не в кадре: кадр обрезает всё за своими
+       66%, а стрелки тычут в лесенку правее. Ширина в процентах от
+       раскладки, высота сама по пропорциям картинки */
+    .cases__tik {
+      position: absolute;
+      z-index: 3;
+      pointer-events: none;
+      opacity: 0.85;
+      transition: opacity var(--transition);
+    }
+    .cases__tik--1 { left: 39.6%; top: 0;     width: 11%; }
+    .cases__tik--2 { left: 42.3%; top: 29.3%; width: 10.5%; }
+    .cases__tik--3 { left: 39.9%; top: 67.7%; width: 8.9%; }
+    /* работа открылась — подсказка своё отработала */
+    .cases__layout:has(.cases__shot.is-open) .cases__tik { opacity: 0; }
 
     /* Появление снимка — «Цвет» (28) из подборки _anim-demo.html: кадр входит
        обесцвеченным и пересвеченным, за время анимации набирает цвет и
@@ -1166,6 +1203,8 @@
       .cases__shot { display: none; }
       /* точки листали общее превью — без него им негде жить */
       .cases__dots { display: none; }
+      /* стрелки тычут в лесенку по диагонали — в столбик это бессмысленно */
+      .cases__tik { display: none; }
       .cases__list {
         position: static;
         display: block;
@@ -1619,18 +1658,13 @@
       border-top: 1px solid rgba(255,255,255,0.10);
     }
     .footer__copy { font-size: 13px; color: rgba(255,255,255,0.45); }
-    .footer__up {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.55);
-      transition: color var(--transition);
+    /* Реквизиты самозанятой. Самозанятый — это физлицо на НПД, у него есть
+       только ИНН: ОГРН и ОГРНИП бывают у юрлиц и ИП, здесь их не существует */
+    .footer__legal {
+      font-size: 13px;
+      color: rgba(255,255,255,0.45);
+      text-align: right;
     }
-    .footer__up:hover { color: #fff; }
 
     /* ── Адаптив ── */
     @media (max-width: 960px) {
@@ -1689,8 +1723,8 @@
       }
       .footer__copy-dash { display: none; }
       .footer__copy-role { grid-column: 2; white-space: nowrap; }
-      /* «Наверх» в подвале на телефоне не нужна */
-      .footer__up { display: none; }
+      /* реквизиты прячем не в подвал, а под подпись — их видно всегда */
+      .footer__legal { text-align: left; }
     }
   </style>
 </head>
@@ -1737,8 +1771,9 @@
         <p class="hero__greeting hero-in">Привет, я</p>
         <h1 class="hero__name hero-in" id="hero-title" data-text="КАТЕРИНА">КАТЕРИНА</h1>
         <p class="hero__desc hero-in">
-          Помогаю экспертам и онлайн-школам выглядеть профессионально в интернете:
-          создаю сайты, настраиваю ботов, связываю сервисы.<br />
+          Помогаю экспертам, онлайн-школам и малому бизнесу выглядеть
+          профессионально в интернете: создаю сайты, настраиваю ботов,
+          связываю сервисы.<br />
           Работаю удалённо из Тобольска.
         </p>
         <div class="hero__actions hero-in">
@@ -1776,7 +1811,7 @@
       <div class="services__top-text">
         <p class="section-label">Услуги</p>
         <h2 class="section-title" id="services-title">Что я делаю</h2>
-        <p class="section-desc">Беру задачи под ключ — от идеи до результата, без лишних посредников.</p>
+        <p class="section-desc">Беру задачи под ключ — от идеи до результата, без лишних посредников.</p>
       </div>
     </div>
     <div class="services__grid">
@@ -1821,13 +1856,13 @@
     <div class="process__header">
       <p class="section-label">Процесс</p>
       <h2 class="section-title" id="process-title">Как я работаю</h2>
-      <p class="section-desc">Без хаоса и лишних согласований — чёткий процесс от заявки до результата.</p>
+      <p class="section-desc">Самозанятая. Работаю и с частными заказчиками, и с компаниями — по договору или без, как вам удобнее.</p>
     </div>
     <div class="process__steps">
       <div class="process-step">
         <div class="process-step__num">1</div>
         <h3 class="process-step__title">Заявка</h3>
-        <p class="process-step__desc">Пишете в Telegram или на почту, описываете задачу своими словами</p>
+        <p class="process-step__desc">Напишите мне в соцсети или на почту, опишите задачу своими словами</p>
       </div>
       <div class="process-step">
         <div class="process-step__num">2</div>
@@ -1854,15 +1889,22 @@
     <div class="cases__header">
       <p class="section-label">Кейсы</p>
       <h2 class="section-title" id="cases-title">Портфолио</h2>
-      <p class="section-desc">Реальные проекты с реальными результатами.</p>
+      <p class="section-desc">Собрала для вас посмотреть-полистать.</p>
     </div>
   </div>
 
   <!-- выходит за .container: картинка прижата к левому краю экрана -->
   <div class="cases__layout">
+    <!-- подсказки «ТЫК»: тычут в лесенку, поэтому лежат вне кадра -->
+    <img class="cases__tik cases__tik--1" src="tik1.png" alt="" aria-hidden="true" />
+    <img class="cases__tik cases__tik--2" src="tik2.png" alt="" aria-hidden="true" />
+    <img class="cases__tik cases__tik--3" src="tik3.png" alt="" aria-hidden="true" />
     <div class="cases__shot">
-      <!-- заглушка до первого клика -->
-      <img class="cases__stub" src="port-robot.png" alt="" aria-hidden="true" />
+      <!-- заглушка до первого клика: тень идёт первой, чтобы лежать под роботом -->
+      <div class="cases__stub-wrap" aria-hidden="true">
+        <span class="cases__stub-shadow"></span>
+        <img class="cases__stub" src="port-robot.png" alt="" />
+      </div>
       <!-- src подставляет скрипт при первом клике по плашке -->
       <img alt="" id="casesShot" />
       <!-- Точки слайдера: появляются вместе с картинкой проекта.
@@ -1963,7 +2005,7 @@
         <div class="footer__name">Катерина Степанова</div>
         <p class="footer__tagline">
           Верстка сайтов, чат-боты, интеграции и графический дизайн
-          для онлайн-школ и экспертов.
+          для онлайн-школ, экспертов и малого бизнеса.
         </p>
       </div>
 
@@ -2005,10 +2047,7 @@
       <!-- разбито на части ради мобильной раскладки: род занятий уходит
            второй строкой под имя, тире там прячется -->
       <div class="footer__copy"><span class="footer__copy-year">© 2026</span> <span class="footer__copy-name">Катерина Степанова</span><span class="footer__copy-dash"> — </span><span class="footer__copy-role">техспец &amp; граф.дизайнер</span></div>
-      <a href="#top" class="footer__up">
-        Наверх
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
-      </a>
+      <div class="footer__legal">Самозанятая · ИНН [ИНН]</div>
     </div>
   </div>
 </footer>
