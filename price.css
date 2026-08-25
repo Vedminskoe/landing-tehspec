@@ -1,0 +1,460 @@
+/* Общие стили прайс-страниц: price-web.html и price-tech.html.
+   Один файл на обе, чтобы они не разъезжались по мелочам. */
+
+@font-face {
+  font-family: 'Involve';
+  src: url('Involve-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+:root {
+  --font-heading: 'Spectral', Georgia, serif;
+  --font-body:    'Involve', system-ui, sans-serif;
+  --accent:        #4A6C33;
+  --accent-hover:  #395426;
+  --accent-light:  #EDF4E6;
+  --accent2:       #E8A800;
+  --accent2-hover: #C48900;
+  --accent2-light: #FFF8E0;
+  --bg:           #FFFFFF;
+  --bg-alt:       #F7F8F6;
+  --text:         #1A1A1A;
+  --text-muted:   #525C68;
+  --border:       #E5E7EB;
+  --bg-art-opacity: 0.5;
+  --radius:       12px;
+  --transition:   0.25s ease;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* Курсор-крестик: страница закрывается щелчком в любом месте, и курсор
+   должен говорить об этом сам. Рисунок инлайном в data-URI — отдельный
+   файл ради 34 пикселей заводить незачем. Цифры в конце — «горячая
+   точка»: центр кружка, а не левый верхний угол */
+body {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='34' height='34'%3E%3Ccircle cx='17' cy='17' r='15' fill='%23ffffff' fill-opacity='0.92' stroke='%231A1A1A' stroke-width='1.4'/%3E%3Cpath d='M11.5 11.5l11 11M22.5 11.5l-11 11' stroke='%231A1A1A' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E") 17 17, pointer;
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--text);
+  background: var(--bg);
+  position: relative;
+  min-height: 100vh;
+}
+/* внутри раскрывашек и ссылок курсор обычный: там щелчок не закрывает */
+summary, a { cursor: pointer; }
+a { color: inherit; text-decoration: none; }
+
+/* Тот же фоновый рисунок, что на лендинге, но приколот к окну, а не к
+   странице. На лендинге он тянется на всю высоту документа (auto 100%) — здесь
+   так нельзя: стоит раскрыть подробности, страница становится выше, рисунок
+   пересчитывает масштаб, и весь фон дёргается. fixed + cover считаются от окна,
+   поэтому от раскрывашек не зависят вовсе */
+.page-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: url('fon-web2.jpg') center / cover no-repeat;
+  opacity: var(--bg-art-opacity);
+}
+/* полоса прокрутки не должна появляться и исчезать — иначе текст дёргается
+   вбок ровно тогда же, когда раскрывается строка */
+html { scrollbar-gutter: stable; }
+
+.wrap {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 40px 24px 64px;
+}
+/* Белая подложка под весь текст: фоновый рисунок под ней просвечивает ровно
+   настолько, чтобы страница не выглядела наклейкой, но читать не мешал */
+.sheet {
+  background: rgba(255,255,255,0.97);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 48px 52px 56px;
+}
+@media (max-width: 720px) {
+  .sheet { padding: 30px 20px 36px; border-radius: 8px; }
+}
+
+/* ── Шапка ── */
+.head { margin-bottom: 44px; }
+.head__label {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent2-hover);
+  background: var(--accent2-light);
+  border: 1px solid var(--accent2);
+  border-radius: 999px;
+  padding: 5px 14px;
+  margin-bottom: 18px;
+}
+.head__title {
+  font-family: var(--font-heading);
+  font-size: clamp(32px, 5vw, 46px);
+  font-weight: 500;
+  line-height: 1.15;
+  margin-bottom: 14px;
+}
+.head__lead {
+  max-width: 620px;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+.head__hint {
+  margin-top: 22px;
+  font-size: 14px;
+  color: var(--text-muted);
+  border-left: 2px solid var(--accent2);
+  padding-left: 12px;
+}
+
+/* ── Раздел ── */
+.sec { margin-top: 52px; }
+.sec__head {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 4px;
+}
+.sec__num {
+  font-family: var(--font-heading);
+  font-size: 15px;
+  color: var(--accent2);
+}
+.sec__title {
+  font-family: var(--font-heading);
+  font-size: 24px;
+  font-weight: 500;
+}
+
+/* ── Строка прайса ──
+   Сетка одна и для раскрывающихся строк, и для обычных: слева название с
+   описанием, справа срок и цена. На узком экране всё складывается в столбик */
+.row { border-bottom: 1px solid var(--border); }
+/* Строка без срока и описания — только название и цена. Черновой прайс
+   технических задач собран из таких: там нет ни сроков, ни расшифровок */
+.row--plain .row__head {
+  grid-template-columns: 1fr 150px;
+  padding: 13px 0;
+}
+.row__head {
+  display: grid;
+  grid-template-columns: 1fr 120px 150px;
+  gap: 8px 20px;
+  align-items: baseline;
+  padding: 18px 0;
+  list-style: none;
+}
+/* стандартный треугольник у summary убираем — свой знак ниже */
+.row__head::-webkit-details-marker { display: none; }
+.row__name {
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.row__desc {
+  grid-column: 1;
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.55;
+}
+.row__term {
+  grid-row: 1;
+  grid-column: 2;
+  font-size: 14px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+.row__price {
+  grid-row: 1;
+  grid-column: 3;
+  text-align: right;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.row__price small {
+  display: block;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-muted);
+}
+.row__from {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text-muted);
+  margin-right: 3px;
+}
+
+/* Знак «развернуть»: стрелка вниз в кружке. При открытии крутится весь
+   кружок — галочка сама встаёт остриём вверх, второй символ не нужен */
+.row__toggle {
+  position: relative;
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--accent);
+  border-radius: 50%;
+  transition: background var(--transition), transform var(--transition);
+}
+.row__toggle::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 5px;
+  height: 5px;
+  /* сдвиг руками: у повёрнутого квадрата центр тяжести галочки не совпадает
+     с центром кружка, иначе стрелка сидит низко */
+  margin: -4px 0 0 -3px;
+  border-right: 1.5px solid var(--accent);
+  border-bottom: 1.5px solid var(--accent);
+  transform: rotate(45deg);
+  transition: border-color var(--transition);
+}
+.row[open] .row__toggle {
+  transform: rotate(180deg);
+  background: var(--accent);
+}
+.row[open] .row__toggle::before { border-color: #fff; }
+.row__head:hover .row__toggle { background: var(--accent-light); }
+.row[open] .row__head:hover .row__toggle { background: var(--accent-hover); }
+
+/* ── Что входит ── */
+.row__list {
+  list-style: none;
+  padding: 0 0 20px 0;
+  max-width: 640px;
+}
+.row__list li {
+  position: relative;
+  padding-left: 20px;
+  font-size: 14.5px;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+.row__list li::before {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 10px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent2);
+}
+
+/* ── Пакеты ── */
+.pack {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: rgba(255,255,255,0.72);
+  padding: 22px 24px;
+  margin-top: 16px;
+}
+.pack__top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px 20px;
+}
+.pack__name {
+  font-family: var(--font-heading);
+  font-size: 20px;
+  font-weight: 500;
+}
+.pack__prices { white-space: nowrap; }
+.pack__old {
+  color: var(--text-muted);
+  text-decoration: line-through;
+  margin-right: 10px;
+  font-size: 15px;
+}
+.pack__new { font-weight: 500; font-size: 19px; }
+.pack__save {
+  display: inline-block;
+  margin-left: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--accent2-hover);
+  background: var(--accent2-light);
+  border-radius: 999px;
+  padding: 3px 10px;
+}
+.pack__desc {
+  color: var(--text-muted);
+  font-size: 14.5px;
+  margin-top: 8px;
+  max-width: 620px;
+}
+.pack__term { font-size: 13px; color: var(--text-muted); margin-top: 8px; }
+
+/* ── Условия ── */
+.terms { list-style: none; margin-top: 6px; }
+.terms li {
+  position: relative;
+  padding: 12px 0 12px 22px;
+  border-bottom: 1px solid var(--border);
+  font-size: 15px;
+  color: var(--text-muted);
+}
+.terms li::before {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 21px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+.terms b { color: var(--text); font-weight: 500; }
+
+/* ── Подвал ── */
+.foot {
+  margin-top: 56px;
+  padding: 26px 28px;
+  border-radius: var(--radius);
+  background: var(--accent-light);
+}
+.foot__title {
+  font-family: var(--font-heading);
+  font-size: 22px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+/* без max-width: строка идёт от края до края плашки, иначе первая строка
+   обрывается на середине и справа зияет пустота */
+.foot__text { color: var(--text-muted); font-size: 15px; }
+.foot__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 26px;
+  margin-top: 16px;
+  font-size: 15px;
+}
+.foot__links a { color: var(--accent-hover); text-decoration: underline; }
+.foot__links a:hover { color: var(--accent2-hover); }
+.foot__note {
+  margin-top: 26px;
+  font-size: 12.5px;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+/* Кнопка закрытия — только там, где мыши нет: на телефоне курсор ничего
+   не подсказывает, и без неё со страницы было бы не выйти */
+.close-btn {
+  display: none;
+  position: fixed;
+  top: 14px;
+  right: 14px;
+  z-index: 10;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: rgba(255,255,255,0.92);
+  color: var(--text);
+  align-items: center;
+  justify-content: center;
+}
+@media (hover: none) {
+  .close-btn { display: flex; }
+  body { cursor: auto; }
+  /* на тач-экране курсора нет, закрывает кнопка в углу — фразу про щелчок прячем */
+  .hint-click { display: none; }
+}
+
+@media (max-width: 720px) {
+  .wrap { padding: 40px 18px 72px; }
+  .row__head {
+    grid-template-columns: 1fr auto;
+    gap: 4px 14px;
+  }
+  .row__desc { grid-column: 1 / -1; }
+  .row__term { grid-row: 2; grid-column: 1; }
+  .row__price { grid-row: 1; grid-column: 2; }
+  .row__desc { order: 3; }
+}
+
+/* ── Подвал: тот же, что на лендинге ── */
+.footer {
+  background: var(--text);
+  color: rgba(255,255,255,0.65);
+  padding: 64px 0 26px;
+}
+.footer__inner {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+.footer__top {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 1fr;
+  gap: 48px;
+  padding-bottom: 36px;
+}
+.footer__name {
+  font-family: var(--font-heading);
+  font-size: 20px;
+  letter-spacing: 0.06em;
+  color: #fff;
+  margin-bottom: 14px;
+}
+.footer__tagline {
+  font-size: 13px;
+  line-height: 1.7;
+  max-width: 380px;
+  color: rgba(255,255,255,0.55);
+}
+.footer__col-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.4);
+  margin-bottom: 18px;
+}
+.footer__col nav {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.footer__col a {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 13px;
+  color: rgba(255,255,255,0.72);
+  transition: color var(--transition);
+}
+.footer__col a:hover { color: var(--accent2); }
+.footer__col a svg { flex-shrink: 0; opacity: 0.7; }
+.footer__bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-top: 22px;
+  border-top: 1px solid rgba(255,255,255,0.10);
+  font-size: 13px;
+  color: rgba(255,255,255,0.45);
+}
+@media (max-width: 720px) {
+  .footer { padding: 48px 0 22px; }
+  .footer__top { grid-template-columns: 1fr; gap: 30px; }
+  .footer__bottom { flex-direction: column; align-items: flex-start; }
+}

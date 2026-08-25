@@ -579,6 +579,84 @@
     @media (prefers-reduced-motion: reduce) {
       .services__robot { animation: none; }
     }
+    /* Прайсы — те же плашки, что в лесенке портфолио. Класс .case-plate взят
+       буквально тот же, поэтому цвет, размер, шрифт, рамка и объём при
+       наведении не скопированы, а общие: правится в одном месте. Здесь только
+       геометрия ряда — вылет вправо за .container, ступенчатый отступ слева,
+       выезд справа и та же маска, что растворяет правый край.
+       z-index — робот в услугах лежит абсолютом поверх раскладки; кликам он
+       не мешает (pointer-events выключены), но перекрыть плашки мог бы */
+    .prices__list {
+      position: relative;
+      z-index: 4;
+      margin-top: 18px;
+      /* Запас под подсветку. overflow-x: clip по спецификации утягивает в clip
+         и вертикальную ось, а сверху ещё режет маска — без запаса рамка и тень
+         наведённой плашки обрезались бы о край ряда, снизу особенно заметно.
+         В лесенке портфолио та же беда решена тем же: там бокс уходит на 34px
+         ниже картинки. Отступ съедает этот запас, между блоками ничего не растёт */
+      padding: 26px 0 30px;
+      /* Полная ширина окна с обеих сторон — как у лесенки портфолио. Только
+         вправо не хватало: --off считается в процентах от ширины ряда, и от
+         более узкой базы плашки выходили короче портфолийных на полсотни пикселей */
+      margin-left: calc(50% - 50vw);
+      margin-right: calc(50% - 50vw);
+      list-style: none;
+      /* плашки стартуют за правым краем экрана: без обрезки страница
+         разъехалась бы вбок на всю их отлётную дистанцию */
+      overflow-x: clip;
+      /* Растворение правого края, как у лесенки портфолио, но начинается не на
+         78% ширины, а ровно на правой границе карточек услуг: до неё плашка
+         плотная и текст читается в полную силу, дальше уходит в фон.
+         Граница контейнера = половина окна плюс 576px (макс. 1200 минус поля 24) */
+      -webkit-mask-image: linear-gradient(90deg, #000 0 calc(50% + 576px), transparent 100%);
+              mask-image: linear-gradient(90deg, #000 0 calc(50% + 576px), transparent 100%);
+    }
+    /* Плашка не тянется через полэкрана, а обнимает свой текст: правым краем
+       упирается в край окна, левым обрывается сразу за началом надписи.
+       Ступеньку рисовать вручную не нужно — она получается сама из разной
+       длины названий, как в лесенке портфолио из разных --off.
+       Поле справа = расстояние от края окна до границы карточек услуг;
+       на узком экране контейнер шире формулы, тогда работает нижняя граница */
+    .prices__item { justify-content: flex-end; }
+    .prices__item .case-plate {
+      flex: 0 0 auto;
+      margin-left: 0;
+      justify-content: flex-end;
+      padding-left: 30px;
+      padding-right: max(15px, calc(50vw - 576px));
+    }
+    .prices__item {
+      display: flex;
+      /* Высота строки лесенки — не круглое число, а производная: кадр портфолио
+         занимает 66% ширины при пропорции 12/7 и делится на 18 строк.
+         Запас в 34px под кадром в счёт не идёт — его
+         съедает распорка ::after, строки его не делят.
+         Жёсткие пиксели разъехались бы с портфолио на любой другой ширине окна */
+      height: calc(100vw * 0.66 * 7 / 12 / 18);
+      /* --in ставит скрипт: вторая плашка выезжает следом за первой */
+      transform: translateX(100vw);
+      opacity: 0;
+      transition: transform .95s cubic-bezier(0.22, 0.9, 0.25, 1),
+                  opacity   .55s ease;
+      transition-delay: calc(var(--in, 0) * 110ms);
+    }
+    .prices__list.is-live .prices__item { transform: none; opacity: 1; }
+    @media (prefers-reduced-motion: reduce) {
+      .prices__item { transform: none; opacity: 1; transition: none; }
+    }
+    @media (max-width: 900px) {
+      /* лесенка портфолио на узком экране разворачивается в столбик —
+         эти две плашки следом: маска и ступеньки там ни к чему */
+      .prices__list {
+        margin-left: 0;
+        margin-right: 0;
+        -webkit-mask-image: none;
+                mask-image: none;
+      }
+      .prices__item { height: auto; }
+      .prices__item .case-plate { flex: 1; padding: 12px 15px; justify-content: flex-start; }
+    }
     .services__grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -843,7 +921,44 @@
        Раскладка по макету: картинка уходит в левый край экрана,
        плашки лежат лесенкой поверх её правого края */
     .cases__header { margin-bottom: 18px; }
-    .cases__layout { position: relative; }
+    .cases__layout {
+      position: relative;
+      /* плашки стартуют за правым краем экрана — без этого страница
+         разъезжалась бы вбок на всю их отлётную дистанцию.
+         clip, а не hidden: он не делает из блока контейнер прокрутки */
+      overflow-x: clip;
+    }
+
+    /* ── Появление портфолио ──
+       Робот и подсказки проявляются, как робот в услугах; плашки въезжают
+       по очереди от правого края экрана. Класс вешает наблюдатель, когда
+       блок доходит до кадра, и снимает, когда уходит: возвращение к
+       портфолио каждый раз проигрывается заново */
+    .cases__stub-wrap {
+      opacity: 0;
+      /* только opacity: transform занят центровкой, а у робота внутри — качанием */
+      transition: opacity .9s ease .2s;
+    }
+    .cases__layout.is-live .cases__stub-wrap { opacity: 1; }
+    /* Стрелки вступают поодиночке и уже после того, как робот проявился
+       целиком (0.2s задержки + 0.9s хода). Шаг между ними 0.4s — крупный
+       нарочно: на 0.15s очередь читалась как одновременная вспышка */
+    .cases__layout.is-live .cases__tik--1 { opacity: 0.85; transition-delay: 1.1s; }
+    .cases__layout.is-live .cases__tik--2 { opacity: 0.85; transition-delay: 1.5s; }
+    .cases__layout.is-live .cases__tik--3 { opacity: 0.85; transition-delay: 1.9s; }
+    .cases__item {
+      transform: translateX(100vw);
+      opacity: 0;
+      /* --in ставит скрипт по порядку плашек — отсюда очередь */
+      transition: transform .95s cubic-bezier(0.22, 0.9, 0.25, 1) calc(var(--in, 0) * 70ms),
+                  opacity   .55s ease                             calc(var(--in, 0) * 70ms);
+    }
+    .cases__layout.is-live .cases__item { transform: none; opacity: 1; }
+    @media (prefers-reduced-motion: reduce) {
+      .cases__stub-wrap, .cases__item { transition: none; }
+      .cases__item { transform: none; opacity: 1; }
+      .cases__stub-wrap { opacity: 1; }
+    }
     /* место под превью проекта — картинку положу позже */
     /* Картинка заходит под всю лесенку (правее самой правой плашки на 64%),
        поэтому её правым краем работает ступенчатая граница плашек,
@@ -885,7 +1000,7 @@
          width он остаётся на том же месте. По центру кадра было бы 50/50 */
       left: 38%;
       top: 54%;
-      width: 75%;
+      width: 67.5%;
       transform: translate(-50%, -50%);
       pointer-events: none;
     }
@@ -895,9 +1010,9 @@
       height: auto;
       /* Маятник: ноги стоят, корпус качается. Точка вращения — ступни робота,
          а не низ картинки: по альфе он занимает 50.3% ширины и кончается
-         на 97.8% высоты. Темп тот же, что у парящего робота в услугах */
+         на 97.8% высоты. Темп заметно живее, чем у парящего робота в услугах (4.5s) */
       transform-origin: 50.3% 97.8%;
-      animation: stub-swing 4.5s ease-in-out infinite;
+      animation: stub-swing 3.0s ease-in-out infinite;
     }
     @keyframes stub-swing {
       0%, 100% { transform: rotate(-3deg); }
@@ -932,14 +1047,22 @@
       position: absolute;
       z-index: 3;
       pointer-events: none;
-      opacity: 0.85;
-      transition: opacity var(--transition);
+      /* Стартуют невидимыми, показывает их .is-live у раскладки. Раньше здесь
+         стояло 0.85, и это правило перебивало начальный ноль в блоке анимации —
+         стрелки просто всегда были на месте. Ход длинный, как у робота: с общим
+         --transition в 0.25s они вспыхивали мгновенно */
+      opacity: 0;
+      transition: opacity .7s ease;
     }
     .cases__tik--1 { left: 39.6%; top: 0;     width: 11%; }
     .cases__tik--2 { left: 42.3%; top: 29.3%; width: 10.5%; }
     .cases__tik--3 { left: 39.9%; top: 67.7%; width: 8.9%; }
-    /* работа открылась — подсказка своё отработала */
-    .cases__layout:has(.cases__shot.is-open) .cases__tik { opacity: 0; }
+    /* работа открылась — подсказка своё отработала. Задержку обнуляем, иначе
+       стрелки гасли бы вразнобой, доигрывая очередь появления */
+    .cases__layout:has(.cases__shot.is-open) .cases__tik {
+      opacity: 0;
+      transition-delay: 0s;
+    }
 
     /* Появление снимка — «Цвет» (28) из подборки _anim-demo.html: кадр входит
        обесцвеченным и пересвеченным, за время анимации набирает цвет и
@@ -1742,6 +1865,8 @@
           <a href="#services">Услуги</a>
           <a href="#process">Как я работаю</a>
           <a href="#cases">Портфолио</a>
+          <a href="price-tech.html">Прайс на технические задачи</a>
+          <a href="price-web.html">Прайс на сайты и дизайн</a>
           <a href="#contacts">Контакты</a>
         </nav>
       </div>
@@ -1844,6 +1969,13 @@
         <p class="service-card__desc">Баннеры, обложки, оформление соцсетей, брендинг. Создаю визуал, который работает на узнаваемость и доверие.</p>
       </article>
     </div>
+    <!-- Прайсы отдельными страницами: на них курсор превращается в крестик,
+         щелчок в любом месте возвращает сюда. Плашки те же, что в портфолио,
+         только это ссылки, а не кнопки-переключатели -->
+    <ul class="prices__list">
+      <li class="prices__item"><a href="price-tech.html" class="case-plate"><span class="case-plate__text">Прайс на технические задачи</span></a></li>
+      <li class="prices__item"><a href="price-web.html" class="case-plate"><span class="case-plate__text">Прайс на сайты и дизайн</span></a></li>
+    </ul>
     <!-- Робот вынесен из карточки: иначе наклон/подсветка карточки его обрежут
          и перевернут. Позиционируется от .container, как и раньше на ПК -->
     <img class="services__robot" src="4.png" alt="" aria-hidden="true" />
@@ -2281,6 +2413,35 @@
         card.style.transform = '';
       });
     });
+  })();
+
+  // Плашки прайсов въезжают справа, когда блок услуг доходит до кадра
+  (function () {
+    const box = document.querySelector('.prices__list');
+    if (!box) return;
+    box.querySelectorAll('.prices__item').forEach((el, i) => {
+      el.style.setProperty('--in', i);
+    });
+    if (!('IntersectionObserver' in window)) { box.classList.add('is-live'); return; }
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => box.classList.toggle('is-live', e.isIntersecting));
+    }, { threshold: 0.4 });
+    io.observe(box);
+  })();
+
+  // Портфолио: появление блока — робот и подсказки проявляются, плашки
+  // въезжают по очереди справа. Всё остальное делает CSS по классу is-live
+  (function () {
+    const layout = document.querySelector('.cases__layout');
+    if (!layout) return;
+    layout.querySelectorAll('.cases__item').forEach((el, i) => {
+      el.style.setProperty('--in', i);
+    });
+    if (!('IntersectionObserver' in window)) { layout.classList.add('is-live'); return; }
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => layout.classList.toggle('is-live', e.isIntersecting));
+    }, { threshold: 0.15, rootMargin: '0px 0px -10% 0px' });
+    io.observe(layout);
   })();
 
   // Портфолио: клик по плашке подставляет снимки проекта и собирает точки
