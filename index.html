@@ -1770,6 +1770,10 @@
     }
     .footer__col a:hover { color: var(--accent2); }
     .footer__col a svg { flex-shrink: 0; opacity: 0.7; }
+    /* Контакты прижаты вправо: правый край строк ложится на ту же вертикаль,
+       что и реквизиты в нижней строке подвала */
+    .footer__col--right { text-align: right; }
+    .footer__col--right nav { align-items: flex-end; }
     /* Разделитель + нижняя строка */
     .footer__bottom {
       display: flex;
@@ -1827,6 +1831,9 @@
       .footer__top { grid-template-columns: 1fr 1fr; gap: 32px; }
       .footer__brand { grid-column: 1 / -1; }
       .footer__bottom { flex-direction: column; align-items: flex-start; }
+      /* в две колонки сводить вправо не с чем — реквизиты внизу уходят влево */
+      .footer__col--right { text-align: left; }
+      .footer__col--right nav { align-items: flex-start; }
     }
 
     @media (max-width: 480px) {
@@ -2151,7 +2158,7 @@
         </nav>
       </div>
 
-      <div class="footer__col">
+      <div class="footer__col footer__col--right">
         <div class="footer__col-title">Контакты</div>
         <nav aria-label="Контакты">
           <a href="https://t.me/vedminskoe" target="_blank" rel="noopener">
