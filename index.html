@@ -1732,7 +1732,10 @@
     /* Верх подвала — четыре колонки: бренд, навигация, прайсы, контакты */
     .footer__top {
       display: grid;
-      grid-template-columns: 1.5fr 0.9fr 1fr 1.2fr;
+      /* колонки по ширине содержимого, свободное место раскидано поровну —
+         иначе колонка контактов растягивается и они висят особняком */
+      grid-template-columns: repeat(4, auto);
+      justify-content: space-between;
       gap: 40px;
       padding-bottom: 40px;
     }
