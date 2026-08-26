@@ -1410,8 +1410,57 @@
       color: #D95252;
       display: none;
     }
-    .field__input:user-invalid + .field__error,
+    .field__input:user-invalid ~ .field__error,
     .field__consent:has(:user-invalid) + .field__error { display: block; }
+    /* два текста на одно поле: пустое — одна причина, кривая ссылка — другая */
+    .field__input:placeholder-shown ~ .field__error--format,
+    .field__input:not(:placeholder-shown) ~ .field__error--empty { display: none; }
+    /* Значок «i» рядом с подписью поля + подсказка по наведению.
+       Кнопка, а не span в label: клик по ней не должен ставить курсор в поле */
+    .field__label-row { position: relative; display: flex; align-items: center; gap: 6px; }
+    .field__info {
+      display: inline-flex;
+      padding: 0;
+      border: 0;
+      background: none;
+      line-height: 0;
+      color: var(--text-muted);
+      cursor: help;
+      transition: color var(--transition);
+    }
+    .field__info:hover, .field__info:focus-visible { color: var(--accent); }
+    .field__tip {
+      position: absolute;
+      bottom: calc(100% + 9px);
+      /* от левого края поля, а не от значка: так подсказка не вылезает
+         за карточку на десктопе и за экран на телефоне */
+      left: 0;
+      width: max-content;
+      max-width: min(270px, 100%);
+      padding: 10px 13px;
+      border-radius: 8px;
+      background: var(--text);
+      color: rgba(255,255,255,0.82);
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 1.65;
+      letter-spacing: 0;
+      text-align: left;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(4px);
+      transition: opacity var(--transition), transform var(--transition), visibility var(--transition);
+      pointer-events: none;
+      z-index: 5;
+    }
+    .field__tip b { color: #fff; font-weight: 600; }
+    .field__info:hover .field__tip,
+    .field__info:focus-visible .field__tip {
+      opacity: 1;
+      visibility: visible;
+      transform: none;
+    }
     /* honeypot: убираем из виду и из потока, но оставляем доступным ботам */
     .field__honeypot {
       position: absolute;
@@ -2114,9 +2163,20 @@
                 <p class="field__error">Пожалуйста, введите ваше имя</p>
               </div>
               <div class="field">
-                <label class="field__label" for="fieldTg">Telegram <span class="field__required">*</span></label>
-                <input class="field__input" type="text" id="fieldTg" name="telegram" placeholder="@username" autocomplete="off" required />
-                <p class="field__error">Пожалуйста, укажите ваш Telegram</p>
+                <div class="field__label-row">
+                  <label class="field__label" for="fieldSocial">Соцсеть <span class="field__required">*</span></label>
+                  <button type="button" class="field__info" aria-label="Как указать соцсеть">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                    <span class="field__tip" role="tooltip">
+                      <b>Телеграм:</b> @ник или t.me/ник<br />
+                      <b>ВКонтакте:</b> vk.com/ник или vk.com/id1234567
+                    </span>
+                  </button>
+                </div>
+                <input class="field__input" type="text" id="fieldSocial" name="telegram" placeholder="@ник или ссылка" autocomplete="off" required
+                       pattern="\s*(@[A-Za-z0-9_]{3,32}|(https?://)?(www\.)?t\.me/[A-Za-z0-9_]{3,32}/?|(https?://)?(m\.|www\.)?vk\.com/[A-Za-z0-9_.]{3,50}/?)\s*" />
+                <p class="field__error field__error--empty">Пожалуйста, укажите, где с вами связаться</p>
+                <p class="field__error field__error--format">Не похоже на ссылку. Примеры: @ник, t.me/ник, vk.com/ник</p>
               </div>
             </div>
             <div class="field">
