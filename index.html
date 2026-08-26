@@ -1377,7 +1377,8 @@
       color: var(--text);
     }
     .field__required { color: var(--accent2); }
-    .field__optional { color: var(--text-muted); font-weight: 400; font-size: 12px; }
+    .field__optional,
+    .field__note { color: var(--text-muted); font-weight: 400; font-size: 12px; }
     .field__input {
       width: 100%;
       padding: 12px 16px;
@@ -2164,19 +2165,19 @@
               </div>
               <div class="field">
                 <div class="field__label-row">
-                  <label class="field__label" for="fieldSocial">Соцсеть <span class="field__required">*</span></label>
-                  <button type="button" class="field__info" aria-label="Как указать соцсеть">
+                  <label class="field__label" for="fieldSocial">Как связаться <span class="field__note">(соцсеть)</span> <span class="field__required">*</span></label>
+                  <button type="button" class="field__info" aria-label="Как указать ссылку">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
                     <span class="field__tip" role="tooltip">
                       <b>Телеграм:</b> @ник или t.me/ник<br />
-                      <b>ВКонтакте:</b> vk.com/ник или vk.com/id1234567
+                      <b>ВКонтакте:</b> vk.ru/ник или vk.com/id1234567
                     </span>
                   </button>
                 </div>
                 <input class="field__input" type="text" id="fieldSocial" name="telegram" placeholder="@ник или ссылка" autocomplete="off" required
-                       pattern="\s*(@[A-Za-z0-9_]{3,32}|(https?://)?(www\.)?t\.me/[A-Za-z0-9_]{3,32}/?|(https?://)?(m\.|www\.)?vk\.com/[A-Za-z0-9_.]{3,50}/?)\s*" />
+                       pattern="\s*(@[A-Za-z0-9_]{3,32}|(https?://)?(www\.)?t\.me/[A-Za-z0-9_]{3,32}/?|(https?://)?(m\.|www\.)?vk\.(com|ru)/[A-Za-z0-9_.]{3,50}/?)\s*" />
                 <p class="field__error field__error--empty">Пожалуйста, укажите, где с вами связаться</p>
-                <p class="field__error field__error--format">Не похоже на ссылку. Примеры: @ник, t.me/ник, vk.com/ник</p>
+                <p class="field__error field__error--format">Не похоже на ссылку. Примеры: @ник, t.me/ник, vk.ru/ник</p>
               </div>
             </div>
             <div class="field">
