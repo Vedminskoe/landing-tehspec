@@ -657,8 +657,32 @@
         -webkit-mask-image: none;
                 mask-image: none;
       }
+      .prices__list { display: flex; flex-direction: column; gap: 12px; padding: 10px 0 0; }
       .prices__item { height: auto; }
-      .prices__item .case-plate { flex: 1; padding: 12px 15px; justify-content: flex-start; }
+      /* На телефоне прайсы — не плашки, а кнопки в пару к «Написать в
+         Telegram» и «Смотреть портфолио»: те же радиус, кегль, шрифт и
+         заливки. Рамка-подсветка плашки здесь только мешала бы */
+      .prices__item .case-plate {
+        flex: 1;
+        justify-content: center;
+        text-align: center;
+        padding: 14px 20px;
+        margin-bottom: 0;
+        border-radius: 8px;
+        font-family: var(--font-body);
+        font-size: 15px;
+        font-weight: 500;
+        box-shadow: none;
+      }
+      .prices__item .case-plate::before,
+      .prices__item .case-plate::after { content: none; }
+      /* Белые, как плашки портфолио: рамка нужна, иначе на светлом фоне
+         страницы кнопка не читается краями */
+      .prices__item .case-plate {
+        background: #fff;
+        border: 1.5px solid var(--border);
+        color: var(--text);
+      }
     }
     .services__grid {
       display: grid;
@@ -1008,6 +1032,7 @@
       pointer-events: none;
     }
     .cases__shot.is-open .cases__stub-wrap { display: none; }
+    .cases__stub-pic { display: block; }
     .cases__shot .cases__stub {
       width: 100%;
       height: auto;
@@ -1321,12 +1346,68 @@
     .cases__item--gap .case-plate:hover { transform: none; box-shadow: none; }
     /* Снимок, раскрытый прямо под плашкой. Нужен только на узком экране,
        где общего превью нет; на ПК лежит скрытым */
-    .cases__inline-shot { display: none; }
+    .cases__inline-shot { display: none; position: relative; }
+    /* Стрелки листания поверх снимка. Без кружка — белый шеврон с тенью
+       читается и на светлом кадре, и на тёмном. Крайняя стрелка не гаснет,
+       а убирается совсем: слева до первого шага вперёд, справа на последнем */
+    .cases__arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 46px;
+      height: 46px;
+      padding: 0;
+      border: none;
+      background: none;
+      color: #fff;
+      filter: drop-shadow(0 1px 3px rgba(0,0,0,0.6));
+      cursor: pointer;
+    }
+    .cases__arrow[hidden] { display: none; }
+    .cases__arrow--prev { left: 0; }
+    .cases__arrow--next { right: 0; }
+    /* «Смотреть больше ...» — только для узкого экрана: на ПК лесенка
+       показывает все работы сразу. Не кнопка, а строка текста: золотой
+       цвет отличает её от названий работ и говорит, что по ней жмут */
+    .cases__more {
+      display: none;
+      margin: 14px 16px 0;
+      padding: 6px 0;
+      width: calc(100% - 32px);
+      border: none;
+      background: none;
+      font-family: var(--font-body);
+      font-size: 16px;
+      color: var(--accent2);
+      cursor: pointer;
+    }
     @media (max-width: 900px) {
       /* Лесенка не помещается, и постоянное превью убрано совсем:
          плашки идут простым списком, а снимок проекта раскрывается
-         под той плашкой, которую нажали */
-      .cases__shot { display: none; }
+         под той плашкой, которую нажали.
+         От кадра остаётся только робот с табличкой — он встаёт перед
+         списком работ. Стрелки «ТЫК» тут не нужны: на телефоне и так
+         понятно, что по плашке надо ткнуть пальцем */
+      .cases__shot {
+        display: block;
+        width: 42%;
+        margin: 0 auto;
+        aspect-ratio: auto;
+        overflow: visible;
+      }
+      .cases__shot.is-open { background: none; }
+      /* снимок открывается под плашкой, в кадре ему делать нечего */
+      .cases__shot #casesShot { display: none; }
+      /* робот занимает весь кадр и остаётся на месте, когда работа открыта */
+      .cases__stub-wrap { position: static; width: 100%; transform: none; }
+      /* у мобильного робота ноги по центру кадра, а не слева, как у того,
+         что на ПК — точка качания и тень переезжают под него */
+      .cases__shot .cases__stub { transform-origin: 50% 98%; }
+      .cases__stub-shadow { left: 50%; width: 42%; }
+      .cases__shot.is-open .cases__stub-wrap { display: block; }
       /* точки листали общее превью — без него им негде жить */
       .cases__dots { display: none; }
       /* стрелки тычут в лесенку по диагонали — в столбик это бессмысленно */
@@ -1347,14 +1428,23 @@
         width: 100%;
         margin-bottom: 6px;
         margin-left: 0;
-        padding: 10px 16px;
+        /* плашка выше и кегль крупнее: пальцем попадать, а не ногтем */
+        padding: 17px 18px;
         background: #fff;
         justify-content: center;
         text-align: center;
         /* лесенки здесь нет, строка не сжата — шрифт полного размера */
-        font-size: 17px;
+        font-size: 19px;
+        /* четыре самых длинных названия в строку не влезают: balance делит
+           их пополам, иначе на вторую строку падало одно слово */
+        text-wrap: balance;
       }
       .cases__inline-shot { display: block; width: 100%; margin: 8px 0 14px; }
+      /* Свёрнутый список: сразу видно восемь работ, остальные под кнопкой.
+         Раскрылись — кнопка уходит, второй раз сворачивать нечего */
+      .cases__item--more { display: none; }
+      .cases__list.is-expanded .cases__item--more { display: block; }
+      .cases__more { display: block; }
     }
     /* ── Форма заявки (живёт в блоке контактов) ── */
     .booking-form__grid {
@@ -1841,6 +1931,7 @@
       border-top: 1px solid rgba(255,255,255,0.10);
     }
     .footer__copy { font-size: 13px; color: rgba(255,255,255,0.45); }
+    .footer__robot { display: none; }
     /* Реквизиты самозанятой. Самозанятый — это физлицо на НПД, у него есть
        только ИНН: ОГРН и ОГРНИП бывают у юрлиц и ИП, здесь их не существует */
     .footer__legal {
@@ -1872,13 +1963,33 @@
         right: -22px;
         width: 280px;
       }
+      /* Робот нарочно свисает за правый край экрана. Без клипа эти 22px
+         дают странице горизонтальную прокрутку — её и таскали мышкой,
+         а на телефоне экран уезжал вбок от случайного смахивания.
+         clip, а не hidden: hidden сделал бы секцию контейнером прокрутки */
+      #services { overflow-x: clip; }
     }
 
     @media (max-width: 768px) {
+      /* Шапка на телефоне сжимается, как только страница тронулась с места:
+         64 → 48px и кегль мельче. Класс is-scrolled уже ставит скрипт
+         полоски прогресса на 120px прокрутки — второго слушателя не нужно */
+      .header__inner { transition: height var(--transition); }
+      .header__logo { transition: color var(--transition), font-size var(--transition); }
+      body.is-scrolled .header__inner { height: 48px; }
+      body.is-scrolled .header__logo { font-size: 13px; }
+      /* Фон как на странице 404: ровный светлый тон вместо рисунка.
+         На телефоне картинка обрезалась до пары веток и только мешала */
+      .page-bg { display: none; }
+      body { background: #F5F5F3; }
       .header__tagline { font-size: 22px; }
       .section { padding: 60px 0; }
       /* сверху хватает воздуха шапки — 72px оставляли пустую полосу */
       .hero { padding: 24px 0 60px; }
+      /* «КАТЕРИНА» набрана в 60px и на экранах уже 380px не помещалась в
+         строку — эти пара букв за краем и давали странице ход вбок.
+         min() ужимает имя только там, где оно не влезает */
+      .hero__name { font-size: min(60px, 15.2vw); }
       .hero__scroll { display: none; }
       .process__steps { grid-template-columns: repeat(2, 1fr); }
       /* круглая кнопка «наверх» на телефоне только мешается поверх контента */
@@ -1886,31 +1997,59 @@
       .footer { padding: 52px 0 24px; }
       .footer__top { grid-template-columns: 1fr 1fr; gap: 32px; }
       .footer__brand { grid-column: 1 / -1; }
-      .footer__bottom { flex-direction: column; align-items: flex-start; }
-      /* в две колонки сводить вправо не с чем — реквизиты внизу уходят влево */
+      /* копирайт и реквизиты — по центру подвала */
+      .footer__bottom { flex-direction: column; align-items: center; position: relative; }
+      /* Робот стоит ровно на линии-разделителе: bottom: 100% отсчитывается
+         от верха внутренней области, а она начинается сразу под рамкой */
+      .footer__robot {
+        display: block;
+        position: absolute;
+        bottom: 100%;
+        right: 14%;
+        width: 24%;
+        transform: scaleX(-1);
+        pointer-events: none;
+      }
+      /* в две колонки сводить вправо не с чем — контакты выравниваем влево */
       .footer__col--right { text-align: left; }
       .footer__col--right nav { align-items: flex-start; }
+      /* Прайсы и контакты меняются местами: контакты встают в пару к
+         навигации, прайсы уходят строкой ниже */
+      .footer__col--right  { grid-column: 2; grid-row: 2; }
+      .footer__col--prices { grid-column: 1; grid-row: 3; }
     }
 
     @media (max-width: 480px) {
       .header__tagline { display: none; }
+      /* Меню на телефоне раскрывается во всю ширину контейнера, пункты
+         крупные и с воздухом — попадать пальцем, а не ногтем */
+      .header__dropdown {
+        width: calc(100vw - 48px);
+        max-width: none;
+      }
+      .header__dropdown a {
+        padding: 26px 18px;
+        font-size: 15px;
+        white-space: normal;
+        border-bottom: 1px solid var(--border);
+      }
+      .header__dropdown a:last-child { border-bottom: none; }
+      /* воздуха между строчками hero: бейдж → «Привет, я» и имя → описание */
+      .hero__badge { margin-bottom: 26px; }
+      .hero__name { margin-bottom: 20px; }
       .process__steps { grid-template-columns: 1fr; }
       /* кнопки в столбик во всю ширину экрана */
       .hero__actions { flex-direction: column; align-items: stretch; gap: 12px; }
       .hero__actions .btn { width: 100%; justify-content: center; }
       .booking-form__grid { grid-template-columns: 1fr; }
-      /* Подпись подвала в две строки: «техспец & граф.дизайнер» целиком
-         под именем, ровно по его левому краю. Сетка держит вторую строку
-         в той же колонке, что и «Катерина» — отступ не подбирается на глаз */
-      .footer__copy {
-        display: grid;
-        grid-template-columns: auto 1fr;
-        column-gap: 0.35em;
-      }
+      /* Подпись подвала в две строки, обе по центру: род занятий целиком
+         на своей строке — display: block ставит перенос, переносить по
+         словам тут нечего */
+      .footer__copy { text-align: center; }
       .footer__copy-dash { display: none; }
-      .footer__copy-role { grid-column: 2; white-space: nowrap; }
+      .footer__copy-role { display: block; white-space: nowrap; }
       /* реквизиты прячем не в подвал, а под подпись — их видно всегда */
-      .footer__legal { text-align: left; }
+      .footer__legal { text-align: center; }
     }
   </style>
 </head>
@@ -1941,7 +2080,7 @@
           <a href="https://t.me/vedminskoe" target="_blank" rel="noopener">Telegram — @vedminskoe</a>
           <!-- href заменить на ссылку группы ВК -->
           <a href="#" target="_blank" rel="noopener">ВКонтакте</a>
-          <a href="mailto:vedminskoe@yandex.ru">vedminskoe@yandex.ru</a>
+          <a href="mailto:vedminskoe@yandex.ru">Почта — vedminskoe@yandex.ru</a>
         </nav>
       </div>
     </div>
@@ -2099,7 +2238,12 @@
       <!-- заглушка до первого клика: тень идёт первой, чтобы лежать под роботом -->
       <div class="cases__stub-wrap" aria-hidden="true">
         <span class="cases__stub-shadow"></span>
-        <img class="cases__stub" src="port-robot.png" alt="" />
+        <!-- На телефоне робот другой: держит табличку двумя руками над
+             головой. Подменяет его <source>, на ПК грузится прежний -->
+        <picture class="cases__stub-pic">
+          <source media="(max-width: 900px)" srcset="robot-cases-m.webp" />
+          <img class="cases__stub" src="port-robot.png" alt="" />
+        </picture>
       </div>
       <!-- src подставляет скрипт при первом клике по плашке -->
       <img alt="" id="casesShot" />
@@ -2112,24 +2256,27 @@
     </div>
     <ul class="cases__list">
       <li class="cases__item"><button type="button" class="case-plate" data-shots="img/sait-unumgarden/1.jpg"><span class="case-plate__text">Сайт ландшафтного архитектора на Tilda</span></button></li>
-      <li class="cases__item"><button type="button" class="case-plate" data-shots="img/sait-adminka/1.jpg,img/sait-adminka/2.jpg"><span class="case-plate__text">Сайт-админка для досок референсов</span></button></li>
-      <li class="cases__item"><button type="button" class="case-plate"><span class="case-plate__text">название</span></button></li>
+      <li class="cases__item"><button type="button" class="case-plate" data-shots="img/sait-adminka/1.jpg,img/sait-adminka/2.jpg" data-shots-m="img/sait-adminka/m1.jpg,img/sait-adminka/m2.jpg"><span class="case-plate__text">Сайт-админка для досок референсов</span></button></li>
+      <li class="cases__item cases__item--more"><button type="button" class="case-plate"><span class="case-plate__text">название</span></button></li>
       <li class="cases__item cases__item--gap"><span class="case-plate"></span></li>
       <li class="cases__item"><button type="button" class="case-plate" data-shots="img/spravochnik/1.jpg,img/spravochnik/2.jpg,img/spravochnik/3.jpg,img/spravochnik/4.jpg,img/spravochnik/5.jpg,img/spravochnik/6.jpg"><span class="case-plate__text">Справочник «Лечение животных травами»</span></button></li>
-      <li class="cases__item"><button type="button" class="case-plate" data-shots="img/present/1.jpg,img/present/2.jpg,img/present/3.jpg"><span class="case-plate__text">Презентация для справочника</span></button></li>
+      <li class="cases__item cases__item--more"><button type="button" class="case-plate" data-shots="img/present/1.jpg,img/present/2.jpg,img/present/3.jpg"><span class="case-plate__text">Презентация для справочника</span></button></li>
       <li class="cases__item"><button type="button" class="case-plate" data-shots="img/albom/1.jpg,img/albom/2.jpg,img/albom/3.jpg,img/albom/4.jpg"><span class="case-plate__text">Альбом ландшафтного проекта</span></button></li>
-      <li class="cases__item"><button type="button" class="case-plate" data-shots="img/kupon/1.jpg,img/kupon/2.jpg,img/kupon/3.jpg"><span class="case-plate__text">Подарочные купоны для UNUM</span></button></li>
-      <li class="cases__item"><button type="button" class="case-plate" data-shots="img/pechat/1.jpg"><span class="case-plate__text">Графика на заказ</span></button></li>
+      <li class="cases__item cases__item--more"><button type="button" class="case-plate" data-shots="img/kupon/1.jpg,img/kupon/2.jpg,img/kupon/3.jpg" data-shots-m="img/kupon/m1.jpg"><span class="case-plate__text">Подарочные купоны для UNUM</span></button></li>
+      <li class="cases__item cases__item--more"><button type="button" class="case-plate" data-shots="img/pechat/1.jpg"><span class="case-plate__text">Графика на заказ</span></button></li>
       <li class="cases__item"><button type="button" class="case-plate" data-shots="img/vk-unum/1.jpg,img/vk-unum/2.jpg"><span class="case-plate__text">Группа ВКонтакте студии дизайна</span></button></li>
-      <li class="cases__item"><button type="button" class="case-plate" data-shots="img/vk-univet/1.jpg,img/vk-univet/2.jpg,img/vk-univet/3.jpg,img/vk-univet/4.jpg,img/vk-univet/5.jpg"><span class="case-plate__text">Группа ВКонтакте ветклиники «ЮниВет»</span></button></li>
+      <li class="cases__item cases__item--more"><button type="button" class="case-plate" data-shots="img/vk-univet/1.jpg,img/vk-univet/2.jpg,img/vk-univet/3.jpg,img/vk-univet/4.jpg,img/vk-univet/5.jpg"><span class="case-plate__text">Группа ВКонтакте ветклиники «ЮниВет»</span></button></li>
       <li class="cases__item cases__item--gap"><span class="case-plate"></span></li>
       <li class="cases__item"><button type="button" class="case-plate" data-shots="img/bot/1.jpg"><span class="case-plate__text">Бот с проверкой подписки</span></button></li>
       <li class="cases__item"><button type="button" class="case-plate" data-shots="img/bot/2.jpg"><span class="case-plate__text">Бот «Гадание на метаморфозных картах»</span></button></li>
-      <li class="cases__item"><button type="button" class="case-plate" data-shots="img/bot/3-1.jpg,img/bot/3-2.jpg,img/bot/3-3.jpg,img/bot/3-4.jpg"><span class="case-plate__text">Бот клуба по подписке</span></button></li>
-      <li class="cases__item"><button type="button" class="case-plate" data-shots="img/bot/4-1.jpg,img/bot/4-2.jpg"><span class="case-plate__text">Бот для салона красоты</span></button></li>
+      <li class="cases__item cases__item--more"><button type="button" class="case-plate" data-shots="img/bot/3-1.jpg,img/bot/3-2.jpg,img/bot/3-3.jpg,img/bot/3-4.jpg"><span class="case-plate__text">Бот клуба по подписке</span></button></li>
+      <li class="cases__item cases__item--more"><button type="button" class="case-plate" data-shots="img/bot/4-1.jpg,img/bot/4-2.jpg"><span class="case-plate__text">Бот для салона красоты</span></button></li>
       <li class="cases__item"><button type="button" class="case-plate" data-shots="img/bot/5.jpg"><span class="case-plate__text">Бот с подключением AI</span></button></li>
-      <li class="cases__item"><button type="button" class="case-plate" data-shots="img/bot/6-1.jpg,img/bot/6-2.jpg"><span class="case-plate__text">Бот-опросник</span></button></li>
+      <li class="cases__item cases__item--more"><button type="button" class="case-plate" data-shots="img/bot/6-1.jpg,img/bot/6-2.jpg"><span class="case-plate__text">Бот-опросник</span></button></li>
     </ul>
+    <!-- На телефоне список свёрнут до восьми работ: остальные раскрывает кнопка.
+         Живёт вне <ul>, чтобы не сбить нумерацию :nth-child лесенки на ПК -->
+    <button type="button" class="cases__more" id="casesMore" aria-expanded="false">Смотреть больше ...</button>
   </div>
 </section>
 
@@ -2226,7 +2373,7 @@
         </nav>
       </div>
 
-      <div class="footer__col">
+      <div class="footer__col footer__col--prices">
         <div class="footer__col-title">Прайсы</div>
         <nav aria-label="Прайсы">
           <a href="price-tech.html">Технические задачи</a>
@@ -2263,6 +2410,9 @@
     </div>
 
     <div class="footer__bottom">
+      <!-- Робот сидит на линии-разделителе. Отражён по горизонтали, чтобы
+           смотреть в подпись, а не за край экрана. Только для телефона -->
+      <img class="footer__robot" src="robot-podval.webp" alt="" aria-hidden="true" />
       <!-- разбито на части ради мобильной раскладки: род занятий уходит
            второй строкой под имя, тире там прячется -->
       <div class="footer__copy"><span class="footer__copy-year">© 2026</span> <span class="footer__copy-name">Катерина Степанова</span><span class="footer__copy-dash"> — </span><span class="footer__copy-role">техспец &amp; граф.дизайнер</span></div>
@@ -2521,14 +2671,33 @@
   (function () {
     const layout = document.querySelector('.cases__layout');
     if (!layout) return;
-    layout.querySelectorAll('.cases__item').forEach((el, i) => {
-      el.style.setProperty('--in', i);
+    // очередь считаем только по видимым плашкам: на телефоне часть списка
+    // скрыта под «Смотреть больше», и по сквозному индексу в очереди
+    // получались бы дыры
+    let step = 0;
+    layout.querySelectorAll('.cases__item').forEach((el) => {
+      el.style.setProperty('--in', el.offsetParent === null ? 0 : step++);
     });
     if (!('IntersectionObserver' in window)) { layout.classList.add('is-live'); return; }
     const io = new IntersectionObserver((entries) => {
       entries.forEach(e => layout.classList.toggle('is-live', e.isIntersecting));
     }, { threshold: 0.15, rootMargin: '0px 0px -10% 0px' });
     io.observe(layout);
+  })();
+
+  // Портфолио на телефоне: «Смотреть больше» раскрывает остальные работы
+  (function () {
+    const more = document.getElementById('casesMore');
+    const list = document.querySelector('.cases__list');
+    if (!more || !list) return;
+    more.addEventListener('click', () => {
+      const open = list.classList.toggle('is-expanded');
+      more.textContent = open ? 'Свернуть' : 'Смотреть больше ...';
+      more.setAttribute('aria-expanded', String(open));
+      // после сворачивания список короче на пол-экрана, и кнопка оказалась
+      // бы далеко вверху — возвращаем её под палец
+      if (!open) more.scrollIntoView({ block: 'center' });
+    });
   })();
 
   // Портфолио: клик по плашке подставляет снимки проекта и собирает точки
@@ -2552,14 +2721,47 @@
     // На узком экране общего превью нет — снимок раскрывается под плашкой.
     // Элемент один на всё портфолио: appendChild сам уносит его с прошлого
     // места, поэтому открытым всегда остаётся ровно один. На ПК он скрыт CSS
-    const inline = document.createElement('img');
+    const inline = document.createElement('div');
     inline.className = 'cases__inline-shot';
-    inline.alt = '';
+    const inlineImg = document.createElement('img');
+    inlineImg.alt = '';
+
+    const arrow = (dir, label, path) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'cases__arrow cases__arrow--' + dir;
+      b.setAttribute('aria-label', label);
+      b.innerHTML = '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" '
+        + 'stroke="currentColor" stroke-width="2" stroke-linecap="round" '
+        + 'stroke-linejoin="round"><path d="' + path + '"/></svg>';
+      return b;
+    };
+    const prevBtn = arrow('prev', 'Предыдущий кадр', 'M15 5l-7 7 7 7');
+    const nextBtn = arrow('next', 'Следующий кадр', 'M9 5l7 7-7 7');
+    inline.append(inlineImg, prevBtn, nextBtn);
+
+    // Листание снимков под плашкой: кадры того проекта, что сейчас открыт
+    let strip = [];
+    let frameIdx = 0;
+    const syncArrows = () => {
+      prevBtn.hidden = frameIdx <= 0;
+      nextBtn.hidden = frameIdx >= strip.length - 1;
+    };
+    const step = (d) => {
+      frameIdx = Math.min(Math.max(frameIdx + d, 0), strip.length - 1);
+      inlineImg.src = strip[frameIdx];
+      syncArrows();
+    };
+    prevBtn.addEventListener('click', () => step(-1));
+    nextBtn.addEventListener('click', () => step(1));
 
     const show = (list, i) => {
       if (i >= list.length) return;
       shot.src = list[i];
-      inline.src = list[i];
+      inlineImg.src = list[i];
+      strip = list;
+      frameIdx = i;
+      syncArrows();
     };
 
     // Появление снимка: скрипт только вешает классы, всё остальное делает CSS.
@@ -2574,13 +2776,38 @@
       frame.classList.add('is-playing');
     };
 
-    document.querySelectorAll('.case-plate[data-shots]').forEach(plate => {
-      const list = plate.dataset.shots.split(',');
+    // Снимки с ПК — широкие развороты, на телефоне в них ничего не разобрать.
+    // Поэтому на узком экране показываются только те работы, у которых есть
+    // свой мобильный кадр в data-shots-m; у остальных клик просто подсвечивает
+    // плашку. На ПК data-shots-m не читается вовсе
+    const isNarrow = () => window.matchMedia('(max-width: 900px)').matches;
+    const shotsOf = (plate) => {
+      const src = isNarrow() ? plate.dataset.shotsM : plate.dataset.shots;
+      return src ? src.split(',') : [];
+    };
+
+    document.querySelectorAll('.case-plate[data-shots], .case-plate[data-shots-m]').forEach(plate => {
       plate.addEventListener('click', () => {
+        // На телефоне ряда точек с крестиком нет, закрывать снимок нечем —
+        // это делает повторный клик по той же плашке. На ПК крестик есть,
+        // и повторный клик по-прежнему переигрывает появление снимка
+        if (plate.classList.contains('is-active') && isNarrow()) {
+          closeShot();
+          return;
+        }
+        const list = shotsOf(plate);
         // подсветка остаётся на открытой плашке — видно, где мы в портфолио
         document.querySelectorAll('.case-plate.is-active')
           .forEach(p => p.classList.remove('is-active'));
         plate.classList.add('is-active');
+        // работа без снимка — остаётся только подсветка, прошлый снимок убираем
+        if (!list.length) {
+          frame.classList.remove('is-open', 'is-playing');
+          dots.hidden = true;
+          dots.textContent = '';
+          inline.remove();
+          return;
+        }
         show(list, 0);
         // onload переприсваиваем, а не копим слушателей: если щёлкать по
         // плашкам быстро, отработает только последняя
