@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex" />
+  <title>Страница не найдена — Катерина Степанова</title>
+  <link rel="icon" href="favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" href="favicon-32.png" sizes="32x32" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Spectral:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    @font-face {
+      font-family: 'Involve';
+      src: url('Involve-Regular.ttf') format('truetype');
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'Vasek';
+      src: url('Vasek Italic_0.ttf') format('truetype');
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    :root {
+      --font-heading: 'Spectral', Georgia, serif;
+      --font-body:    'Involve', system-ui, sans-serif;
+      --font-script:  'Vasek', cursive;
+      --accent2:       #E8A800;
+      --accent2-hover: #C48900;
+      --text: #1A1A1A;
+      --bg:   #F5F5F3;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      position: relative;
+      overflow: hidden;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: clamp(28px, 5vh, 64px);
+      padding: 48px 24px;
+      font-family: var(--font-heading);
+      color: var(--text);
+      background: var(--bg);
+      text-align: center;
+    }
+    img { display: block; max-width: 100%; }
+
+    /* Огромные «404» водяным знаком: белым по чуть сероватому фону —
+       разница в пару тонов, видно только если приглядеться */
+    .e404__ghost {
+      position: absolute;
+      left: 50%;
+      bottom: 100%;
+      /* 60.6vw — при таком кегле «404» в Involve ровно во всю ширину окна.
+         Вычет 0.108em гасит пустоту под чернилами (line-height 1, но под
+         цифрами остаётся место под выносные): зазор до текста — честные 28px.
+         Сдвиг на 0.0086em выравнивает правый боковой отступ последней цифры */
+      font-size: 61.7vw;
+      margin-bottom: calc(28px - 0.108em);
+      transform: translateX(calc(-50% + 0.0086em));
+      font-family: var(--font-body);
+      line-height: 1;
+      color: #FFFFFF;
+      white-space: nowrap;
+      user-select: none;
+      pointer-events: none;
+      z-index: -1;
+    }
+    /* Робот выше цифр, текст выше цифр, но цифры выше фона страницы */
+    .e404__row  { position: relative; z-index: 3; }
+    .e404__copy { position: relative; z-index: 2; }
+
+    .e404__row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: clamp(8px, 8.3vw, 120px);
+    }
+    .e404__oops {
+      font-family: var(--font-script);
+      font-size: clamp(64px, 12.3vw, 178px);
+      line-height: 1;
+      /* «Упс!» стоит чуть выше центра робота — как на макете */
+      transform: translateY(-0.28em);
+      user-select: none;
+    }
+    .e404__oops--mirror { transform: translateY(-0.28em) scaleX(-1); }
+    .e404__robot {
+      width: clamp(230px, 33vw, 450px);
+      height: auto;
+      flex-shrink: 0;
+      /* парение — как у робота в блоке услуг на лендинге */
+      animation: robot-float 4.5s ease-in-out infinite;
+    }
+    @keyframes robot-float {
+      0%, 100% { transform: translateY(0); }
+      50%      { transform: translateY(-14px); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .e404__robot { animation: none; }
+    }
+
+    /* Размер и начертание — как у заголовков карточек услуг на лендинге */
+    .e404__text {
+      font-size: 26px;
+      letter-spacing: 0.03em;
+      line-height: 1.35;
+    }
+    .e404__text + .e404__text { margin-top: 0.5em; }
+    .e404__link {
+      color: var(--accent2);
+      text-decoration: underline;
+      text-decoration-thickness: 2px;
+      text-underline-offset: 5px;
+      transition: color 0.2s ease;
+    }
+    .e404__link:hover { color: var(--accent2-hover); }
+
+    /* На узких экранах «Упс!» уезжает над роботом, зеркальная копия прячется */
+    @media (max-width: 700px) {
+      .e404__row { flex-direction: column; gap: 4px; }
+      .e404__oops { transform: none; }
+      .e404__oops--mirror { display: none; }
+      .e404__text { font-size: 22px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="e404__row">
+    <span class="e404__oops">Упс!</span>
+    <img class="e404__robot" src="robot-404.webp" width="450" height="580"
+         alt="Робот с крестиками вместо глаз и звёздочками над головой" />
+    <span class="e404__oops e404__oops--mirror" aria-hidden="true">Упс!</span>
+  </div>
+
+  <div class="e404__copy">
+    <div class="e404__ghost" aria-hidden="true">404</div>
+    <p class="e404__text">Что-то пошло не так и мы потерялись.</p>
+    <p class="e404__text">Давайте вернем вас на <a class="e404__link" href="index.html">главную страницу</a></p>
+  </div>
+
+</body>
+</html>
