@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Катерина Степанова — техспец для онлайн-школ и малого бизнеса</title>
+  <title>Катерина Степанова — техспец и графический дизайнер</title>
   <meta name="description" content="Верстка сайтов, Telegram-боты, интеграции и графический дизайн для онлайн-школ, экспертов и малого бизнеса. Тобольск, работаю удалённо." />
   <link rel="icon" href="favicon.ico" sizes="any" />
   <link rel="icon" type="image/png" href="favicon-32.png" sizes="32x32" />
@@ -976,9 +976,11 @@
     .cases__item {
       transform: translateX(100vw);
       opacity: 0;
-      /* --in ставит скрипт по порядку плашек — отсюда очередь */
-      transition: transform .95s cubic-bezier(0.22, 0.9, 0.25, 1) calc(var(--in, 0) * 70ms),
-                  opacity   .55s ease                             calc(var(--in, 0) * 70ms);
+      /* --in ставит скрипт по порядку плашек — отсюда очередь.
+         Шаг 115ms вместо прежних 70: очередь читается плашка за плашкой,
+         а не сливается в один взмах. Сам ход тоже длиннее */
+      transition: transform 1.15s cubic-bezier(0.22, 0.9, 0.25, 1) calc(var(--in, 0) * 115ms),
+                  opacity   .65s  ease                             calc(var(--in, 0) * 115ms);
     }
     .cases__layout.is-live .cases__item { transform: none; opacity: 1; }
     @media (prefers-reduced-motion: reduce) {
@@ -1219,13 +1221,14 @@
          12% оставляют 2% запаса */
       --shift: 12%;
       /* Растворение задано маской на весь список, а не на каждую плашку:
-         белое держится плотным до 78% ширины экрана — то есть заведомо
+         белое держится плотным до 74% ширины экрана — то есть заведомо
          дальше правого края картинки (66%), чтобы она нигде не просвечивала.
-         Было 68%, но названия работ в это не укладывались: у самого длинного
-         (ячейка 14) хвост приходился на место, где от белого осталась четверть.
+         Растворение при этом длинное, до 96%: хвосты самых длинных названий
+         («…ветклиники „ЮниВет“», «…для досок референсов») попадают в него,
+         но белого под ними хватает — буквы читаются, а поле мягко тает.
          Границу мерил шрифтом Involve на 17px */
-      -webkit-mask-image: linear-gradient(90deg, #000 0 78%, transparent 92%);
-              mask-image: linear-gradient(90deg, #000 0 78%, transparent 92%);
+      -webkit-mask-image: linear-gradient(90deg, #000 0 74%, transparent 96%);
+              mask-image: linear-gradient(90deg, #000 0 74%, transparent 96%);
     }
     /* распорка: забирает те самые 34px, чтобы строки делили ровно
        высоту картинки, как раньше */
@@ -1264,13 +1267,14 @@
       padding: 0 15px;
       border: none;
       background: #fff;
-      /* Шрифт заголовков, а не жирный Involve: жирного начертания у Involve
-         нет вообще, браузер рисовал бы его сам и на мелком кегле размазывал
-         бы контур. Spectral 500 даёт плотность честно и связывает плашки с
-         заголовками карточек услуг. Он вдобавок уже: самое длинное название
-         похудело с 358 до 333px и целиком укладывается в плотное белое */
-      font-family: var(--font-heading);
-      font-weight: 500;
+      /* Текстовый Involve в своём единственном честном начертании: жирного
+         у него нет, и подделывать его браузером — размазывать контур на
+         мелком кегле. Тот же шрифт держат тексты карточек и подпись под
+         портфолио, плашки читаются с ними в один голос.
+         Он шире засечкового: самое длинное название выросло с 354 до 374px,
+         поэтому граница растворения белого отодвинута (см. .cases__list) */
+      font-family: var(--font-body);
+      font-weight: 400;
       letter-spacing: 0.02em;
       /* Строки делят высоту кадра: строк стало 18 вместо 14 — на узком
          десктопе строка ужимается до ~21px, и 17px текста в неё не влезают.
@@ -1370,8 +1374,8 @@
     .cases__arrow--prev { left: 0; }
     .cases__arrow--next { right: 0; }
     /* «Смотреть больше ...» — только для узкого экрана: на ПК лесенка
-       показывает все работы сразу. Не кнопка, а строка текста: золотой
-       цвет отличает её от названий работ и говорит, что по ней жмут */
+       показывает все работы сразу. Не кнопка, а строка обычного текста
+       и обычного цвета: от белых плашек её и так отличает голое поле */
     .cases__more {
       display: none;
       margin: 14px 16px 0;
@@ -1381,7 +1385,7 @@
       background: none;
       font-family: var(--font-body);
       font-size: 16px;
-      color: var(--accent2);
+      color: var(--text);
       cursor: pointer;
     }
     @media (max-width: 900px) {
@@ -1446,6 +1450,55 @@
       .cases__list.is-expanded .cases__item--more { display: block; }
       .cases__more { display: block; }
     }
+    /* Подпись под портфолио. Текстовый шрифт, а не заголовочный: строка
+       читается как реплика от себя, а не как ещё один заголовок.
+       Кегль резиновый — на телефоне строка ложится в две-три без переносов
+       посреди слова, balance делит её на равные части */
+    .cases__signature {
+      margin: 84px auto 0;
+      font-family: var(--font-body);
+      font-size: clamp(14px, 1.2vw, 17px);
+      letter-spacing: 0.02em;
+      line-height: 1.5;
+      color: var(--text);
+      text-align: center;
+      text-wrap: balance;
+    }
+    /* Ладошки — картинка, а не эмодзи: тот же робот, что и в остальных
+       блоках. Высота задана в em, поэтому смайл едет за кеглем строки;
+       приспущен на базовую линию, иначе висел бы над текстом */
+    /* Ладошки стоят под строкой по центру и проявляются, когда фраза
+       допечаталась. Место под них занято всегда, поэтому появление
+       никуда не двигает соседние блоки */
+    .cases__signature-hands {
+      display: block;
+      height: clamp(44px, 4.2vw, 62px);
+      width: auto;
+      margin: 12px auto 0;
+      /* бледно-жёлтые звёзды на светлом фоне сливались — тень обрисовывает
+         и их, и пальцы, не делая картинку темнее */
+      filter: drop-shadow(0 1px 2px rgba(26,26,26,0.45));
+      transition: opacity .5s ease, transform .5s ease;
+    }
+    /* класс вешает скрипт на время набора: без скрипта ладошки просто видны */
+    .cases__signature-hands.is-waiting {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    /* Обе копии строки лежат в одной ячейке сетки: призрак задаёт размер,
+       живая печатается поверх него */
+    .cases__signature { display: grid; }
+    .cases__signature > span { grid-area: 1 / 1; }
+    .cases__signature-ghost { visibility: hidden; }
+    /* каретка живёт только пока идёт набор — потом класс снимает скрипт */
+    .cases__signature-live.is-typing::after {
+      content: '|';
+      margin-left: 2px;
+      color: var(--accent2);
+      animation: sign-caret 0.9s step-end infinite;
+    }
+    @keyframes sign-caret { 50% { opacity: 0; } }
+
     /* ── Полноэкранный просмотр работы ── */
     /* Тап по снимку под плашкой разворачивает кадр на весь экран. Широкий
        разворот в вертикальном экране кладётся на бок: повернула телефон —
@@ -2349,6 +2402,20 @@
          Живёт вне <ul>, чтобы не сбить нумерацию :nth-child лесенки на ПК -->
     <button type="button" class="cases__more" id="casesMore" aria-expanded="false">Смотреть больше ...</button>
   </div>
+
+  <!-- Подпись под портфолио: сайт собран руками, а не в конструкторе.
+       Скобки — часть строки, поэтому живут в тексте, а не в псевдоэлементах -->
+  <div class="container">
+    <p class="cases__signature">
+      <!-- Копия строки держит размер: пока текст печатается, блок под ним
+           не дёргается на переходе с одной строки на две -->
+      <span class="cases__signature-ghost" aria-hidden="true">{Сей сайт написан кодом, дизайн и вёрстка — всё моими ручками}</span>
+      <!-- Текст стоит в разметке целиком: без скрипта строка просто видна -->
+      <span class="cases__signature-live">{Сей сайт написан кодом, дизайн и вёрстка — всё моими ручками}</span>
+    </p>
+    <!-- Ладошки под строкой: проявляются, когда фраза допечаталась -->
+    <img class="cases__signature-hands" src="hands.webp" width="186" height="128" alt="" />
+  </div>
 </section>
 
 <!-- ── Contacts ── -->
@@ -2511,8 +2578,8 @@
 </div>
 
 <script>
-  // Каскадное вступление hero. Играет при загрузке и заново каждый раз,
-  // когда возвращаешься к первому экрану
+  // Каскадное вступление hero. Играет один раз, при загрузке: вернулся
+  // к первому экрану — он уже собран, ничего не переигрывается
   (function () {
     const parts = document.querySelectorAll('.hero-in');
     if (!parts.length) return;
@@ -2524,7 +2591,9 @@
 
     const io = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
-        entry.target.classList.toggle('is-in', entry.isIntersecting);
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add('is-in');
+        io.unobserve(entry.target);
       });
     }, { threshold: 0.2 });
 
@@ -2645,20 +2714,13 @@
       return;
     }
 
-    // На ПК не отписываемся: ушёл блок из кадра — снимаем класс, вернулся —
-    // анимация проигрывается заново, каждое возвращение к блоку выглядит живым.
-    // На телефоне обратного хода нет: пролистал вверх-вниз — показанное
-    // остаётся на месте, иначе страница мигает на каждом качке пальца
-    const ONE_WAY = window.matchMedia('(max-width: 768px)').matches;
+    // Обратного хода нет: блок вошёл в кадр — класс поставлен, наблюдение снято.
+    // Прокрутил назад — показанное остаётся на месте и заново не переигрывается
     const io = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
-        if (ONE_WAY) {
-          if (!entry.isIntersecting) return;
-          entry.target.classList.add('is-visible');
-          io.unobserve(entry.target);
-          return;
-        }
-        entry.target.classList.toggle('is-visible', entry.isIntersecting);
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add('is-visible');
+        io.unobserve(entry.target);
       });
     }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
 
@@ -2684,8 +2746,9 @@
       // поднялись выше середины экрана, а hero почти ушёл
       const robotIo = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
-          if (ONE_WAY && !entry.isIntersecting) return;
-          robot.classList.toggle('is-shown', entry.isIntersecting);
+          if (!entry.isIntersecting) return;
+          robot.classList.add('is-shown');
+          robotIo.unobserve(entry.target);
         });
       }, { threshold: 0, rootMargin: '0px 0px -45% 0px' });
       robotIo.observe(services);
@@ -2741,6 +2804,9 @@
       el.style.setProperty('--in', i);
     });
     if (!('IntersectionObserver' in window)) { box.classList.add('is-live'); return; }
+    // Обратный ход тут нарочно оставлен: плашки прайсов уезжают за край,
+    // когда блок уходит из кадра, и въезжают заново при возврате — так их
+    // трудно не заметить. У остальных появлений обратного хода нет
     const io = new IntersectionObserver((entries) => {
       entries.forEach(e => box.classList.toggle('is-live', e.isIntersecting));
     }, { threshold: 0.4 });
@@ -2760,10 +2826,67 @@
       el.style.setProperty('--in', el.offsetParent === null ? 0 : step++);
     });
     if (!('IntersectionObserver' in window)) { layout.classList.add('is-live'); return; }
+    // въехали — и стоят: прокрутил мимо и вернулся, плашки на месте
     const io = new IntersectionObserver((entries) => {
-      entries.forEach(e => layout.classList.toggle('is-live', e.isIntersecting));
+      entries.forEach(e => {
+        if (!e.isIntersecting) return;
+        layout.classList.add('is-live');
+        io.unobserve(e.target);
+      });
     }, { threshold: 0.15, rootMargin: '0px 0px -10% 0px' });
     io.observe(layout);
+  })();
+
+  // Подпись под портфолио печатается по буквам, когда доходит до кадра
+  (function () {
+    const live = document.querySelector('.cases__signature-live');
+    if (!live) return;
+    // при выключенных анимациях строка просто стоит готовой
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    // Очередь набора собираем прямо из разметки: текстовые узлы разбираем
+    // по буквам, картинку берём целиком — она встаёт в строку одним «символом»
+    const full = [];
+    live.childNodes.forEach(node => {
+      if (node.nodeType === Node.TEXT_NODE) full.push(...node.textContent);
+      else full.push(node.outerHTML);
+    });
+    const render = (n) => { live.innerHTML = full.slice(0, n).join(''); };
+    const hands = document.querySelector('.cases__signature-hands');
+    const SPEED = 60;    // мс на букву
+    const PAUSE = 6000;  // сколько строка стоит готовой перед новым заходом
+
+    render(0);
+    if (!('IntersectionObserver' in window)) { render(full.length); return; }
+
+    // Набирается по кругу: напечаталась, постояла и заново. Крутится только
+    // пока строка в кадре — ушла из виду, круг доигрывает и останавливается
+    let visible = false, running = false;
+    const type = () => {
+      running = true;
+      live.classList.add('is-typing');
+      hands?.classList.add('is-waiting');
+      let i = 0;
+      const tick = setInterval(() => {
+        render(++i);
+        if (i < full.length) return;
+        clearInterval(tick);
+        // фраза допечаталась — ладошки выходят следом
+        hands?.classList.remove('is-waiting');
+        setTimeout(() => {
+          running = false;
+          if (visible) { render(0); type(); }
+        }, PAUSE);
+      }, SPEED);
+    };
+
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        visible = e.isIntersecting;
+        if (visible && !running) { render(0); type(); }
+      });
+    }, { threshold: 0.6 });
+    io.observe(live);
   })();
 
   // Портфолио на телефоне: «Смотреть больше» раскрывает остальные работы
