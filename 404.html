@@ -125,6 +125,8 @@
       transition: color 0.2s ease;
     }
     .e404__link:hover { color: var(--accent2-hover); }
+    /* Перенос перед ссылкой — только на мобильных */
+    .e404__br { display: none; }
 
     /* На узких экранах «Упс!» уезжает над роботом, зеркальная копия прячется */
     @media (max-width: 700px) {
@@ -132,6 +134,7 @@
       .e404__oops { transform: none; }
       .e404__oops--mirror { display: none; }
       .e404__text { font-size: 22px; }
+      .e404__br { display: inline; }
     }
   </style>
 </head>
@@ -147,7 +150,7 @@
   <div class="e404__copy">
     <div class="e404__ghost" aria-hidden="true">404</div>
     <p class="e404__text">Что-то пошло не так и мы потерялись.</p>
-    <p class="e404__text">Давайте вернем вас на <a class="e404__link" href="index.html">главную страницу</a></p>
+    <p class="e404__text">Давайте вернем вас на<br class="e404__br" /> <a class="e404__link" href="index.html">главную страницу</a></p>
   </div>
 
 </body>

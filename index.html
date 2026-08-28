@@ -1446,6 +1446,84 @@
       .cases__list.is-expanded .cases__item--more { display: block; }
       .cases__more { display: block; }
     }
+    /* ── Полноэкранный просмотр работы ── */
+    /* Тап по снимку под плашкой разворачивает кадр на весь экран. Широкий
+       разворот в вертикальном экране кладётся на бок: повернула телефон —
+       и он стоит ровно во всю ширину. Листание то же, что и под плашкой:
+       стрелки по краям кадра и смахивание */
+    .cases__inline-shot img { cursor: zoom-in; }
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      display: none;
+      background: rgba(12,12,12,0.95);
+      /* смахивание листает кадры, а не таскает страницу под оверлеем */
+      touch-action: none;
+      overscroll-behavior: contain;
+    }
+    .lightbox.is-open { display: block; }
+    body.lightbox-open { overflow: hidden; }
+    /* Центрируем абсолютом, а не флексом: повёрнутый кадр шире экрана,
+       и у флекса центр такого элемента съезжает. Здесь середина сцены
+       прибита к середине экрана при любом размере кадра */
+    .lightbox__stage {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      display: flex;
+    }
+    .lightbox__img {
+      display: block;
+      max-width: 100vw;
+      max-height: 100vh;
+      max-width: 100dvw;
+      max-height: 100dvh;
+      object-fit: contain;
+    }
+    /* Поворот только там, где кадр шире, чем выше, а экран наоборот.
+       Предельные размеры меняются местами: по высоте экрана — ширина кадра */
+    @media (orientation: portrait) {
+      .lightbox--rotate .lightbox__stage {
+        transform: translate(-50%, -50%) rotate(90deg);
+      }
+      .lightbox--rotate .lightbox__img {
+        max-width: 100vh;
+        max-height: 100vw;
+        max-width: 100dvh;
+        max-height: 100dvw;
+      }
+    }
+    /* стрелки и крестик лежат в сцене — крутятся вместе с кадром и остаются
+       на его краях, как их видит глаз после поворота телефона */
+    .lightbox__close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 40px;
+      height: 40px;
+      padding: 0;
+      border: none;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.75);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+      cursor: pointer;
+    }
+    .lightbox__close::before,
+    .lightbox__close::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 18px;
+      height: 3px;
+      border-radius: 2px;
+      background: var(--text);
+    }
+    .lightbox__close::before { transform: translate(-50%, -50%) rotate(45deg); }
+    .lightbox__close::after  { transform: translate(-50%, -50%) rotate(-45deg); }
+
     /* ── Форма заявки (живёт в блоке контактов) ── */
     .booking-form__grid {
       display: grid;
@@ -1971,13 +2049,6 @@
     }
 
     @media (max-width: 768px) {
-      /* Шапка на телефоне сжимается, как только страница тронулась с места:
-         64 → 48px и кегль мельче. Класс is-scrolled уже ставит скрипт
-         полоски прогресса на 120px прокрутки — второго слушателя не нужно */
-      .header__inner { transition: height var(--transition); }
-      .header__logo { transition: color var(--transition), font-size var(--transition); }
-      body.is-scrolled .header__inner { height: 48px; }
-      body.is-scrolled .header__logo { font-size: 13px; }
       /* Фон как на странице 404: ровный светлый тон вместо рисунка.
          На телефоне картинка обрезалась до пары веток и только мешала */
       .page-bg { display: none; }
@@ -2339,7 +2410,7 @@
               <span>Я соглашаюсь с <a href="privacy.html" target="_blank" rel="noopener">Политикой обработки персональных данных</a></span>
             </label>
             <p class="field__error">Нужно согласие на обработку персональных данных</p>
-            <button type="submit" class="btn btn--primary booking-form__submit">Записаться на консультацию</button>
+            <button type="submit" class="btn btn--primary booking-form__submit">Обсудим ваш проект</button>
           </form>
           <div class="booking-success" id="bookingSuccess" aria-live="polite">
             <div class="booking-success__icon">✓</div>
@@ -2574,10 +2645,19 @@
       return;
     }
 
-    // Не отписываемся: ушёл блок из кадра — снимаем класс, вернулся — анимация
-    // проигрывается заново. Так каждое возвращение к блоку выглядит живым
+    // На ПК не отписываемся: ушёл блок из кадра — снимаем класс, вернулся —
+    // анимация проигрывается заново, каждое возвращение к блоку выглядит живым.
+    // На телефоне обратного хода нет: пролистал вверх-вниз — показанное
+    // остаётся на месте, иначе страница мигает на каждом качке пальца
+    const ONE_WAY = window.matchMedia('(max-width: 768px)').matches;
     const io = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
+        if (ONE_WAY) {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add('is-visible');
+          io.unobserve(entry.target);
+          return;
+        }
         entry.target.classList.toggle('is-visible', entry.isIntersecting);
       });
     }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
@@ -2604,6 +2684,7 @@
       // поднялись выше середины экрана, а hero почти ушёл
       const robotIo = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
+          if (ONE_WAY && !entry.isIntersecting) return;
           robot.classList.toggle('is-shown', entry.isIntersecting);
         });
       }, { threshold: 0, rootMargin: '0px 0px -45% 0px' });
@@ -2740,20 +2821,93 @@
     const nextBtn = arrow('next', 'Следующий кадр', 'M9 5l7 7-7 7');
     inline.append(inlineImg, prevBtn, nextBtn);
 
-    // Листание снимков под плашкой: кадры того проекта, что сейчас открыт
+    // Полноэкранный просмотр: тап по снимку под плашкой. Оверлей один на всё
+    // портфолио, лежит в конце body и до первого тапа ничего не грузит
+    const lb = document.createElement('div');
+    lb.className = 'lightbox';
+    const lbStage = document.createElement('div');
+    lbStage.className = 'lightbox__stage';
+    const lbImg = document.createElement('img');
+    lbImg.className = 'lightbox__img';
+    lbImg.alt = '';
+    const lbPrev = arrow('prev', 'Предыдущий кадр', 'M15 5l-7 7 7 7');
+    const lbNext = arrow('next', 'Следующий кадр', 'M9 5l7 7-7 7');
+    const lbClose = document.createElement('button');
+    lbClose.type = 'button';
+    lbClose.className = 'lightbox__close';
+    lbClose.setAttribute('aria-label', 'Закрыть просмотр');
+    lbStage.append(lbImg, lbPrev, lbNext, lbClose);
+    lb.appendChild(lbStage);
+    document.body.appendChild(lb);
+
+    // Кладём кадр на бок, только если он и правда широкий. Мобильные снимки
+    // вертикальные — их поворачивать незачем, класс просто не встаёт
+    const fitRotate = () => {
+      lb.classList.toggle('lightbox--rotate',
+                          lbImg.naturalWidth > lbImg.naturalHeight);
+    };
+    lbImg.addEventListener('load', fitRotate);
+
+    // Листание снимков: кадры того проекта, что сейчас открыт. Стрелки под
+    // плашкой и стрелки в полном экране ходят по одному и тому же счётчику
     let strip = [];
     let frameIdx = 0;
     const syncArrows = () => {
-      prevBtn.hidden = frameIdx <= 0;
-      nextBtn.hidden = frameIdx >= strip.length - 1;
+      prevBtn.hidden = lbPrev.hidden = frameIdx <= 0;
+      nextBtn.hidden = lbNext.hidden = frameIdx >= strip.length - 1;
     };
     const step = (d) => {
       frameIdx = Math.min(Math.max(frameIdx + d, 0), strip.length - 1);
       inlineImg.src = strip[frameIdx];
+      lbImg.src = strip[frameIdx];
       syncArrows();
     };
     prevBtn.addEventListener('click', () => step(-1));
     nextBtn.addEventListener('click', () => step(1));
+    lbPrev.addEventListener('click', () => step(-1));
+    lbNext.addEventListener('click', () => step(1));
+
+    const lbIsOpen = () => lb.classList.contains('is-open');
+    const openLb = () => {
+      if (!strip.length) return;
+      lbImg.src = strip[frameIdx];
+      if (lbImg.complete) fitRotate();
+      lb.classList.add('is-open');
+      document.body.classList.add('lightbox-open');
+      syncArrows();
+    };
+    const closeLb = () => {
+      lb.classList.remove('is-open');
+      document.body.classList.remove('lightbox-open');
+    };
+    inlineImg.addEventListener('click', openLb);
+    lbClose.addEventListener('click', closeLb);
+    // мимо кадра — закрыть; по самому кадру закрытия нет, чтобы не ловить
+    // случайное касание при листании
+    lb.addEventListener('click', (e) => { if (e.target === lb) closeLb(); });
+    document.addEventListener('keydown', (e) => {
+      if (!lbIsOpen()) return;
+      if (e.key === 'Escape')     closeLb();
+      if (e.key === 'ArrowLeft')  step(-1);
+      if (e.key === 'ArrowRight') step(1);
+    });
+
+    // Смахивание. Оси у страницы не поворачиваются вместе с картинкой:
+    // когда кадр лежит на боку, «влево» для глаза — это движение вверх
+    let touchX = 0, touchY = 0;
+    lb.addEventListener('touchstart', (e) => {
+      touchX = e.changedTouches[0].clientX;
+      touchY = e.changedTouches[0].clientY;
+    }, { passive: true });
+    lb.addEventListener('touchend', (e) => {
+      const rotated = lb.classList.contains('lightbox--rotate')
+        && window.matchMedia('(orientation: portrait)').matches;
+      const d = rotated
+        ? e.changedTouches[0].clientY - touchY
+        : e.changedTouches[0].clientX - touchX;
+      if (Math.abs(d) < 40) return;
+      step(d < 0 ? 1 : -1);
+    }, { passive: true });
 
     const show = (list, i) => {
       if (i >= list.length) return;
@@ -2776,13 +2930,13 @@
       frame.classList.add('is-playing');
     };
 
-    // Снимки с ПК — широкие развороты, на телефоне в них ничего не разобрать.
-    // Поэтому на узком экране показываются только те работы, у которых есть
-    // свой мобильный кадр в data-shots-m; у остальных клик просто подсвечивает
-    // плашку. На ПК data-shots-m не читается вовсе
+    // На узком экране берём мобильные кадры (data-shots-m), если они сняты,
+    // иначе те же, что на ПК: широкий разворот под плашкой мелковат, но тап
+    // разворачивает его на весь экран на бок — там всё читается.
+    // На ПК data-shots-m не читается вовсе
     const isNarrow = () => window.matchMedia('(max-width: 900px)').matches;
     const shotsOf = (plate) => {
-      const src = isNarrow() ? plate.dataset.shotsM : plate.dataset.shots;
+      const src = (isNarrow() && plate.dataset.shotsM) || plate.dataset.shots;
       return src ? src.split(',') : [];
     };
 
@@ -2930,7 +3084,7 @@
         if (Math.hypot(ox, oy) < RADIUS) {
           // магнит только по вертикали — кнопки не наезжают друг на друга
           let strength = STRENGTH;
-          // у кнопки «Записаться на консультацию» тяга вверх слабее в 3 раза
+          // у кнопки «Обсудим ваш проект» тяга вверх слабее в 3 раза
           if (dy < 0 && btn.classList.contains('booking-form__submit')) {
             strength = STRENGTH / 3;
           }
