@@ -8,9 +8,6 @@
   <link rel="icon" href="favicon.ico" sizes="any" />
   <link rel="icon" type="image/png" href="favicon-32.png" sizes="32x32" />
   <link rel="apple-touch-icon" href="apple-touch-icon.png" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Spectral:wght@400;500;600&display=swap" rel="stylesheet" />
   <style>
     @font-face {
       font-family: 'Involve';
@@ -19,6 +16,35 @@
       font-style: normal;
       font-display: swap;
     }
+    /* Spectral — заголовки. Лежит рядом, а не на fonts.googleapis.com: внешняя
+       таблица стилей в head держит рендер, пока не ответит чужой сервер — на
+       мобильном канале это около полусекунды белого экрана. Плюс IP посетителя
+       уходил к Google раньше, чем тот успевал увидеть cookie-баннер.
+       Три веса объявлены одинаково на всех страницах: объявление само по себе
+       ничего не качает, браузер берёт только те файлы, что нужны для рендера.
+       Курсива нет намеренно — единственный <em> на сайте выпрямлен стилем. */
+    @font-face {
+      font-family: 'Spectral';
+      src: url('Spectral-Regular.woff2') format('woff2');
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'Spectral';
+      src: url('Spectral-Medium.woff2') format('woff2');
+      font-weight: 500;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'Spectral';
+      src: url('Spectral-SemiBold.woff2') format('woff2');
+      font-weight: 600;
+      font-style: normal;
+      font-display: swap;
+    }
+
     :root {
       --font-heading: 'Spectral', Georgia, serif;
       --font-body:    'Involve', system-ui, sans-serif;
