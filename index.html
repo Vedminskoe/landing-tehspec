@@ -72,7 +72,10 @@
       background: var(--bg);
     }
     a { color: inherit; text-decoration: none; }
-    img { display: block; max-width: 100%; }
+    /* height: auto — чтобы атрибуты width/height в разметке (они держат место
+       под картинку и убирают скачок вёрстки) не применялись как жёсткая высота
+       там, где CSS задаёт одну ширину. Правила с классами это перебивают */
+    img { display: block; max-width: 100%; height: auto; }
 
     /* Единый фон: рисунок тянется от шапки до подвала на всю высоту страницы.
        auto 100% — высота по странице, пропорции не плывут (края чуть обрезаются).
@@ -83,7 +86,7 @@
       inset: 0;
       z-index: -1;
       pointer-events: none;
-      background: url('fon-web2.jpg') top center / auto 100% no-repeat;
+      background: url('fon-web2.webp') top center / auto 100% no-repeat;
       opacity: var(--bg-art-opacity, 1);
     }
 
@@ -394,7 +397,7 @@
       color: transparent;
       /* реальная фактура crushed velvet заливает буквы */
       background-color: #0b0b0f;
-      background-image: url('velvet.jpg');
+      background-image: url('velvet.webp');
       background-size: 140% auto;
       background-position: 50% 40%;
       -webkit-background-clip: text;
@@ -2253,7 +2256,7 @@
       <div class="hero__right hero-in">
         <div class="hero__right-inner">
           <div class="hero__photo">
-            <img src="2.png" alt="Катерина Степанова" />
+            <img src="2.webp" alt="Катерина Степанова" width="896" height="1184" fetchpriority="high" decoding="async" />
           </div>
         </div>
         <p class="hero__caption">технический специалист<br />графический дизайнер</p>
@@ -2315,7 +2318,7 @@
     </ul>
     <!-- Робот вынесен из карточки: иначе наклон/подсветка карточки его обрежут
          и перевернут. Позиционируется от .container, как и раньше на ПК -->
-    <img class="services__robot" src="4.png" alt="" aria-hidden="true" />
+    <img class="services__robot" src="4.webp" alt="" aria-hidden="true" width="1280" height="714" decoding="async" />
   </div>
 </section>
 
@@ -2365,9 +2368,9 @@
   <!-- выходит за .container: картинка прижата к левому краю экрана -->
   <div class="cases__layout">
     <!-- подсказки «ТЫК»: тычут в лесенку, поэтому лежат вне кадра -->
-    <img class="cases__tik cases__tik--1" src="tik1.png" alt="" aria-hidden="true" />
-    <img class="cases__tik cases__tik--2" src="tik2.png" alt="" aria-hidden="true" />
-    <img class="cases__tik cases__tik--3" src="tik3.png" alt="" aria-hidden="true" />
+    <img class="cases__tik cases__tik--1" src="tik1.webp" alt="" aria-hidden="true" width="802" height="415" decoding="async" />
+    <img class="cases__tik cases__tik--2" src="tik2.webp" alt="" aria-hidden="true" width="737" height="303" decoding="async" />
+    <img class="cases__tik cases__tik--3" src="tik3.webp" alt="" aria-hidden="true" width="624" height="699" decoding="async" />
     <div class="cases__shot">
       <!-- заглушка до первого клика: тень идёт первой, чтобы лежать под роботом -->
       <div class="cases__stub-wrap" aria-hidden="true">
@@ -2375,12 +2378,12 @@
         <!-- На телефоне робот другой: держит табличку двумя руками над
              головой. Подменяет его <source>, на ПК грузится прежний -->
         <picture class="cases__stub-pic">
-          <source media="(max-width: 900px)" srcset="robot-cases-m.webp" />
-          <img class="cases__stub" src="port-robot.png" alt="" />
+          <source media="(max-width: 900px)" srcset="robot-cases-m.webp" width="760" height="968" />
+          <img class="cases__stub" src="port-robot.webp" alt="" width="1000" height="558" decoding="async" />
         </picture>
       </div>
       <!-- src подставляет скрипт при первом клике по плашке -->
-      <img alt="" id="casesShot" />
+      <img alt="" id="casesShot" decoding="async" />
       <!-- Точки слайдера: появляются вместе с картинкой проекта.
            Лежат внутри .cases__shot — проценты нужны от кадра, чтобы
            держаться острия белой стрелки на любой ширине экрана.
@@ -2424,7 +2427,7 @@
       <span class="cases__signature-live">{Сей сайт написан кодом, дизайн и вёрстка — всё моими ручками}</span>
     </p>
     <!-- Ладошки под строкой: проявляются, когда фраза допечаталась -->
-    <img class="cases__signature-hands" src="hands.webp" width="186" height="128" alt="" />
+    <img class="cases__signature-hands" src="hands.webp" width="186" height="128" alt="" decoding="async" />
   </div>
 </section>
 
@@ -2560,7 +2563,7 @@
     <div class="footer__bottom">
       <!-- Робот сидит на линии-разделителе. Отражён по горизонтали, чтобы
            смотреть в подпись, а не за край экрана. Только для телефона -->
-      <img class="footer__robot" src="robot-podval.webp" alt="" aria-hidden="true" />
+      <img class="footer__robot" src="robot-podval.webp" alt="" aria-hidden="true" width="600" height="856" loading="lazy" decoding="async" />
       <!-- разбито на части ради мобильной раскладки: род занятий уходит
            второй строкой под имя, тире там прячется -->
       <div class="footer__copy"><span class="footer__copy-year">© 2026</span> <span class="footer__copy-name">Катерина Степанова</span><span class="footer__copy-dash"> — </span><span class="footer__copy-role">техспец &amp; граф.дизайнер</span></div>
@@ -2576,7 +2579,7 @@
 
 <!-- Cookie-уведомление -->
 <div class="cookie-banner" id="cookieBanner" role="dialog" aria-labelledby="cookieTitle" hidden>
-  <img class="cookie-banner__icon" src="robot-cookie.png" width="300" height="363" alt="" aria-hidden="true" />
+  <img class="cookie-banner__icon" src="robot-cookie.webp" width="300" height="363" alt="" aria-hidden="true" loading="lazy" decoding="async" />
   <div class="cookie-banner__body">
     <h3 id="cookieTitle">Печенье — на ваших условиях</h3>
     <p>Сайт хранит только то, что нужно для его работы: язык, отправленные формы и вот это согласие. Никакой рекламы и слежки. Подробности — в <a href="privacy.html" target="_blank" rel="noopener">Политике обработки персональных данных</a>.</p>

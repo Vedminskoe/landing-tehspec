@@ -56,7 +56,7 @@ a { color: inherit; text-decoration: none; }
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  background: url('fon-web2.jpg') center / cover no-repeat;
+  background: url('fon-web2.webp') center / cover no-repeat;
   opacity: var(--bg-art-opacity);
 }
 /* полоса прокрутки не должна появляться и исчезать — иначе текст дёргается
