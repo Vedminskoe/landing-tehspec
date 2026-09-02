@@ -2191,6 +2191,20 @@
       /* реквизиты прячем не в подвал, а под подпись — их видно всегда */
       .footer__legal { text-align: center; }
     }
+    /* ── Анимации не крутятся за краем экрана ──
+       Бесконечные анимации браузер честно проигрывает и когда их не видно.
+       Две из них (velvetGlint у заголовка и btn-flow у кнопок) двигают
+       background-position — это свойство не композитится, то есть каждый кадр
+       перерисовывается заново. Класс вешает наблюдатель ниже; paused, а не
+       none: кадр замирает на месте и с него же продолжается при возврате,
+       тогда как none отбросил бы анимацию в начало.
+       Класс удвоен — так правило перевешивает объявления animation у самих
+       элементов и не зависит от порядка строк в файле */
+    .is-idle.is-idle,
+    .is-idle.is-idle::before,
+    .is-idle.is-idle::after,
+    .is-idle.is-idle svg,
+    .is-idle.is-idle .cases__stub { animation-play-state: paused; }
   </style>
 </head>
 <body>
@@ -2594,6 +2608,22 @@
 </div>
 
 <script>
+  // will-change готовит слой под будущую анимацию, но после того как появление
+  // отыграло, держать его незачем: два десятка элементов до конца жизни
+  // страницы занимали бы отдельные слои в памяти видеокарты. Снимаем по
+  // окончании перехода — и только его, не трогая остальные стили элемента
+  const dropWillChange = (el) => {
+    const done = (e) => {
+      if (e && e.target !== el) return;
+      el.style.willChange = 'auto';
+      el.removeEventListener('transitionend', done);
+    };
+    el.addEventListener('transitionend', done);
+    // переход может не случиться вовсе (reduce-motion, элемент уже на месте) —
+    // тогда снимаем по запасному таймеру
+    setTimeout(done, 2000);
+  };
+
   // Каскадное вступление hero. Играет один раз, при загрузке: вернулся
   // к первому экрану — он уже собран, ничего не переигрывается
   (function () {
@@ -2610,6 +2640,7 @@
         if (!entry.isIntersecting) return;
         entry.target.classList.add('is-in');
         io.unobserve(entry.target);
+        dropWillChange(entry.target);
       });
     }, { threshold: 0.2 });
 
@@ -2737,6 +2768,7 @@
         if (!entry.isIntersecting) return;
         entry.target.classList.add('is-visible');
         io.unobserve(entry.target);
+        dropWillChange(entry.target);
       });
     }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
 
@@ -2867,7 +2899,20 @@
       if (node.nodeType === Node.TEXT_NODE) full.push(...node.textContent);
       else full.push(node.outerHTML);
     });
-    const render = (n) => { live.innerHTML = full.slice(0, n).join(''); };
+    // Пока строка состоит из одного текста, набираем её в текстовый узел:
+    // правка .data не заставляет браузер разбирать HTML заново на каждую
+    // букву, как это делал innerHTML. Появится внутри строки картинка —
+    // сработает прежний путь через innerHTML
+    const plain = [...live.childNodes].every(n => n.nodeType === Node.TEXT_NODE);
+    let render;
+    if (plain) {
+      const node = document.createTextNode('');
+      live.textContent = '';
+      live.appendChild(node);
+      render = (n) => { node.data = full.slice(0, n).join(''); };
+    } else {
+      render = (n) => { live.innerHTML = full.slice(0, n).join(''); };
+    }
     const hands = document.querySelector('.cases__signature-hands');
     const SPEED = 60;    // мс на букву
     const PAUSE = 6000;  // сколько строка стоит готовой перед новым заходом
@@ -3153,28 +3198,47 @@
   (function () {
     const bar = document.getElementById('scrollProgress');
     if (!bar) return;
+    // Ссылки берём один раз: искать их заново на каждом кадре прокрутки незачем
+    const contacts = document.getElementById('contacts');
+    const footer   = document.querySelector('.footer');
+    const toTopBtn = document.getElementById('toTop');
     let ticking = false;
 
+    // Геометрия страницы меняется только при resize и когда раскрывается
+    // список работ — а не на каждом кадре. Держим её в кеше: иначе чтение
+    // scrollHeight и getBoundingClientRect заставляло браузер пересчитывать
+    // вёрстку по 60 раз в секунду всю прокрутку
+    let maxScroll = 0, viewH = 0, contactsTop = 0, footerTop = 0;
+    const measure = () => {
+      const y = window.scrollY;
+      viewH = window.innerHeight;
+      maxScroll = document.documentElement.scrollHeight - viewH;
+      contactsTop = contacts ? contacts.getBoundingClientRect().top + y : 0;
+      footerTop   = footer   ? footer.getBoundingClientRect().top   + y : 0;
+    };
+
+    let lastBottom = '';
     const update = () => {
       ticking = false;
-      const max = document.documentElement.scrollHeight - window.innerHeight;
-      const p = max > 0 ? Math.min(window.scrollY / max, 1) : 0;
-      bar.style.setProperty('--p', p);
-      document.body.classList.toggle('is-scrolled', window.scrollY > 120);
-      // кнопка «наверх»: показывается от блока контактов
-      const contacts = document.getElementById('contacts');
-      const started = contacts
-        ? contacts.getBoundingClientRect().top < window.innerHeight * 0.5
-        : window.scrollY > window.innerHeight;
-      document.body.classList.toggle('is-bottom', started);
-
+      // сначала все чтения, потом все записи: вперемешку они заставляют
+      // браузер пересчитывать вёрстку посреди кадра
+      const y = window.scrollY;
+      const p = maxScroll > 0 ? Math.min(y / maxScroll, 1) : 0;
+      const started = contacts ? (contactsTop - y) < viewH * 0.5 : y > viewH;
       // край движения — футер: как только он входит снизу, кнопка встаёт
       // над ним и дальше не опускается (в подвал не заходит)
-      const footer = document.querySelector('.footer');
-      const toTopBtn = document.getElementById('toTop');
-      if (footer && toTopBtn) {
-        const overlap = window.innerHeight - footer.getBoundingClientRect().top;
-        toTopBtn.style.bottom = (overlap > 0 ? 24 + overlap : 24) + 'px';
+      const overlap = viewH - (footerTop - y);
+      const bottom = (footer && overlap > 0 ? 24 + overlap : 24) + 'px';
+
+      bar.style.setProperty('--p', p);
+      document.body.classList.toggle('is-scrolled', y > 120);
+      // кнопка «наверх»: показывается от блока контактов
+      document.body.classList.toggle('is-bottom', started);
+      // Почти всю страницу значение одно и то же. Записывать его каждый кадр
+      // значило бы каждый кадр заново размывать подложку под кнопкой
+      if (toTopBtn && bottom !== lastBottom) {
+        toTopBtn.style.bottom = bottom;
+        lastBottom = bottom;
       }
     };
 
@@ -3184,6 +3248,16 @@
         requestAnimationFrame(update);
       }
     }, { passive: true });
+
+    // Пересчитываем кеш, когда страница меняет размер: поворот экрана,
+    // догрузка картинок, раскрытие «Смотреть больше» в портфолио
+    const remeasure = () => { measure(); update(); };
+    window.addEventListener('resize', remeasure, { passive: true });
+    window.addEventListener('load', remeasure);
+    if ('ResizeObserver' in window) {
+      new ResizeObserver(remeasure).observe(document.documentElement);
+    }
+    measure();
     update();
 
     const toTop = document.getElementById('toTop');
@@ -3211,29 +3285,53 @@
     let ticking = false;
     let lastX = 0, lastY = 0;
 
+    // «Домашнее» положение кнопок в координатах страницы. Раньше геометрия
+    // читалась прямо в кадре — три пересчёта вёрстки на каждое движение мыши
+    // по всей странице. Вдобавок прямоугольник читался с уже смещённой кнопки,
+    // и магнит считал тягу от сдвинутого центра, подтягивая сам себя
+    let homes = [];
+    const measure = () => {
+      const sx = window.scrollX, sy = window.scrollY;
+      homes = [...buttons].map(btn => {
+        const keep = btn.style.transform;
+        btn.style.transform = '';     // меряем дом, а не текущий сдвиг
+        const r = btn.getBoundingClientRect();
+        btn.style.transform = keep;
+        return {
+          btn,
+          cx: r.left + sx + r.width / 2,
+          cy: r.top + sy + r.height / 2,
+          hw: r.width / 2,
+          hh: r.height / 2,
+          // у кнопки «Обсудим ваш проект» тяга вверх слабее в 3 раза
+          soft: btn.classList.contains('booking-form__submit'),
+          last: keep,
+        };
+      });
+    };
+
     const update = () => {
       ticking = false;
-      buttons.forEach(btn => {
-        const r = btn.getBoundingClientRect();
-        const cx = r.left + r.width / 2;
-        const cy = r.top + r.height / 2;
-        const dx = lastX - cx;
-        const dy = lastY - cy;
+      const sx = window.scrollX, sy = window.scrollY;
+      for (const h of homes) {
+        const dx = lastX - (h.cx - sx);
+        const dy = lastY - (h.cy - sy);
         // расстояние от курсора до края кнопки (0 внутри кнопки)
-        const ox = Math.max(Math.abs(dx) - r.width / 2, 0);
-        const oy = Math.max(Math.abs(dy) - r.height / 2, 0);
+        const ox = Math.max(Math.abs(dx) - h.hw, 0);
+        const oy = Math.max(Math.abs(dy) - h.hh, 0);
+        let want = '';
         if (Math.hypot(ox, oy) < RADIUS) {
           // магнит только по вертикали — кнопки не наезжают друг на друга
-          let strength = STRENGTH;
-          // у кнопки «Обсудим ваш проект» тяга вверх слабее в 3 раза
-          if (dy < 0 && btn.classList.contains('booking-form__submit')) {
-            strength = STRENGTH / 3;
-          }
-          btn.style.transform = `translateY(${dy * strength}px)`;
-        } else {
-          btn.style.transform = '';
+          const strength = (dy < 0 && h.soft) ? STRENGTH / 3 : STRENGTH;
+          want = `translateY(${dy * strength}px)`;
         }
-      });
+        // курсор далеко от всех кнопок — самый частый случай: тогда ни одной
+        // записи в стиль не происходит
+        if (want !== h.last) {
+          h.btn.style.transform = want;
+          h.last = want;
+        }
+      }
     };
 
     window.addEventListener('pointermove', (e) => {
@@ -3244,6 +3342,24 @@
         requestAnimationFrame(update);
       }
     }, { passive: true });
+
+    window.addEventListener('resize', measure, { passive: true });
+    window.addEventListener('load', measure);
+    measure();
+  })();
+  // Бесконечные анимации живут только пока их видно. Шаги «Как я работаю»
+  // сюда не входят: у них свой наблюдатель и свой класс is-live
+  (function () {
+    if (!('IntersectionObserver' in window)) return;
+    const targets = document.querySelectorAll(
+      '.hero__name, .hero__scroll, .services__robot, .cases__shot,' +
+      '.contacts__status, .cases__signature-live, .btn--primary'
+    );
+    if (!targets.length) return;
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => e.target.classList.toggle('is-idle', !e.isIntersecting));
+    }, { rootMargin: '10% 0px' });
+    targets.forEach(el => io.observe(el));
   })();
 </script>
 
