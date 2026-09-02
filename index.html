@@ -2397,7 +2397,7 @@
     <ul class="cases__list">
       <li class="cases__item"><button type="button" class="case-plate" data-shots="img/sait-unumgarden/1.jpg"><span class="case-plate__text">Сайт ландшафтного архитектора на Tilda</span></button></li>
       <li class="cases__item"><button type="button" class="case-plate" data-shots="img/sait-adminka/1.jpg,img/sait-adminka/2.jpg" data-shots-m="img/sait-adminka/m1.jpg,img/sait-adminka/m2.jpg"><span class="case-plate__text">Сайт-админка для досок референсов</span></button></li>
-      <li class="cases__item cases__item--more"><button type="button" class="case-plate"><span class="case-plate__text">название</span></button></li>
+      <li class="cases__item cases__item--more"><button type="button" class="case-plate"><span class="case-plate__text">сайт (в разработке)</span></button></li>
       <li class="cases__item cases__item--gap"><span class="case-plate"></span></li>
       <li class="cases__item"><button type="button" class="case-plate" data-shots="img/spravochnik/1.jpg,img/spravochnik/2.jpg,img/spravochnik/3.jpg,img/spravochnik/4.jpg,img/spravochnik/5.jpg,img/spravochnik/6.jpg" data-shots-m="img/spravochnik/m1.jpg,img/spravochnik/m2.jpg,img/spravochnik/m3.jpg,img/spravochnik/m4.jpg,img/spravochnik/m5.jpg,img/spravochnik/m6.jpg"><span class="case-plate__text">Справочник «Лечение животных травами»</span></button></li>
       <li class="cases__item cases__item--more"><button type="button" class="case-plate" data-shots="img/present/1.jpg,img/present/2.jpg,img/present/3.jpg"><span class="case-plate__text">Презентация для справочника</span></button></li>
@@ -3143,7 +3143,9 @@
       all.forEach(d => d.classList.remove('is-active'));
       dot.classList.add('is-active');
       const open = document.querySelector('.case-plate.is-active');
-      if (open) show(open.dataset.shots.split(','), all.indexOf(dot));
+      // через shotsOf, а не dataset.shots напрямую: на узком экране
+      // у работы могут быть свои кадры, и точки должны листать их же
+      if (open) show(shotsOf(open), all.indexOf(dot));
     });
   })();
 
