@@ -56,6 +56,7 @@
   --transition:   0.25s ease;
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+img { display: block; max-width: 100%; height: auto; }
 
 /* Курсор-крестик: страница закрывается щелчком в любом месте, и курсор
    должен говорить об этом сам. Рисунок инлайном в data-URI — отдельный
@@ -382,23 +383,32 @@ html { scrollbar-gutter: stable; }
   text-align: center;
 }
 
-/* Кнопка закрытия — только там, где мыши нет: на телефоне курсор ничего
-   не подсказывает, и без неё со страницы было бы не выйти */
+/* Кнопка «Закрыть» — только на тач-экране: на телефоне курсор ничего
+   не подсказывает, а голого крестика без подписи посетители не замечали.
+   Вид тот же, что у закрывашек в портфолио и в полноэкранном просмотре:
+   белый кружок, тёмный крестик, мягкая тень. Прибита к верхнему правому
+   углу окна и висит там всю прокрутку — выйти можно с любого места */
 .close-btn {
   display: none;
   position: fixed;
-  top: 14px;
-  right: 14px;
-  z-index: 10;
-  width: 44px;
-  height: 44px;
-  border: 1px solid var(--border);
-  border-radius: 50%;
-  background: rgba(255,255,255,0.92);
+  top: max(10px, env(safe-area-inset-top));
+  right: max(10px, env(safe-area-inset-right));
+  z-index: 50;
+  gap: 7px;
+  padding: 10px 15px 10px 12px;
+  border: none;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.94);
   color: var(--text);
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1;
+  box-shadow: 0 1px 6px rgba(26,26,26,0.35);
   align-items: center;
   justify-content: center;
+  cursor: pointer;
 }
+.close-btn svg { flex: none; }
 @media (hover: none) {
   .close-btn { display: flex; }
   body { cursor: auto; }
@@ -418,22 +428,29 @@ html { scrollbar-gutter: stable; }
   .row__desc { order: 3; }
 }
 
-/* ── Подвал: тот же, что на лендинге ── */
+/* ── Подвал ──
+   Один в один с лендингом: разметка и стили скопированы оттуда, чтобы
+   подвал не разъезжался между главной и прайсами. Единственное отличие —
+   ширина внутренней области: она по ширине листа прайса, а не страницы */
 .footer {
   background: var(--text);
   color: rgba(255,255,255,0.65);
-  padding: 64px 0 26px;
+  padding: 72px 0 28px;
 }
 .footer__inner {
   max-width: 960px;
   margin: 0 auto;
   padding: 0 24px;
 }
+/* Верх подвала — четыре колонки: бренд, навигация, прайсы, контакты */
 .footer__top {
   display: grid;
-  grid-template-columns: 1.6fr 1fr 1fr;
-  gap: 48px;
-  padding-bottom: 36px;
+  /* колонки по ширине содержимого, свободное место раскидано поровну —
+     иначе колонка контактов растягивается и они висят особняком */
+  grid-template-columns: repeat(4, auto);
+  justify-content: space-between;
+  gap: 40px;
+  padding-bottom: 40px;
 }
 .footer__name {
   font-family: var(--font-heading);
@@ -471,19 +488,60 @@ html { scrollbar-gutter: stable; }
 }
 .footer__col a:hover { color: var(--accent2); }
 .footer__col a svg { flex-shrink: 0; opacity: 0.7; }
+/* Контакты прижаты вправо: правый край строк ложится на ту же вертикаль,
+   что и реквизиты в нижней строке подвала */
+.footer__col--right { text-align: right; }
+.footer__col--right nav { align-items: flex-end; }
+/* Разделитель + нижняя строка */
 .footer__bottom {
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 12px;
-  padding-top: 22px;
+  padding-top: 24px;
   border-top: 1px solid rgba(255,255,255,0.10);
+}
+.footer__copy { font-size: 13px; color: rgba(255,255,255,0.45); }
+.footer__robot { display: none; }
+/* Реквизиты самозанятой: физлицо на НПД, у него есть только ИНН */
+.footer__legal {
   font-size: 13px;
   color: rgba(255,255,255,0.45);
+  text-align: right;
 }
-@media (max-width: 720px) {
-  .footer { padding: 48px 0 22px; }
-  .footer__top { grid-template-columns: 1fr; gap: 30px; }
-  .footer__bottom { flex-direction: column; align-items: flex-start; }
+
+@media (max-width: 960px) {
+  .footer { padding: 52px 0 24px; }
+  .footer__top { grid-template-columns: 1fr 1fr; gap: 32px; }
+  .footer__brand { grid-column: 1 / -1; }
+  /* копирайт и реквизиты — по центру подвала */
+  .footer__bottom { flex-direction: column; align-items: center; position: relative; }
+  /* Робот стоит ровно на линии-разделителе: bottom: 100% отсчитывается
+     от верха внутренней области, а она начинается сразу под рамкой */
+  .footer__robot {
+    display: block;
+    position: absolute;
+    bottom: 100%;
+    right: 14%;
+    width: 24%;
+    transform: scaleX(-1);
+    pointer-events: none;
+  }
+  /* в две колонки сводить вправо не с чем — контакты выравниваем влево */
+  .footer__col--right { text-align: left; }
+  .footer__col--right nav { align-items: flex-start; }
+  /* Прайсы и контакты меняются местами: контакты встают в пару к
+     навигации, прайсы уходят строкой ниже */
+  .footer__col--right  { grid-column: 2; grid-row: 2; }
+  .footer__col--prices { grid-column: 1; grid-row: 3; }
+}
+
+@media (max-width: 480px) {
+  /* Подпись подвала в две строки, обе по центру */
+  .footer__copy { text-align: center; }
+  .footer__copy-dash { display: none; }
+  .footer__copy-role { display: block; white-space: nowrap; }
+  /* реквизиты прячем не в подвал, а под подпись — их видно всегда */
+  .footer__legal { text-align: center; }
 }

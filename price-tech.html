@@ -17,6 +17,7 @@
 
 <button type="button" class="close-btn" id="closeBtn" aria-label="Закрыть">
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+  <span>Закрыть</span>
 </button>
 
 <div class="wrap">
@@ -551,12 +552,19 @@
           <a href="index.html#services">Услуги</a>
           <a href="index.html#process">Как я работаю</a>
           <a href="index.html#cases">Портфолио</a>
-          <a href="price-web.html">Прайс на сайты и дизайн</a>
           <a href="index.html#contacts">Контакты</a>
         </nav>
       </div>
 
-      <div class="footer__col">
+      <div class="footer__col footer__col--prices">
+        <div class="footer__col-title">Прайсы</div>
+        <nav aria-label="Прайсы">
+          <a href="price-tech.html">Технические задачи</a>
+          <a href="price-web.html">Сайты и дизайн</a>
+        </nav>
+      </div>
+
+      <div class="footer__col footer__col--right">
         <div class="footer__col-title">Контакты</div>
         <nav aria-label="Контакты">
           <a href="https://t.me/vedminskoe" target="_blank" rel="noopener">
@@ -585,8 +593,13 @@
     </div>
 
     <div class="footer__bottom">
-      <div>© 2026 Катерина Степанова — техспец &amp; граф.дизайнер</div>
-      <div>Самозанятая · ИНН 720697490906</div>
+      <!-- Робот сидит на линии-разделителе. Отражён по горизонтали, чтобы
+           смотреть в подпись, а не за край экрана. Только для телефона -->
+      <img class="footer__robot" src="robot-podval.webp" alt="" aria-hidden="true" width="600" height="856" loading="lazy" decoding="async" />
+      <!-- разбито на части ради мобильной раскладки: род занятий уходит
+           второй строкой под имя, тире там прячется -->
+      <div class="footer__copy"><span class="footer__copy-year">© 2026</span> <span class="footer__copy-name">Катерина Степанова</span><span class="footer__copy-dash"> — </span><span class="footer__copy-role">техспец &amp; граф.дизайнер</span></div>
+      <div class="footer__legal">Самозанятая · ИНН 720697490906</div>
     </div>
   </div>
 </footer>
