@@ -801,6 +801,13 @@
     }
 
     /* ── Process ── */
+    /* На ПК блок подтянут к прайсам: у ряда плашек снизу свой запас под
+       подсветку, и вместе с двумя полями секций между ними копилось под
+       две сотни пустых пикселей. На телефоне ряд идёт столбиком без запаса,
+       там поле секции остаётся прежним */
+    @media (min-width: 769px) {
+      #process { padding-top: 0; }
+    }
     .process__header {
       margin-bottom: 52px;
     }
@@ -1053,6 +1060,81 @@
        пока скрипт не подставит первый снимок. Как только работа открылась,
        робот уходит и кадр раскрывается кинескопом уже под снимок */
     .cases__shot:not(.is-open) #casesShot { display: none; }
+    /* ── Ролик вместо снимка ──
+       У двух ботов кадр — не картинка, а запись экрана. Ролик вертикальный,
+       а превью широкое: поэтому он не растягивается на весь кадр, а стоит по
+       центру на зелёной подложке, углы скруглены. Подложка и скругление живут
+       здесь, а не запечены в файл: так один и тот же ролик годится и в широкое
+       превью на ПК, и в разворот под плашкой на телефоне, где места больше */
+    .cases__video {
+      display: none;
+      place-items: center;
+      background: url(fon-video.webp) center / cover no-repeat;
+    }
+    /* ролик и кнопка запуска лежат в одной клетке — кнопка поверх кадра */
+    .cases__video > *,
+    .lightbox__video > * { grid-area: 1 / 1; }
+    /* Кнопка запуска. Родной пульт браузера — тёмная плашка во всю ширину
+       ролика, поверх акварели она грубовата. До первого нажатия пульта нет:
+       в кадре стоит постер и этот кружок. Нажали — кружок уходит навсегда,
+       дальше перемоткой и полным экраном заведует обычный пульт */
+    .video-play {
+      z-index: 1;
+      justify-self: center;
+      align-self: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 64px;
+      height: 64px;
+      /* треугольник рисуется от центра, а оптически центр у него правее */
+      padding-left: 4px;
+      border: none;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.9);
+      color: var(--accent);
+      box-shadow: 0 4px 16px rgba(26,26,26,0.35);
+      cursor: pointer;
+      transition: transform var(--transition), background var(--transition);
+    }
+    .video-play:hover { transform: scale(1.08); background: #fff; }
+    .is-started .video-play { display: none; }
+    @media (prefers-reduced-motion: reduce) {
+      .video-play:hover { transform: none; }
+    }
+    /* снимок и ролик делят одно место в кадре: показан всегда ровно один */
+    .cases__shot.is-video .cases__video { display: grid; }
+    .cases__shot.is-video #casesShot { display: none; }
+    .cases__shot .cases__video { position: absolute; inset: 0; }
+    /* В кадре ролик стоит абсолютом, а не ячейкой грида: у грида строка
+       разъезжается под натуральную высоту постера (848px) и видео вылезает
+       за кадр. Абсолют считает проценты от самого кадра */
+    .cases__shot .cases__video video,
+    .cases__shot .cases__video .video-play {
+      position: absolute;
+      /* Лесенка плашек лежит абсолютом поверх всей раскладки и перехватывала бы
+         и кнопку, и пульт — поднимаем их над ней, как это уже сделано с
+         точками. Поднимаем именно их, а не подложку: та во весь кадр и
+         накрыла бы плашки, а ролик стоит в левой трети и им не мешает.
+         Проявления у подложки поэтому и нет: filter от анимации завёл бы на
+         ней свой слой, и этот z-index заперся бы внутри него */
+      z-index: 2;
+      /* Не по центру кадра, а там же, где стоит работа на остальных снимках:
+         правую треть кадра накрывает лесенка плашек, а нижние 14% — полоса
+         под подпись со стрелкой. Ролик вертикальный, поэтому ведущая у него
+         высота: ширина набегает сама */
+      left: 44%;
+      top: 45%;
+      transform: translate(-50%, -50%);
+      height: 80%;
+      max-width: 60%;
+    }
+    .cases__shot .cases__video video {
+      border-radius: 14px;
+      box-shadow: 0 8px 26px rgba(26,26,26,0.3);
+    }
+    /* кнопка круглая — доли кадра ей ни к чему, размер у неё свой */
+    .cases__shot .cases__video .video-play { height: 64px; }
     /* Робот и его тень лежат в общей обёртке: место и размер задаются тремя
        числами на ней одной, тень внутри привязана к роботу и едет вместе с
        ним. Фон у картинки вырезан, подложка кадра сквозь неё не читается */
@@ -1481,6 +1563,18 @@
         text-wrap: balance;
       }
       .cases__inline-shot { display: block; width: 100%; margin: 8px 0 14px; }
+      /* общего превью на телефоне нет — вместе с ним из кадра уходит и ролик */
+      .cases__shot.is-video .cases__video { display: none; }
+      /* Ролик под плашкой: подложка та же, но места больше — видео встаёт во
+         всю ширину блока, лишь бы влезло в экран по высоте */
+      .cases__inline-shot.is-video .cases__video { display: grid; }
+      .cases__inline-shot.is-video img { display: none; }
+      .cases__inline-shot .cases__video { padding: 12px; }
+      .cases__inline-shot .cases__video video {
+        max-width: 100%;
+        max-height: 72vh;
+        border-radius: 12px;
+      }
       /* Свёрнутый список: сразу видно восемь работ, остальные под кнопкой.
          Раскрылись — кнопка уходит, второй раз сворачивать нечего */
       .cases__item--more { display: none; }
@@ -1577,6 +1671,26 @@
       max-width: 100dvw;
       max-height: 100dvh;
       object-fit: contain;
+    }
+    /* Ролик на весь экран: подложка та же зелёная, поля по краям — чтобы
+       скруглённые углы не упирались в границу экрана */
+    .lightbox__video {
+      display: none;
+      place-items: center;
+      padding: 10px;
+      background: url(fon-video.webp) center / cover no-repeat;
+    }
+    .lightbox.is-video .lightbox__video { display: grid; }
+    .lightbox.is-video .lightbox__img { display: none; }
+    /* пальцем по ролику ведут ползунок перемотки, а не листают кадры */
+    .lightbox.is-video { touch-action: auto; }
+    .lightbox__video video {
+      display: block;
+      max-width: 94vw;
+      max-height: 90vh;
+      max-width: 94dvw;
+      max-height: 90dvh;
+      border-radius: 12px;
     }
     /* Поворот только там, где кадр шире, чем выше, а экран наоборот.
        Предельные размеры меняются местами: по высоте экрана — ширина кадра */
@@ -2468,9 +2582,9 @@
       <li class="cases__item cases__item--more"><button type="button" class="case-plate" data-shots="img/vk-univet/1.jpg,img/vk-univet/2.jpg,img/vk-univet/3.jpg,img/vk-univet/4.jpg,img/vk-univet/5.jpg"><span class="case-plate__text">Группа ВКонтакте ветклиники «ЮниВет»</span></button></li>
       <li class="cases__item cases__item--gap"><span class="case-plate"></span></li>
       <li class="cases__item"><button type="button" class="case-plate" data-shots="img/bot/1.jpg"><span class="case-plate__text">Бот с проверкой подписки</span></button></li>
-      <li class="cases__item"><button type="button" class="case-plate" data-shots="img/bot/2.jpg"><span class="case-plate__text">Бот «Гадание на метаморфозных картах»</span></button></li>
+      <li class="cases__item"><button type="button" class="case-plate" data-shots="img/bot/2.jpg" data-video="img/bot/cards.mp4"><span class="case-plate__text">Бот «Гадание на метаморфозных картах»</span></button></li>
       <li class="cases__item cases__item--more"><button type="button" class="case-plate" data-shots="img/bot/3-1.jpg,img/bot/3-2.jpg,img/bot/3-3.jpg,img/bot/3-4.jpg"><span class="case-plate__text">Бот клуба по подписке</span></button></li>
-      <li class="cases__item cases__item--more"><button type="button" class="case-plate" data-shots="img/bot/4-1.jpg,img/bot/4-2.jpg"><span class="case-plate__text">Бот для салона красоты</span></button></li>
+      <li class="cases__item cases__item--more"><button type="button" class="case-plate" data-shots="img/bot/4-1.jpg,img/bot/4-2.jpg" data-video="img/bot/salon.mp4"><span class="case-plate__text">Бот для салона красоты</span></button></li>
       <li class="cases__item"><button type="button" class="case-plate" data-shots="img/bot/5.jpg"><span class="case-plate__text">Бот с подключением AI</span></button></li>
       <li class="cases__item cases__item--more"><button type="button" class="case-plate" data-shots="img/bot/6-1.jpg,img/bot/6-2.jpg"><span class="case-plate__text">Бот-опросник</span></button></li>
     </ul>
@@ -3037,6 +3151,40 @@
     const inlineImg = document.createElement('img');
     inlineImg.alt = '';
 
+    // Кадром работы может быть и снимок, и ролик: у двух ботов это запись
+    // экрана. В каждом из трёх мест, где живёт кадр (превью на ПК, разворот
+    // под плашкой, полный экран), рядом с картинкой лежит своё видео на
+    // зелёной подложке — показан всегда ровно один из двоих.
+    // preload='none': файл начинает грузиться только по нажатию play,
+    // до этого в кадре висит постер — первый осмысленный кадр ролика
+    const isVideo = (src) => src.endsWith('.mp4');
+    const makeVideo = (cls) => {
+      const box = document.createElement('div');
+      box.className = cls;
+      const v = document.createElement('video');
+      v.playsInline = true;
+      v.preload = 'none';
+      // Пульт появляется только после запуска: до него в кадре постер и
+      // круглая кнопка, а тёмная плашка пульта не лежит поверх акварели
+      const play = document.createElement('button');
+      play.type = 'button';
+      play.className = 'video-play';
+      play.setAttribute('aria-label', 'Смотреть ролик');
+      play.innerHTML = '<svg width="26" height="26" viewBox="0 0 24 24" '
+        + 'fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>';
+      play.addEventListener('click', () => {
+        box.classList.add('is-started');
+        v.controls = true;
+        v.play();
+      });
+      box.append(v, play);
+      return [box, v];
+    };
+    const [shotVidBox,   shotVid]   = makeVideo('cases__video');
+    const [inlineVidBox, inlineVid] = makeVideo('cases__video');
+    const [lbVidBox,     lbVid]     = makeVideo('lightbox__video');
+    shot.insertAdjacentElement('afterend', shotVidBox);
+
     const arrow = (dir, label, path) => {
       const b = document.createElement('button');
       b.type = 'button';
@@ -3049,7 +3197,7 @@
     };
     const prevBtn = arrow('prev', 'Предыдущий кадр', 'M15 5l-7 7 7 7');
     const nextBtn = arrow('next', 'Следующий кадр', 'M9 5l7 7-7 7');
-    inline.append(inlineImg, prevBtn, nextBtn);
+    inline.append(inlineImg, inlineVidBox, prevBtn, nextBtn);
 
     // Полноэкранный просмотр: тап по снимку под плашкой. Оверлей один на всё
     // портфолио, лежит в конце body и до первого тапа ничего не грузит
@@ -3066,7 +3214,7 @@
     lbClose.type = 'button';
     lbClose.className = 'lightbox__close';
     lbClose.setAttribute('aria-label', 'Закрыть просмотр');
-    lbStage.append(lbImg, lbPrev, lbNext, lbClose);
+    lbStage.append(lbImg, lbVidBox, lbPrev, lbNext, lbClose);
     lb.appendChild(lbStage);
     document.body.appendChild(lb);
 
@@ -3074,7 +3222,8 @@
     // вертикальные — их поворачивать незачем, класс просто не встаёт
     const fitRotate = () => {
       lb.classList.toggle('lightbox--rotate',
-                          lbImg.naturalWidth > lbImg.naturalHeight);
+                          !lb.classList.contains('is-video')
+                          && lbImg.naturalWidth > lbImg.naturalHeight);
     };
     lbImg.addEventListener('load', fitRotate);
 
@@ -3082,14 +3231,29 @@
     // плашкой и стрелки в полном экране ходят по одному и тому же счётчику
     let strip = [];
     let frameIdx = 0;
+    // Ставит кадр в одно место: снимок — в картинку, ролик — в видео, а класс
+    // is-video на обёртке решает, кто из двоих виден
+    const setFrame = (box, img, vid, src) => {
+      box.classList.toggle('is-video', isVideo(src));
+      if (!isVideo(src)) { vid.pause(); img.src = src; return; }
+      // src переприсваиваем только при смене ролика: иначе начатый просмотр
+      // сбрасывался бы на ноль при каждом возврате на эту точку
+      if (vid.dataset.src === src) return;
+      vid.dataset.src = src;
+      vid.controls = false;
+      vid.parentElement.classList.remove('is-started');
+      vid.poster = src.replace('.mp4', '-poster.webp');
+      vid.src = src;
+    };
+    const putLb = (src) => { setFrame(lb, lbImg, lbVid, src); fitRotate(); };
     const syncArrows = () => {
       prevBtn.hidden = lbPrev.hidden = frameIdx <= 0;
       nextBtn.hidden = lbNext.hidden = frameIdx >= strip.length - 1;
     };
     const step = (d) => {
       frameIdx = Math.min(Math.max(frameIdx + d, 0), strip.length - 1);
-      inlineImg.src = strip[frameIdx];
-      lbImg.src = strip[frameIdx];
+      setFrame(inline, inlineImg, inlineVid, strip[frameIdx]);
+      putLb(strip[frameIdx]);
       syncArrows();
     };
     prevBtn.addEventListener('click', () => step(-1));
@@ -3100,13 +3264,14 @@
     const lbIsOpen = () => lb.classList.contains('is-open');
     const openLb = () => {
       if (!strip.length) return;
-      lbImg.src = strip[frameIdx];
+      putLb(strip[frameIdx]);
       if (lbImg.complete) fitRotate();
       lb.classList.add('is-open');
       document.body.classList.add('lightbox-open');
       syncArrows();
     };
     const closeLb = () => {
+      lbVid.pause();
       lb.classList.remove('is-open');
       document.body.classList.remove('lightbox-open');
     };
@@ -3130,6 +3295,8 @@
       touchY = e.changedTouches[0].clientY;
     }, { passive: true });
     lb.addEventListener('touchend', (e) => {
+      // по самому ролику палец ведёт ползунок перемотки — не листание
+      if (e.target.closest('video')) return;
       const rotated = lb.classList.contains('lightbox--rotate')
         && window.matchMedia('(orientation: portrait)').matches;
       const d = rotated
@@ -3141,8 +3308,8 @@
 
     const show = (list, i) => {
       if (i >= list.length) return;
-      shot.src = list[i];
-      inlineImg.src = list[i];
+      setFrame(frame, shot, shotVid, list[i]);
+      setFrame(inline, inlineImg, inlineVid, list[i]);
       strip = list;
       frameIdx = i;
       syncArrows();
@@ -3167,7 +3334,10 @@
     const isNarrow = () => window.matchMedia('(max-width: 900px)').matches;
     const shotsOf = (plate) => {
       const src = (isNarrow() && plate.dataset.shotsM) || plate.dataset.shots;
-      return src ? src.split(',') : [];
+      const list = src ? src.split(',') : [];
+      // Ролик идёт последним кадром — и встаёт на предпоследнюю точку ряда
+      if (plate.dataset.video) list.push(plate.dataset.video);
+      return list;
     };
 
     document.querySelectorAll('.case-plate[data-shots], .case-plate[data-shots-m]').forEach(plate => {
@@ -3186,7 +3356,8 @@
         plate.classList.add('is-active');
         // работа без снимка — остаётся только подсветка, прошлый снимок убираем
         if (!list.length) {
-          frame.classList.remove('is-open', 'is-playing');
+          shotVid.pause();
+          frame.classList.remove('is-open', 'is-playing', 'is-video');
           dots.hidden = true;
           dots.textContent = '';
           inline.remove();
@@ -3197,12 +3368,16 @@
         // плашкам быстро, отработает только последняя
         const start = () => { shot.onload = null; playReveal(); };
         shot.onload = start;
-        if (shot.complete) start();
+        // у ролика события load нет — проявляем сразу
+        if (shot.complete || isVideo(list[0])) start();
         plate.closest('.cases__item').appendChild(inline);
         // ряд пересобираем под текущий проект: у каждого своё число кадров.
         // Ряд центрирован по якорю, поэтому от смены количества не съезжает
         dots.textContent = '';
-        for (let i = 0; i < list.length + SPARE; i++) {
+        // Ролик не удлиняет ряд, а занимает одно из запасных мест: так у работ
+        // с видео оно всегда стоит на предпоследней точке
+        const spare = SPARE - (plate.dataset.video ? 1 : 0);
+        for (let i = 0; i < list.length + spare; i++) {
           const d = document.createElement('button');
           d.type = 'button';
           d.className = i ? 'cases__dot' : 'cases__dot is-active';
@@ -3218,7 +3393,9 @@
     // заглушку. src не трогаем, чтобы повторное открытие той же работы
     // не ждало загрузки
     const closeShot = () => {
-      frame.classList.remove('is-open', 'is-playing');
+      shotVid.pause();
+      inlineVid.pause();
+      frame.classList.remove('is-open', 'is-playing', 'is-video');
       dots.hidden = true;
       dots.textContent = '';
       document.querySelectorAll('.case-plate.is-active')
