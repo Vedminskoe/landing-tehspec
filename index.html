@@ -1466,6 +1466,10 @@
     /* Снимок, раскрытый прямо под плашкой. Нужен только на узком экране,
        где общего превью нет; на ПК лежит скрытым */
     .cases__inline-shot { display: none; position: relative; }
+    /* Открытая работа сама подтягивается в экран. Зазор сверху — под
+       липкую шапку, чтобы она не накрывала верх снимка */
+    .cases__shot,
+    .cases__inline-shot { scroll-margin: 80px 0 24px; }
     /* Стрелки листания поверх снимка. Без кружка — белый шеврон с тенью
        читается и на светлом кадре, и на тёмном. Крайняя стрелка не гаснет,
        а убирается совсем: слева до первого шага вперёд, справа на последнем */
@@ -1684,12 +1688,16 @@
     .lightbox.is-video .lightbox__img { display: none; }
     /* пальцем по ролику ведут ползунок перемотки, а не листают кадры */
     .lightbox.is-video { touch-action: auto; }
+    /* Не во всю ширину: ролик, упёртый в кромки, читается как сам экран,
+       а не как кадр внутри него — по краям оставлено тёмное поле.
+       Полный экран есть только на телефоне (открывает его разворот под
+       плашкой, а тот на ПК скрыт), поэтому медиазапрос здесь не нужен */
     .lightbox__video video {
       display: block;
-      max-width: 94vw;
-      max-height: 90vh;
-      max-width: 94dvw;
-      max-height: 90dvh;
+      max-width: 78vw;
+      max-height: 78vh;
+      max-width: 78dvw;
+      max-height: 78dvh;
       border-radius: 12px;
     }
     /* Поворот только там, где кадр шире, чем выше, а экран наоборот.
@@ -2569,24 +2577,24 @@
       <div class="cases__dots" id="casesDots" hidden></div>
     </div>
     <ul class="cases__list">
-      <li class="cases__item"><button type="button" class="case-plate" data-shots="img/sait-unumgarden/1.jpg"><span class="case-plate__text">Сайт ландшафтного архитектора на Tilda</span></button></li>
+      <li class="cases__item"><button type="button" class="case-plate" data-shots="img/sait-unumgarden/1.jpg" data-shots-m="img/sait-unumgarden/m1.jpg,img/sait-unumgarden/m2.jpg,img/sait-unumgarden/m3.jpg,img/sait-unumgarden/m4.jpg"><span class="case-plate__text">Сайт ландшафтного архитектора на Tilda</span></button></li>
       <li class="cases__item"><button type="button" class="case-plate" data-shots="img/sait-adminka/1.jpg,img/sait-adminka/2.jpg" data-shots-m="img/sait-adminka/m1.jpg,img/sait-adminka/m2.jpg"><span class="case-plate__text">Сайт-админка для досок референсов</span></button></li>
       <li class="cases__item cases__item--more"><button type="button" class="case-plate"><span class="case-plate__text">сайт (в разработке)</span></button></li>
       <li class="cases__item cases__item--gap"><span class="case-plate"></span></li>
       <li class="cases__item"><button type="button" class="case-plate" data-shots="img/spravochnik/1.jpg,img/spravochnik/2.jpg,img/spravochnik/3.jpg,img/spravochnik/4.jpg,img/spravochnik/5.jpg,img/spravochnik/6.jpg" data-shots-m="img/spravochnik/m1.jpg,img/spravochnik/m2.jpg,img/spravochnik/m3.jpg,img/spravochnik/m4.jpg,img/spravochnik/m5.jpg,img/spravochnik/m6.jpg"><span class="case-plate__text">Справочник «Лечение животных травами»</span></button></li>
-      <li class="cases__item cases__item--more"><button type="button" class="case-plate" data-shots="img/present/1.jpg,img/present/2.jpg,img/present/3.jpg"><span class="case-plate__text">Презентация для справочника</span></button></li>
-      <li class="cases__item"><button type="button" class="case-plate" data-shots="img/albom/1.jpg,img/albom/2.jpg,img/albom/3.jpg,img/albom/4.jpg"><span class="case-plate__text">Альбом ландшафтного проекта</span></button></li>
-      <li class="cases__item cases__item--more"><button type="button" class="case-plate" data-shots="img/kupon/1.jpg,img/kupon/2.jpg,img/kupon/3.jpg" data-shots-m="img/kupon/m1.jpg"><span class="case-plate__text">Подарочные купоны для UNUM</span></button></li>
-      <li class="cases__item cases__item--more"><button type="button" class="case-plate" data-shots="img/pechat/1.jpg"><span class="case-plate__text">Графика на заказ</span></button></li>
-      <li class="cases__item"><button type="button" class="case-plate" data-shots="img/vk-unum/1.jpg,img/vk-unum/2.jpg"><span class="case-plate__text">Группа ВКонтакте студии дизайна</span></button></li>
-      <li class="cases__item cases__item--more"><button type="button" class="case-plate" data-shots="img/vk-univet/1.jpg,img/vk-univet/2.jpg,img/vk-univet/3.jpg,img/vk-univet/4.jpg,img/vk-univet/5.jpg"><span class="case-plate__text">Группа ВКонтакте ветклиники «ЮниВет»</span></button></li>
+      <li class="cases__item cases__item--more"><button type="button" class="case-plate" data-shots="img/present/1.jpg,img/present/2.jpg,img/present/3.jpg" data-shots-m="img/present/m1.jpg,img/present/m2.jpg,img/present/m3.jpg"><span class="case-plate__text">Презентация для справочника</span></button></li>
+      <li class="cases__item"><button type="button" class="case-plate" data-shots="img/albom/1.jpg,img/albom/2.jpg,img/albom/3.jpg,img/albom/4.jpg" data-shots-m="img/albom/m1.jpg,img/albom/m2.jpg,img/albom/m3.jpg,img/albom/m4.jpg"><span class="case-plate__text">Альбом ландшафтного проекта</span></button></li>
+      <li class="cases__item cases__item--more"><button type="button" class="case-plate" data-shots="img/kupon/1.jpg,img/kupon/2.jpg,img/kupon/3.jpg" data-shots-m="img/kupon/m1.jpg,img/kupon/m2.jpg,img/kupon/m3.jpg"><span class="case-plate__text">Подарочные купоны для UNUM</span></button></li>
+      <li class="cases__item cases__item--more"><button type="button" class="case-plate" data-shots="img/pechat/1.jpg" data-shots-m="img/pechat/m1.jpg"><span class="case-plate__text">Графика на заказ</span></button></li>
+      <li class="cases__item"><button type="button" class="case-plate" data-shots="img/vk-unum/1.jpg,img/vk-unum/2.jpg" data-shots-m="img/vk-unum/m1.jpg,img/vk-unum/m2.jpg"><span class="case-plate__text">Группа ВКонтакте студии дизайна</span></button></li>
+      <li class="cases__item cases__item--more"><button type="button" class="case-plate" data-shots="img/vk-univet/1.jpg,img/vk-univet/2.jpg,img/vk-univet/3.jpg,img/vk-univet/4.jpg,img/vk-univet/5.jpg" data-shots-m="img/vk-univet/m1.jpg,img/vk-univet/m2.jpg,img/vk-univet/m3.jpg,img/vk-univet/m4.jpg,img/vk-univet/m5.jpg"><span class="case-plate__text">Группа ВКонтакте ветклиники «ЮниВет»</span></button></li>
       <li class="cases__item cases__item--gap"><span class="case-plate"></span></li>
-      <li class="cases__item"><button type="button" class="case-plate" data-shots="img/bot/1.jpg"><span class="case-plate__text">Бот с проверкой подписки</span></button></li>
-      <li class="cases__item"><button type="button" class="case-plate" data-shots="img/bot/2.jpg" data-video="img/bot/cards.mp4"><span class="case-plate__text">Бот «Гадание на метаморфозных картах»</span></button></li>
-      <li class="cases__item cases__item--more"><button type="button" class="case-plate" data-shots="img/bot/3-1.jpg,img/bot/3-2.jpg,img/bot/3-3.jpg,img/bot/3-4.jpg"><span class="case-plate__text">Бот клуба по подписке</span></button></li>
-      <li class="cases__item cases__item--more"><button type="button" class="case-plate" data-shots="img/bot/4-1.jpg,img/bot/4-2.jpg" data-video="img/bot/salon.mp4"><span class="case-plate__text">Бот для салона красоты</span></button></li>
-      <li class="cases__item"><button type="button" class="case-plate" data-shots="img/bot/5.jpg"><span class="case-plate__text">Бот с подключением AI</span></button></li>
-      <li class="cases__item cases__item--more"><button type="button" class="case-plate" data-shots="img/bot/6-1.jpg,img/bot/6-2.jpg"><span class="case-plate__text">Бот-опросник</span></button></li>
+      <li class="cases__item"><button type="button" class="case-plate" data-shots="img/bot/1.jpg" data-shots-m="img/bot/m1.jpg"><span class="case-plate__text">Бот с проверкой подписки</span></button></li>
+      <li class="cases__item"><button type="button" class="case-plate" data-shots="img/bot/2.jpg" data-shots-m="img/bot/m2.jpg" data-video="img/bot/cards.mp4"><span class="case-plate__text">Бот «Гадание на метаморфозных картах»</span></button></li>
+      <li class="cases__item cases__item--more"><button type="button" class="case-plate" data-shots="img/bot/3-1.jpg,img/bot/3-2.jpg,img/bot/3-3.jpg,img/bot/3-4.jpg" data-shots-m="img/bot/m3-1.jpg,img/bot/m3-2.jpg,img/bot/m3-3.jpg,img/bot/m3-4.jpg"><span class="case-plate__text">Бот клуба по подписке</span></button></li>
+      <li class="cases__item cases__item--more"><button type="button" class="case-plate" data-shots="img/bot/4-1.jpg,img/bot/4-2.jpg" data-shots-m="img/bot/m4-1.jpg,img/bot/m4-2.jpg" data-video="img/bot/salon.mp4"><span class="case-plate__text">Бот для салона красоты</span></button></li>
+      <li class="cases__item"><button type="button" class="case-plate" data-shots="img/bot/5.jpg" data-shots-m="img/bot/m5.jpg"><span class="case-plate__text">Бот с подключением AI</span></button></li>
+      <li class="cases__item cases__item--more"><button type="button" class="case-plate" data-shots="img/bot/6-1.jpg,img/bot/6-2.jpg" data-shots-m="img/bot/m6-1.jpg,img/bot/m6-2.jpg"><span class="case-plate__text">Бот-опросник</span></button></li>
     </ul>
     <!-- На телефоне список свёрнут до восьми работ: остальные раскрывает кнопка.
          Живёт вне <ul>, чтобы не сбить нумерацию :nth-child лесенки на ПК -->
@@ -3327,6 +3335,33 @@
       frame.classList.add('is-playing');
     };
 
+    // Клик браузер сопровождает своей прокруткой — подтягивает нажатую
+    // кнопку в экран. Пока она идёт, мерить положение кадра бессмысленно:
+    // ждём, пока страница остановится (два одинаковых кадра подряд)
+    const afterScroll = (fn) => {
+      let last = -1, still = 0, frames = 0;
+      const tick = () => {
+        if (window.scrollY === last) { if (++still >= 2) return fn(); }
+        else { still = 0; last = window.scrollY; }
+        if (++frames < 40) requestAnimationFrame(tick); else fn();
+      };
+      requestAnimationFrame(tick);
+    };
+
+    // Кадр открывается не там, где палец: на ПК общее превью висит выше ряда
+    // плашек, на телефоне снимок разворачивается под плашкой и у нижних работ
+    // уезжает за кромку экрана — клик срабатывал, а показать было нечего.
+    // Подтягиваем кадр к глазам, но только если он сам не поместился: иначе
+    // страница дёргалась бы на каждой работе, когда их перебирают подряд
+    const HEAD = 72;
+    const bringIntoView = () => afterScroll(() => {
+      const box = isNarrow() ? inline : frame;
+      const r = box.getBoundingClientRect();
+      if (!r.height) return;
+      if (r.top >= HEAD && r.bottom <= window.innerHeight) return;
+      box.scrollIntoView({ block: r.height > window.innerHeight - HEAD ? 'start' : 'center' });
+    });
+
     // На узком экране берём мобильные кадры (data-shots-m), если они сняты,
     // иначе те же, что на ПК: широкий разворот под плашкой мелковат, но тап
     // разворачивает его на весь экран на бок — там всё читается.
@@ -3363,6 +3398,9 @@
           inline.remove();
           return;
         }
+        // разворот переезжает под нажатую плашку до показа кадра: к моменту
+        // проявления он уже на месте, и его есть куда подтягивать
+        plate.closest('.cases__item').appendChild(inline);
         show(list, 0);
         // onload переприсваиваем, а не копим слушателей: если щёлкать по
         // плашкам быстро, отработает только последняя
@@ -3370,7 +3408,6 @@
         shot.onload = start;
         // у ролика события load нет — проявляем сразу
         if (shot.complete || isVideo(list[0])) start();
-        plate.closest('.cases__item').appendChild(inline);
         // ряд пересобираем под текущий проект: у каждого своё число кадров.
         // Ряд центрирован по якорю, поэтому от смены количества не съезжает
         dots.textContent = '';
@@ -3386,6 +3423,7 @@
         }
         dots.appendChild(closeBtn);
         dots.hidden = false;
+        bringIntoView();
       });
     });
 
