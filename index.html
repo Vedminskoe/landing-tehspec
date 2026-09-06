@@ -119,6 +119,20 @@
       background: url('fon-web2.webp') top center / auto 100% no-repeat;
       opacity: var(--bg-art-opacity, 1);
     }
+    /* Планшеты: рисунок вытянутый (2000x4618), а страница здесь вытянута ещё
+       сильнее — 820 в ширину на 5800 в высоту. Подгонка по высоте раздувала
+       картинку до 2500px, и на экран попадала треть: узкая полоса веток
+       по центру, как было на телефонах до однотонного фона.
+       Тут фреска перестаёт ехать со страницей и встаёт неподвижной подложкой
+       по размеру окна — cover даёт всю ширину экрана, пропорции целы.
+       position:fixed, а не background-attachment:fixed — вторую iOS не тянет */
+    @media (min-width: 769px) and (max-width: 1180px) {
+      .page-bg {
+        position: fixed;
+        background-position: center;
+        background-size: cover;
+      }
+    }
 
     /* ── Утилиты ── */
     .container {
