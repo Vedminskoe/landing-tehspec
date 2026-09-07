@@ -132,8 +132,10 @@ html { scrollbar-gutter: stable; }
   line-height: 1.15;
   margin-bottom: 14px;
 }
+/* без max-width: абзац идёт от края до края листа. С ограничением первая
+   строка обрывалась на середине, а справа зияла пустота — та же беда, что
+   была у текста в нижней плашке */
 .head__lead {
-  max-width: 620px;
   color: var(--text-muted);
   margin-bottom: 10px;
 }
@@ -166,16 +168,44 @@ html { scrollbar-gutter: stable; }
   font-weight: 500;
 }
 
+/* Раздел, который ещё не продаётся. Кружок нарочно серый и мёртвый: он
+   показывает, что тут что-то будет, но раскрывать пока нечего — цены не
+   утверждены. Сами позиции лежат ниже под hidden, ждут своего часа */
+.sec--soon .sec__head { margin-bottom: 0; }
+.sec--soon .row__toggle {
+  margin-left: auto;
+  border-color: var(--text-muted);
+  opacity: 0.5;
+  transition: none;
+}
+.sec--soon .row__toggle::before { border-color: var(--text-muted); }
+/* Пометка рядом с названием раздела: шрифт текстовый, не заголовочный —
+   иначе спорит с самим названием */
+.sec__soon {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text-muted);
+  margin-left: 10px;
+  white-space: nowrap;
+}
+
+/* Подзаголовок группы внутри раздела: в больших разделах (боты, GetCourse)
+   двадцать строк подряд не читаются, нужна разбивка по смыслу */
+.sub {
+  margin: 28px 0 0;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent2-hover);
+}
+.sec__head + .sub { margin-top: 18px; }
+
 /* ── Строка прайса ──
    Сетка одна и для раскрывающихся строк, и для обычных: слева название с
    описанием, справа срок и цена. На узком экране всё складывается в столбик */
 .row { border-bottom: 1px solid var(--border); }
-/* Строка без срока и описания — только название и цена. Черновой прайс
-   технических задач собран из таких: там нет ни сроков, ни расшифровок */
-.row--plain .row__head {
-  grid-template-columns: 1fr 150px;
-  padding: 13px 0;
-}
 .row__head {
   display: grid;
   grid-template-columns: 1fr 120px 150px;
@@ -212,11 +242,16 @@ html { scrollbar-gutter: stable; }
   font-weight: 500;
   white-space: nowrap;
 }
+/* Подпись под ценой («за час»). Перенос разрешён отдельно: родитель стоит
+   в nowrap, чтобы цена не ломалась пополам, но подпись длиннее самой цены
+   и без этого распирала колонку и наезжала на название */
 .row__price small {
   display: block;
   font-size: 12px;
   font-weight: 400;
   color: var(--text-muted);
+  white-space: normal;
+  line-height: 1.35;
 }
 .row__from {
   font-size: 13px;
@@ -282,6 +317,44 @@ html { scrollbar-gutter: stable; }
   border-radius: 50%;
   background: var(--accent2);
 }
+
+/* ── Навигатор по разделу ──
+   Зелёная плашка, один в один с нижним блоком «расскажите, что нужно»:
+   стоит после списка раскрывашек и должна читаться как отдельный блок,
+   а не как продолжение перечисления */
+.pick {
+  margin-top: 30px;
+  padding: 26px 28px;
+  border-radius: var(--radius);
+  background: var(--accent-light);
+}
+.pick__title {
+  font-family: var(--font-heading);
+  font-size: 22px;
+  font-weight: 500;
+  margin-bottom: 16px;
+}
+.pick__list {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px 32px;
+}
+.pick__cond {
+  display: block;
+  font-size: 14.5px;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+.pick__to {
+  display: block;
+  font-size: 14.5px;
+  font-weight: 500;
+  color: var(--accent-hover);
+  margin-top: 3px;
+}
+/* стрелка золотом — тот же приём, что у точек в списках «что входит» */
+.pick__to::before { content: '→ '; color: var(--accent2-hover); }
 
 /* ── Пакеты ── */
 .pack {
@@ -426,6 +499,8 @@ html { scrollbar-gutter: stable; }
   .row__term { grid-row: 2; grid-column: 1; }
   .row__price { grid-row: 1; grid-column: 2; }
   .row__desc { order: 3; }
+  .pick { padding: 20px 20px 22px; }
+  .pick__list { grid-template-columns: 1fr; gap: 12px; }
 }
 
 /* ── Подвал ──
