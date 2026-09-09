@@ -4,6 +4,21 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Прайс на технические задачи — Катерина Степанова</title>
+  <link rel="canonical" href="https://landing.vedminskoe.ru/price-tech.html" />
+
+  <!-- Карточка ссылки в мессенджерах и соцсетях -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Катерина Степанова" />
+  <meta property="og:locale" content="ru_RU" />
+  <meta property="og:url" content="https://landing.vedminskoe.ru/price-tech.html" />
+  <meta property="og:title" content="Прайс на технические задачи — Катерина Степанова" />
+  <meta property="og:description" content="Цены на Telegram-ботов, Salebot, интеграции с AmoCRM и автоматизацию." />
+  <meta property="og:image" content="https://landing.vedminskoe.ru/og.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Катерина Степанова — техспец и графический дизайнер" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="theme-color" content="#4A6C33" />
   <meta name="description" content="Цены на Telegram-ботов, Salebot, интеграции с AmoCRM и автоматизацию. Катерина Степанова, Тобольск." />
   <link rel="icon" href="favicon.ico" sizes="any" />
   <link rel="icon" type="image/png" href="favicon-32.png" sizes="32x32" />
@@ -960,6 +975,48 @@
 
 
 <script>
+  // ── Яндекс.Метрика ──────────────────────────────────────────────
+  // Cookie-баннера тут нет: выбор делается на главной и хранится на весь
+  // домен. Согласия нет или человек пришёл сразу сюда из поиска — счётчик
+  // молчит, и это правильное поведение
+  const METRIKA_ID = 112421919;
+  let metrikaStarted = false;
+
+  function startMetrika() {
+    if (!METRIKA_ID || metrikaStarted) return;
+    metrikaStarted = true;
+    (function (m, e, t, r, i, k, a) {
+      m[i] = m[i] || function () { (m[i].a = m[i].a || []).push(arguments); };
+      m[i].l = 1 * new Date();
+      for (var j = 0; j < e.scripts.length; j++) { if (e.scripts[j].src === r) { return; } }
+      k = e.createElement(t); a = e.getElementsByTagName(t)[0];
+      k.async = 1; k.src = r; a.parentNode.insertBefore(k, a);
+    })(window, document, 'script', 'https://mc.yandex.ru/metrika/tag.js?id=' + METRIKA_ID, 'ym');
+    window.ym(METRIKA_ID, 'init', {
+      ssr: true,
+      webvisor: true,
+      clickmap: true,
+      referrer: document.referrer,
+      url: location.href,
+      accurateTrackBounce: true,
+      trackLinks: true
+    });
+  }
+
+  function goal(name) {
+    if (METRIKA_ID && typeof window.ym === 'function') window.ym(METRIKA_ID, 'reachGoal', name);
+  }
+
+  try { if (localStorage.getItem('cookieChoice') === 'all') startMetrika(); } catch (e) {}
+
+  document.addEventListener('click', (e) => {
+    const link = e.target.closest('a[href]');
+    if (!link) return;
+    const href = link.getAttribute('href') || '';
+    if (href.includes('t.me/')) goal('telegram');
+    else if (href.startsWith('mailto:')) goal('email');
+  });
+
   // Щелчок в любом месте закрывает страницу. Раскрывашки, ссылки и кнопки
   // работают как обычно — иначе прайс нельзя было бы читать
   // Пришли на прайс со своего сайта или со стороны (поиск, прямая ссылка)?

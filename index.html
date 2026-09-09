@@ -4,6 +4,21 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Катерина Степанова — техспец и графический дизайнер</title>
+  <link rel="canonical" href="https://landing.vedminskoe.ru/" />
+
+  <!-- Карточка ссылки в мессенджерах и соцсетях -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Катерина Степанова" />
+  <meta property="og:locale" content="ru_RU" />
+  <meta property="og:url" content="https://landing.vedminskoe.ru/" />
+  <meta property="og:title" content="Катерина Степанова — техспец и графический дизайнер" />
+  <meta property="og:description" content="Сайты, Telegram-боты, интеграции и графический дизайн для онлайн-школ, экспертов и малого бизнеса." />
+  <meta property="og:image" content="https://landing.vedminskoe.ru/og.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Катерина Степанова — техспец и графический дизайнер" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="theme-color" content="#4A6C33" />
   <meta name="description" content="Верстка сайтов, Telegram-боты, интеграции и графический дизайн для онлайн-школ, экспертов и малого бизнеса. Тобольск, работаю удалённо." />
   <link rel="icon" href="favicon.ico" sizes="any" />
   <link rel="icon" type="image/png" href="favicon-32.png" sizes="32x32" />
@@ -77,7 +92,7 @@
       --text-muted:   #525C68;
       --border:       #E5E7EB;
       /* плотность фонового рисунка: 0 — выключен, 1 — во всю силу */
-      --bg-art-opacity: 0.65;
+      --bg-art-opacity: 0.5;
 
       /* Радиусы */
       --radius-sm:    4px;
@@ -164,11 +179,18 @@
       margin-bottom: 18px;
       color: var(--text);
     }
+    /* Описание под заголовком лежит прямо на фреске, и на рельефных местах
+       серый текст в ней терялся. Свечение гасит фон под самими буквами —
+       строка читается на любом участке рисунка, а на страницу не добавляется
+       ни рамки, ни плашки. На телефонах фон однотонный, там оно невидимо.
+       Цвет темнее --text-muted, но не в уровень заголовка: подпись остаётся
+       подписью */
     .section-desc {
       font-size: 16px;
-      color: var(--text-muted);
+      color: #1F252B;
       max-width: 520px;
       line-height: 1.7;
+      text-shadow: 0 0 10px #fff, 0 0 18px #fff, 0 0 4px #fff;
     }
     .btn {
       display: inline-flex;
@@ -689,6 +711,10 @@
       position: relative;
       z-index: 4;
       margin-top: 18px;
+      /* Возврат с прайса приходит на #prices. Без запаса верхняя плашка
+         оказывается под шапкой: её высота плюс воздух, чтобы было видно,
+         что это низ блока услуг, а не случайное место страницы */
+      scroll-margin-top: 110px;
       /* Запас под подсветку. overflow-x: clip по спецификации утягивает в clip
          и вертикальную ось, а сверху ещё режет маска — без запаса рамка и тень
          наведённой плашки обрезались бы о край ряда, снизу особенно заметно.
@@ -1290,6 +1316,80 @@
       transition-delay: 0s;
     }
 
+    /* Очередь появления — только на первый раз. Как только кадр хоть раз
+       открывался, скрипт вешает .is-shown, и подсказки возвращаются мгновенно:
+       закрыл работу или увёл мышь с плашки — они уже на месте. Иначе каждый
+       раз доигрывалась вся очередь на 1.9s и сбивала с толку.
+       :not(:has(...)) — чтобы правило работало только на возврат: уход
+       подсказок при открытии кадра по-прежнему плавный */
+    .cases__layout.is-shown:not(:has(.cases__shot.is-open)) .cases__tik {
+      transition: none;
+    }
+    /* ── Подвёрнутый уголок ──
+       Наведение на плашку работу не открывает, а приподнимает левый нижний
+       угол кадра, как страницу в книге: в прорехе виден кусок картинки, рядом
+       лежит отогнутый клапан. Посмотреть целиком — это уже клик.
+       Обе фигуры — треугольники, растущие от самого угла: в закрытом виде их
+       три точки сходятся в одну, поэтому переход идёт по clip-path и ничего
+       не мигает. 22% по горизонтали и 37.7% по вертикали — при пропорции
+       кадра 12/7 это одно и то же число пикселей, то есть честные 45° сгиба.
+       Меняешь размер уголка — правь оба числа в этой пропорции */
+    .cases__peel-shot,
+    .cases__peel-flap {
+      position: absolute;
+      z-index: 2;
+      pointer-events: none;
+    }
+    /* Картинка лежит на весь кадр: так в прорехе виден тот самый кусок работы
+       и ровно в том масштабе, в каком она раскроется по клику. Обрезана по
+       линию сгиба — три точки в одной значат сложенный уголок */
+    .cases__peel-shot {
+      inset: 0;
+      clip-path: polygon(0 100%, 0 100%, 0 100%);
+      /* Заворачивается быстрее, чем разворачивается: при переходе на соседнюю
+         работу уголок закрывается и открывается заново, и складывание в том же
+         темпе тянуло бы паузу вдвое. Длительность закрытия держит FOLD в
+         скрипте — меняешь тут, меняй и там */
+      transition: clip-path .3s ease-in;
+    }
+    .cases__shot.is-peeking .cases__peel-shot {
+      transition: clip-path .6s cubic-bezier(0.2, 0.75, 0.25, 1);
+    }
+    .cases__shot.is-peeking .cases__peel-shot { clip-path: polygon(0 100%, 0 24.6%, 44% 100%); }
+    /* Завиток сидит в своей коробке размером с уголок, 44% × 75.4% — при
+       пропорции кадра 12/7 это квадрат в пикселях, поэтому дуга не косит.
+       Уголок нарочно крупный и заезжает на робота: кусок работы должно быть
+       видно, а не угадывать. Меняешь размер — правь оба числа в пропорции
+       12/7 и вершину clip-path у картинки: 100% минус высота коробки.
+       Растёт не обрезкой, а масштабом от самого угла: страница отгибается
+       целиком, а не выползает из-под маски.
+       drop-shadow идёт по силуэту пути, а не по коробке, и падает вниз-влево —
+       на открывшийся кусок работы, будто завиток над ним приподнят */
+    .cases__peel-flap {
+      left: 0;
+      bottom: 0;
+      width: 44%;
+      height: 75.4%;
+      /* Холст рисунка квадратный, и коробка уголка тоже квадратная в
+         пикселях (44% × 75.4% при пропорции кадра 12/7) — поэтому растягиваем
+         один в один, сгиб ложится ровно на диагональ */
+      background: url('ugolok.webp') center / 100% 100% no-repeat;
+      transform: scale(0);
+      transform-origin: 0 100%;
+      transition: transform .3s ease-in;
+    }
+    .cases__shot.is-peeking .cases__peel-flap {
+      transform: scale(1);
+      transition: transform .6s cubic-bezier(0.2, 0.75, 0.25, 1);
+    }
+    /* работа открыта — уголку тут делать нечего, и складываться на глазах он
+       не должен: убираем совсем, а не гасим переходом */
+    .cases__shot.is-open .cases__peel-shot,
+    .cases__shot.is-open .cases__peel-flap { display: none; }
+    @media (prefers-reduced-motion: reduce) {
+      .cases__peel-shot, .cases__peel-flap { transition: none; }
+    }
+
     /* Робот с табличкой на планшетах — на четверть меньше.
        Диапазон 700-900 это ветка мобильного робота: он держит табличку над
        головой и занимает весь кадр. Сюда попадают iPad Mini 768, iPad Air 820
@@ -1374,44 +1474,6 @@
     }
     .cases__dot:hover { transform: scale(1.2); }
     .cases__dot.is-active { background: var(--accent2); }
-    /* Крестик за концом ряда: закрывает открытую работу и возвращает робота.
-       Кружок крупнее точек, чтобы читался как отдельное действие, а не как
-       ещё один кадр.
-       Из потока вынесен нарочно: ряд центрирован по якорю, и будь крестик
-       обычной ячейкой флекса, он растянул бы ряд и сдвинул точки влево —
-       на стрелку. Абсолют от правого края ряда: точки стоят там же, где
-       стояли, при любом их количестве */
-    .cases__close {
-      position: absolute;
-      left: 100%;
-      top: 50%;
-      transform: translateY(-50%);
-      /* отступ от последней точки — вдвое против зазора между точками */
-      margin-left: 18px;
-      width: 36px;
-      height: 36px;
-      padding: 0;
-      border: none;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.6);
-      box-shadow: 0 1px 4px rgba(26,26,26,0.35);
-      cursor: pointer;
-      transition: background var(--transition), transform var(--transition);
-    }
-    .cases__close:hover { background: #fff; transform: translateY(-50%) scale(1.15); }
-    .cases__close::before,
-    .cases__close::after {
-      content: '';
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      width: 18px;
-      height: 3px;
-      border-radius: 2px;
-      background: var(--text);
-    }
-    .cases__close::before { transform: translate(-50%, -50%) rotate(45deg); }
-    .cases__close::after  { transform: translate(-50%, -50%) rotate(-45deg); }
     /* Строки занимают всю высоту картинки и прижаты друг к другу:
        белое поле сливается в одну лесенку с чётким левым краем */
     .cases__list {
@@ -2006,10 +2068,15 @@
     /* Cookie-баннер */
     .cookie-banner {
       position: fixed;
-      right: 24px;
+      /* Держится края фонового рисунка, а не края экрана: на широких мониторах
+         фреска не дотягивается до краёв окна, и плашка висела в пустом поле
+         рядом со страницей. Значение ставит скрипт — ширину рисунка в стилях
+         не вычислить. Не сработал скрипт, нет фрески, узкое окно — остаётся
+         прежние 24px от края */
+      right: var(--cookie-right, 24px);
       bottom: 24px;
       z-index: 1000;
-      width: min(440px, calc(100vw - 32px));
+      width: min(500px, calc(100vw - 32px));
       display: flex;
       align-items: flex-start;
       gap: 18px;
@@ -2583,8 +2650,10 @@
     </div>
     <!-- Прайсы отдельными страницами: на них курсор превращается в крестик,
          щелчок в любом месте возвращает сюда. Плашки те же, что в портфолио,
-         только это ссылки, а не кнопки-переключатели -->
-    <ul class="prices__list">
+         только это ссылки, а не кнопки-переключатели.
+         id нужен прайсам: возврат идёт на #prices, иначе выбрасывает в начало
+         страницы и до плашек приходится долистывать заново -->
+    <ul class="prices__list" id="prices">
       <li class="prices__item"><a href="price-tech.html" class="case-plate"><span class="case-plate__text">Прайс на технические задачи</span></a></li>
       <li class="prices__item"><a href="price-web.html" class="case-plate"><span class="case-plate__text">Прайс на сайты и дизайн</span></a></li>
     </ul>
@@ -2662,6 +2731,16 @@
            Сами точки рисует скрипт: их столько, сколько снимков
            у нажатого проекта -->
       <div class="cases__dots" id="casesDots" hidden></div>
+      <!-- Подвёрнутый уголок: картинка лежит на весь кадр и обрезана в
+           треугольник, поэтому в прорехе виден тот самый кусок работы и в том
+           же масштабе, в каком она откроется по клику. src ставит скрипт -->
+      <img class="cases__peel-shot" alt="" aria-hidden="true" decoding="async" />
+      <!-- Завёрнутая страничка: рисунок Катерины. Холст квадратный, сгиб
+           лежит ровно по его диагонали, всё остальное прозрачно — поэтому
+           картинка садится в коробку уголка один в один, без подгонки.
+           Фоном, а не <img>: пока файл меняется, отсутствующий фон просто
+           ничего не покажет, а картинка выдала бы битую иконку -->
+      <span class="cases__peel-flap" aria-hidden="true"></span>
     </div>
     <ul class="cases__list">
       <li class="cases__item"><button type="button" class="case-plate" data-shots="img/sait-unumgarden/1.jpg" data-shots-m="img/sait-unumgarden/m1.jpg,img/sait-unumgarden/m2.jpg,img/sait-unumgarden/m3.jpg,img/sait-unumgarden/m4.jpg"><span class="case-plate__text">Сайт ландшафтного архитектора на Tilda</span></button></li>
@@ -2854,10 +2933,10 @@
   <img class="cookie-banner__icon" src="robot-cookie.webp" width="300" height="363" alt="" aria-hidden="true" loading="lazy" decoding="async" />
   <div class="cookie-banner__body">
     <h3 id="cookieTitle">Печенье — на ваших условиях</h3>
-    <p>Сайт хранит только то, что нужно для его работы: язык, отправленные формы и вот это согласие. Никакой рекламы и слежки. Подробности — в <a href="privacy.html" target="_blank" rel="noopener">Политике обработки персональных данных</a>.</p>
+    <p>Обязательное храню всегда: язык, отправленные формы и вот этот выбор. Статистику посещений — только с вашего согласия. Рекламы и передачи данных на сторону нет. Подробности — в <a href="privacy.html" target="_blank" rel="noopener">Политике обработки персональных данных</a>.</p>
     <div class="cookie-banner__actions">
       <button type="button" class="btn btn--primary" id="cookieAccept">Хорошо</button>
-      <a class="btn btn--outline" href="privacy.html" target="_blank" rel="noopener">Подробнее</a>
+      <button type="button" class="btn btn--outline" id="cookieReject">Только необходимые</button>
     </div>
   </div>
 </div>
@@ -2903,6 +2982,41 @@
   })();
 
   // Форма консультации
+  // ── Яндекс.Метрика ──────────────────────────────────────────────
+  // Номер счётчика. Пока null — метрика не подключается вообще.
+  // Появится счётчик — вписать сюда число, больше ничего менять не нужно.
+  const METRIKA_ID = 112421919;
+  let metrikaStarted = false;
+
+  // Запускается не при загрузке, а только после согласия на статистику.
+  // Тело — код Яндекса как есть, вынесенный в функцию; noscript-пикселя из их
+  // сниппета здесь намеренно нет: он сработал бы в обход согласия
+  function startMetrika() {
+    if (!METRIKA_ID || metrikaStarted) return;
+    metrikaStarted = true;
+    (function (m, e, t, r, i, k, a) {
+      m[i] = m[i] || function () { (m[i].a = m[i].a || []).push(arguments); };
+      m[i].l = 1 * new Date();
+      for (var j = 0; j < e.scripts.length; j++) { if (e.scripts[j].src === r) { return; } }
+      k = e.createElement(t); a = e.getElementsByTagName(t)[0];
+      k.async = 1; k.src = r; a.parentNode.insertBefore(k, a);
+    })(window, document, 'script', 'https://mc.yandex.ru/metrika/tag.js?id=' + METRIKA_ID, 'ym');
+    window.ym(METRIKA_ID, 'init', {
+      ssr: true,
+      webvisor: true,
+      clickmap: true,
+      referrer: document.referrer,
+      url: location.href,
+      accurateTrackBounce: true,
+      trackLinks: true
+    });
+  }
+
+  // Цель засчитывается молча, если метрика выключена или согласия не было
+  function goal(name) {
+    if (METRIKA_ID && typeof window.ym === 'function') window.ym(METRIKA_ID, 'reachGoal', name);
+  }
+
   const bookingForm = document.getElementById('bookingForm');
   const bookingSuccess = document.getElementById('bookingSuccess');
   const bookingSubmit = bookingForm.querySelector('.booking-form__submit');
@@ -2933,6 +3047,7 @@
 
       bookingForm.style.display = 'none';
       bookingSuccess.classList.add('booking-success--visible');
+      goal('zayavka');
     } catch (err) {
       console.error('Не удалось отправить заявку:', err);
       bookingSubmit.disabled = false;
@@ -2943,23 +3058,45 @@
     }
   });
 
-  // Cookie-баннер: показываем один раз, до согласия
+  // Cookie-баннер: показываем, пока человек не выбрал одно из двух.
+  // Старый ключ cookieAccepted намеренно не читаем: по прежнему баннеру
+  // соглашались с обещанием «никакой слежки», на статистику это согласие
+  // не распространяется — такие посетители увидят баннер заново.
   (function () {
     const banner = document.getElementById('cookieBanner');
     const accept = document.getElementById('cookieAccept');
-    if (!banner || !accept) return;
-    let accepted = false;
-    try { accepted = localStorage.getItem('cookieAccepted') === '1'; } catch (e) {}
-    if (!accepted) {
+    const reject = document.getElementById('cookieReject');
+    if (!banner || !accept || !reject) return;
+
+    let choice = null;
+    try { choice = localStorage.getItem('cookieChoice'); } catch (e) {}
+
+    if (choice === 'all') startMetrika();
+    if (!choice) {
       banner.hidden = false;
       document.body.classList.add('cookie-visible');
     }
-    accept.addEventListener('click', () => {
+
+    const decide = (value) => {
       banner.hidden = true;
       document.body.classList.remove('cookie-visible');
-      try { localStorage.setItem('cookieAccepted', '1'); } catch (e) {}
-    });
+      try { localStorage.setItem('cookieChoice', value); } catch (e) {}
+      if (value === 'all') startMetrika();
+    };
+
+    accept.addEventListener('click', () => decide('all'));
+    reject.addEventListener('click', () => decide('necessary'));
   })();
+
+  // Цели по кликам — одним слушателем, чтобы не трогать разметку ссылок
+  document.addEventListener('click', (e) => {
+    const link = e.target.closest('a[href]');
+    if (!link) return;
+    const href = link.getAttribute('href') || '';
+    if (href.includes('t.me/')) goal('telegram');
+    else if (href.startsWith('mailto:')) goal('email');
+    else if (href.startsWith('price-')) goal('price');
+  });
 
   // Выпадающие меню шапки: «Менюшка» слева и «Связаться» справа.
   // Механика одна на оба, открытым может быть только одно
@@ -3230,14 +3367,6 @@
     // ещё не отсняты. Такая точка листается, но картинку не меняет — нечего
     const SPARE = 2;
 
-    // Крестик в конце ряда точек. Элемент один: dots.textContent = '' его
-    // выносит вместе с точками, поэтому при каждой сборке ряда дописываем
-    // заново — и всегда последним, чтобы индексы точек не поехали
-    const closeBtn = document.createElement('button');
-    closeBtn.type = 'button';
-    closeBtn.className = 'cases__close';
-    closeBtn.setAttribute('aria-label', 'Закрыть работу');
-
     // На узком экране общего превью нет — снимок раскрывается под плашкой.
     // Элемент один на всё портфолио: appendChild сам уносит его с прошлого
     // места, поэтому открытым всегда остаётся ровно один. На ПК он скрыт CSS
@@ -3414,6 +3543,11 @@
     // Ждём, пока снимок догрузится, иначе проявляться будет пустое место
     const frame = shot.closest('.cases__shot');
     const playReveal = () => {
+      // Кадр открылся хоть раз — подсказки «ТЫК» своё отработали. Дальше они
+      // возвращаются мгновенно, без очереди появления (см. .is-shown в стилях)
+      frame.closest('.cases__layout')?.classList.add('is-shown');
+      // работа открывается целиком — подвёрнутый угол своё отработал
+      frame.classList.remove('is-peeking');
       frame.classList.add('is-open');
       // без сброса и принудительного пересчёта повторный клик по той же
       // плашке анимацию не переиграет — класс-то уже висит
@@ -3508,7 +3642,6 @@
           d.setAttribute('aria-label', 'Слайд ' + (i + 1));
           dots.appendChild(d);
         }
-        dots.appendChild(closeBtn);
         dots.hidden = false;
         bringIntoView();
       });
@@ -3529,7 +3662,6 @@
     };
 
     dots.addEventListener('click', (e) => {
-      if (e.target.closest('.cases__close')) { closeShot(); return; }
       const dot = e.target.closest('.cases__dot');
       if (!dot) return;
       const all = [...dots.children];
@@ -3540,6 +3672,86 @@
       // у работы могут быть свои кадры, и точки должны листать их же
       if (open) show(shotsOf(open), all.indexOf(dot));
     });
+
+    // Подвёрнутый уголок: на ПК наведение на плашку приподнимает левый нижний
+    // угол кадра и показывает кусок работы. Кадр при этом не открывается —
+    // ни точек, ни листания, ни разворота: это приманка, а не просмотр.
+    // Пока работа открыта кликом, уголок молчит — там уже смотрят целиком
+    (function () {
+      const list = document.querySelector('.cases__list');
+      const peel = frame.querySelector('.cases__peel-shot');
+      if (!list || !peel) return;
+      // только настоящая мышь: на тач-экранах hover эмулируется тапом,
+      // и уголок дрался бы с кликом за один и тот же жест
+      const mouse = window.matchMedia('(hover: hover) and (pointer: fine)');
+      const DELAY = 90;
+      // сколько уголок заворачивается перед тем, как открыться на новой работе.
+      // То же число, что в стилях у .cases__peel-shot / .cases__peel-flap
+      const FOLD = 300;
+      // Сколько курсор должен простоять на пустом месте, чтобы это считалось
+      // уходом с ряда. Проход через зазор между соседними плашками короче
+      const LEAVE = 150;
+      let current = null, timer = 0;
+
+      const fold = () => {
+        clearTimeout(timer);
+        current = null;
+        frame.classList.remove('is-peeking');
+      };
+
+      list.addEventListener('pointerover', (e) => {
+        if (!mouse.matches || isNarrow()) return;
+        const plate = e.target.closest('.case-plate[data-shots]');
+        // Работа открыта кликом, а курсор вернулся на плашки — закрываем её и
+        // отдаём кадр роботу с уголком. Крестика больше нет, закрытие делает
+        // само движение мыши. Уход вверх или вниз с блока так не считается:
+        // оттуда pointerover не приходит вовсе, и работа остаётся открытой
+        const opened = document.querySelector('.case-plate.is-active');
+        if (opened && !plate) return;
+        // Уголок уже поднят над этой плашкой — дальше ничего не делаем.
+        // Без этой проверки переход курсора с кнопки на текст внутри неё
+        // считался новым наведением и складывал уголок заново: рука дрогнула —
+        // анимация с начала
+        if (plate && plate === current) return;
+        clearTimeout(timer);
+        if (opened) closeShot();
+        // Курсор на пустом месте. Бокс списка накрывает всю раскладку, включая
+        // робота и подсказки, — уйти влево, не выходя из него, легко, и тогда
+        // pointerleave не сработает. Поэтому складываемся и здесь, но не сразу:
+        // между плашками лежат зазоры и ступеньки лесенки, и быстрый проход по
+        // ним не должен считаться уходом. Задержался на пустом — значит ушёл
+        if (!plate) { timer = setTimeout(fold, LEAVE); return; }
+        // всегда первый снимок и только снимок: ролики и мобильные кадры
+        // остаются клику, уголок их не касается
+        const src = plate.dataset.shots.split(',')[0];
+        timer = setTimeout(() => {
+          current = plate;
+          // Уголок открыт над прошлой работой — заворачиваем его прямо сейчас,
+          // а картинка пусть грузится параллельно: к концу складывания она
+          // обычно уже готова, и разворот идёт сразу
+          const again = frame.classList.contains('is-peeking');
+          if (again) frame.classList.remove('is-peeking');
+          const pre = new Image();
+          const open = () => {
+            // мышь успела уйти дальше, пока грузилось — этот кадр уже не нужен
+            if (current !== plate) return;
+            peel.src = src;
+            frame.classList.add('is-peeking');
+          };
+          // Картинку подставляем только когда она догрузилась: иначе в прорехе
+          // на миг пустело бы, пока идёт файл
+          const ready = () => {
+            pre.onload = null;
+            if (again) timer = setTimeout(open, FOLD); else open();
+          };
+          pre.onload = ready;
+          pre.src = src;
+          if (pre.complete) ready();
+        }, DELAY);
+      });
+
+      list.addEventListener('pointerleave', fold);
+    })();
   })();
 
   // Скролл: полоска прогресса в шапке + скрытие стрелки-подсказки
@@ -3744,6 +3956,32 @@
     // карточки меняют высоту от переносов текста и догрузки шрифта —
     // наблюдатель ловит это без опроса
     if ('ResizeObserver' in window) new ResizeObserver(fit).observe(box);
+  })();
+  // Край фонового рисунка для cookie-плашки. Ширина фрески нигде не записана:
+  // background-size: auto 100% тянет её по высоте всей страницы, а ширина
+  // выходит из пропорции файла — 2000 на 4618. Высоту документа стили не
+  // знают, поэтому считаем здесь и отдаём переменной
+  (function () {
+    const bg = document.querySelector('.page-bg');
+    if (!bg) return;
+    const RATIO = 2000 / 4618;
+    const MIN = 24;
+    const fit = () => {
+      const cs = getComputedStyle(bg);
+      // На телефоне фрески нет вовсе, на планшете она приколота к окну и
+      // покрывает его целиком — в обоих случаях край рисунка и есть край экрана
+      const w = (cs.display === 'none' || cs.position === 'fixed')
+        ? 0 : bg.offsetHeight * RATIO;
+      // рисунок шире окна — свободного поля нет, прижимаемся к краю как раньше
+      const free = w ? (window.innerWidth - w) / 2 : 0;
+      document.documentElement.style.setProperty(
+        '--cookie-right', Math.max(MIN, free) + 'px');
+    };
+    fit();
+    window.addEventListener('resize', fit, { passive: true });
+    // Страница меняет высоту — раскрылся список работ, догрузились картинки, —
+    // и вместе с ней едет край рисунка. Наблюдатель ловит это без опроса
+    if ('ResizeObserver' in window) new ResizeObserver(fit).observe(document.body);
   })();
 </script>
 
