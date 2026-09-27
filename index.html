@@ -18,7 +18,7 @@
   <meta property="og:image:height" content="630" />
   <meta property="og:image:alt" content="Катерина Степанова — техспец и графический дизайнер" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="theme-color" content="#4A6C33" />
+  <meta name="theme-color" content="#417339" />
   <meta name="description" content="Верстка сайтов, Telegram-боты, интеграции и графический дизайн для онлайн-школ, экспертов и малого бизнеса. Тобольск, работаю удалённо." />
   <link rel="icon" href="favicon.ico" sizes="any" />
   <link rel="icon" type="image/png" href="favicon-32.png" sizes="32x32" />
@@ -79,10 +79,10 @@
       --font-heading: 'Spectral', Georgia, serif;
       --font-body:    'Involve', system-ui, sans-serif;
       --font-script:  'Vasek', cursive;
-      --accent:        #4A6C33;
-      --accent-hover:  #395426;
-      --accent-light:  #EDF4E6;
-      --accent-soft:   #92B771;
+      --accent:        #417339;
+      --accent-hover:  #325B2D;
+      --accent-light:  #EAF4E7;
+      --accent-soft:   #81B470;
       --accent2:       #E8A800;
       --accent2-hover: #C48900;
       --accent2-light: #FFF8E0;
@@ -839,7 +839,7 @@
     }
     .service-card:hover {
       border-color: var(--accent);
-      box-shadow: 0 8px 32px rgba(74,108,51,0.12);
+      box-shadow: 0 8px 32px rgba(65,115,57,0.12);
       transform: translateY(-2px);
     }
     /* 3D-наклон и подсветка за курсором.
@@ -865,8 +865,8 @@
       transition: opacity .3s ease;
       background: radial-gradient(
         260px circle at var(--mx, 50%) var(--my, 50%),
-        rgba(146,183,113,0.22),
-        rgba(146,183,113,0) 70%
+        rgba(129,180,112,0.22),
+        rgba(129,180,112,0) 70%
       );
     }
     .service-card--tilt.is-tilting::after { opacity: 1; }
@@ -964,26 +964,26 @@
         z-index: 0;
         transform: translateY(0);
         border-color: transparent;
-        box-shadow: 0 14px 30px rgba(74,108,51,0);
+        box-shadow: 0 14px 30px rgba(65,115,57,0);
       }
       4%, 21% {
         z-index: 2;
         transform: translateY(-4px);
         /* тот же насыщенный зелёный контур, что у карточек услуг на наведении */
         border-color: var(--accent);
-        box-shadow: 0 12px 26px rgba(74,108,51,0.10);
+        box-shadow: 0 12px 26px rgba(65,115,57,0.10);
       }
     }
     @keyframes num-glow {
       0%, 25%, 100% {
         background: var(--bg);
         color: var(--accent);
-        box-shadow: 0 0 0 5px rgba(74,108,51,0.08);
+        box-shadow: 0 0 0 5px rgba(65,115,57,0.08);
       }
       4%, 21% {
         background: var(--accent-light);
         color: var(--accent);
-        box-shadow: 0 0 0 7px rgba(74,108,51,0.10);
+        box-shadow: 0 0 0 7px rgba(65,115,57,0.10);
       }
     }
     /* курсор в блоке — цикл выключаем целиком, чтобы hover снова работал */
@@ -1027,7 +1027,7 @@
       pointer-events: none;
       opacity: 0;
       filter: blur(18px);
-      background: rgba(146,183,113,0.45);
+      background: rgba(129,180,112,0.45);
     }
     .process-step::after {
       content: '';
@@ -1047,7 +1047,7 @@
     .process-step:hover {
       transform: translateY(-4px);
       border-color: var(--accent-light);
-      box-shadow: 0 14px 30px rgba(74,108,51,0.16);
+      box-shadow: 0 14px 30px rgba(65,115,57,0.16);
     }
     .process-step__num {
       width: 56px; height: 56px;
@@ -1062,7 +1062,7 @@
       color: var(--accent);
       margin-bottom: 18px;
       flex-shrink: 0;
-      box-shadow: 0 0 0 5px rgba(74,108,51,0.08);
+      box-shadow: 0 0 0 5px rgba(65,115,57,0.08);
       transition: background var(--transition), color var(--transition), box-shadow var(--transition),
                   transform .5s cubic-bezier(.34,1.56,.64,1);
       /* «щелчок»: цифра выпрыгивает, когда шаг появляется в поле зрения */
@@ -1076,7 +1076,7 @@
     .process-step:hover .process-step__num {
       background: var(--accent);
       color: #fff;
-      box-shadow: 0 0 0 6px rgba(74,108,51,0.15);
+      box-shadow: 0 0 0 6px rgba(65,115,57,0.15);
     }
     .process-step__title {
       font-family: var(--font-heading);
@@ -1549,7 +1549,7 @@
       inset: 0;
       pointer-events: none;
       border: 1px solid transparent;
-      border-image: linear-gradient(90deg, var(--accent) 0 28%, rgba(74,108,51,0) 68%) 1;
+      border-image: linear-gradient(90deg, var(--accent) 0 28%, rgba(65,115,57,0) 68%) 1;
       opacity: 0;
       transition: opacity var(--transition);
     }
@@ -1567,7 +1567,7 @@
       transform: scale(1.02);
       box-shadow:
         0 8px 22px rgba(26,26,26,0.16),      /* вес: отрывает белое от фото */
-        0 0 18px 2px rgba(146,183,113,0.38); /* зелёный ореол, --accent-soft */
+        0 0 18px 2px rgba(129,180,112,0.38); /* зелёный ореол, --accent-soft */
     }
     /* наведённая перекрывает открытую, если это разные плашки */
     .case-plate:hover { z-index: 2; }
@@ -1933,7 +1933,7 @@
     .field__input::placeholder { color: #A9AFB8; }
     .field__input:focus {
       border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(74,108,51,0.12);
+      box-shadow: 0 0 0 3px rgba(65,115,57,0.12);
     }
     /* Ошибки показывает браузер по required. :user-invalid загорается только
        после попытки отправить или ухода из поля — пока человек печатает, красного нет */
@@ -2227,8 +2227,8 @@
       animation: status-pulse 2.4s ease-in-out infinite;
     }
     @keyframes status-pulse {
-      0%, 100% { opacity: 1;   box-shadow: 0 0 0 0 rgba(74,108,51,0.35); }
-      50%      { opacity: .55; box-shadow: 0 0 0 5px rgba(74,108,51,0); }
+      0%, 100% { opacity: 1;   box-shadow: 0 0 0 0 rgba(65,115,57,0.35); }
+      50%      { opacity: .55; box-shadow: 0 0 0 5px rgba(65,115,57,0); }
     }
     @media (prefers-reduced-motion: reduce) {
       .contacts__status::before { animation: none; }
