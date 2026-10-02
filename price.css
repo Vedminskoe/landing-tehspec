@@ -40,9 +40,9 @@
 :root {
   --font-heading: 'Spectral', Georgia, serif;
   --font-body:    'Involve', system-ui, sans-serif;
-  --accent:        #4A6C33;
-  --accent-hover:  #395426;
-  --accent-light:  #EDF4E6;
+  --accent:        #417339;
+  --accent-hover:  #325B2D;
+  --accent-light:  #EAF4E7;
   --accent2:       #E8A800;
   --accent2-hover: #C48900;
   --accent2-light: #FFF8E0;
