@@ -476,7 +476,9 @@
     /* ::before — бегущий диагональный блик (свет по бархату) */
     /* ::after — россыпь искр, вспыхивают как снег на солнце */
     .hero__name::before,
-    .hero__name::after {
+    .hero__name::after,
+    .cw__title::before,
+    .cw__title::after {
       content: attr(data-text);
       position: absolute;
       left: 0; top: 0;
@@ -487,7 +489,8 @@
       color: transparent;
       background-repeat: no-repeat;
     }
-    .hero__name::before {
+    .hero__name::before,
+    .cw__title::before {
       /* та же механика, что у .btn--primary (btn-flow): градиент 200% перетекает 0→100→0 */
       background-image: linear-gradient(120deg,
         rgba(255,255,255,0)   35%,
@@ -500,7 +503,8 @@
       mix-blend-mode: screen;
       animation: velvetGlint 7s ease-in-out infinite;
     }
-    .hero__name::after {
+    .hero__name::after,
+    .cw__title::after {
       background-image:
         radial-gradient(circle, #fff 0%, rgba(255,255,255,0) 55%),
         radial-gradient(circle, #eaf3ff 0%, rgba(234,243,255,0) 55%),
@@ -538,8 +542,11 @@
     }
     @media (prefers-reduced-motion: reduce) {
       .hero__name::before,
-      .hero__name::after { animation: none; }
-      .hero__name::before { opacity: 0; }
+      .hero__name::after,
+      .cw__title::before,
+      .cw__title::after { animation: none; }
+      .hero__name::before,
+      .cw__title::before { opacity: 0; }
     }
     .hero__caption {
       font-family: var(--font-script);
@@ -1006,7 +1013,7 @@
          за карточкой: .reveal вешает will-change, карточка становится стековым
          контекстом, и z-index: -1 перестаёт уводить слой за её фон */
       background: transparent;
-      border-radius: 16px;
+      border-radius: var(--radius);
       border: 1px solid transparent;
       position: relative;
       transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
@@ -1091,96 +1098,9 @@
       line-height: 1.55;
     }
 
-    /* ── Cases ──
-       Раскладка по макету: картинка уходит в левый край экрана,
-       плашки лежат лесенкой поверх её правого края */
+    /* ── Портфолио ──
+       Окно-папка — стили ниже, в блоке «Портфолио: окно-папка» */
     .cases__header { margin-bottom: 18px; }
-    .cases__layout {
-      position: relative;
-      /* плашки стартуют за правым краем экрана — без этого страница
-         разъезжалась бы вбок на всю их отлётную дистанцию.
-         clip, а не hidden: он не делает из блока контейнер прокрутки */
-      overflow-x: clip;
-    }
-
-    /* ── Появление портфолио ──
-       Робот и подсказки проявляются, как робот в услугах; плашки въезжают
-       по очереди от правого края экрана. Класс вешает наблюдатель, когда
-       блок доходит до кадра, и снимает, когда уходит: возвращение к
-       портфолио каждый раз проигрывается заново */
-    .cases__stub-wrap {
-      opacity: 0;
-      /* только opacity: transform занят центровкой, а у робота внутри — качанием */
-      transition: opacity .9s ease .2s;
-    }
-    .cases__layout.is-live .cases__stub-wrap { opacity: 1; }
-    /* Стрелки вступают поодиночке и уже после того, как робот проявился
-       целиком (0.2s задержки + 0.9s хода). Шаг между ними 0.4s — крупный
-       нарочно: на 0.15s очередь читалась как одновременная вспышка */
-    .cases__layout.is-live .cases__tik--1 { opacity: 0.85; transition-delay: 1.1s; }
-    .cases__layout.is-live .cases__tik--2 { opacity: 0.85; transition-delay: 1.5s; }
-    .cases__layout.is-live .cases__tik--3 { opacity: 0.85; transition-delay: 1.9s; }
-    .cases__item {
-      transform: translateX(100vw);
-      opacity: 0;
-      /* --in ставит скрипт по порядку плашек — отсюда очередь.
-         Шаг 115ms вместо прежних 70: очередь читается плашка за плашкой,
-         а не сливается в один взмах. Сам ход тоже длиннее */
-      transition: transform 1.15s cubic-bezier(0.22, 0.9, 0.25, 1) calc(var(--in, 0) * 115ms),
-                  opacity   .65s  ease                             calc(var(--in, 0) * 115ms);
-    }
-    .cases__layout.is-live .cases__item { transform: none; opacity: 1; }
-    @media (prefers-reduced-motion: reduce) {
-      .cases__stub-wrap, .cases__item { transition: none; }
-      .cases__item { transform: none; opacity: 1; }
-      .cases__stub-wrap { opacity: 1; }
-    }
-    /* место под превью проекта — картинку положу позже */
-    /* Картинка заходит под всю лесенку (правее самой правой плашки на 64%),
-       поэтому её правым краем работает ступенчатая граница плашек,
-       а собственного прямого обреза не видно: он спрятан под плотным белым.
-       Ширина — она же и высота блока через aspect-ratio, поэтому трогать её
-       нельзя: 66% держат высоту. Но она обязана быть больше, чем
-       max(--off) + --shift, иначе прямой обрез вылезет в тех строках,
-       где плашка начинается правее края картинки. Отсюда и потолок сдвига */
-    .cases__shot {
-      /* relative — под точки слайдера, они лежат прямо на картинке */
-      position: relative;
-      width: 66%;
-      aspect-ratio: 12 / 7;
-      /* Подложка нужна только под раскрытие снимка — она подстилает те части
-         кадра, куда кинескоп ещё не дошёл. Пока в кадре робот, её нет вовсе:
-         у робота фон вырезан, и сквозь него виден фон страницы */
-      background: none;
-      overflow: hidden;
-    }
-    .cases__shot.is-open { background: var(--bg-alt); }
-    .cases__shot img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      /* от левого края: обрезка уходит только вправо, под лесенку плашек,
-         а отступ слева и расположение работ остаются как в макете */
-      object-position: left center;
-    }
-    /* До первого клика в кадре стоит робот с табличкой: у #casesShot нет src,
-       пока скрипт не подставит первый снимок. Как только работа открылась,
-       робот уходит и кадр раскрывается кинескопом уже под снимок */
-    .cases__shot:not(.is-open) #casesShot { display: none; }
-    /* ── Ролик вместо снимка ──
-       У двух ботов кадр — не картинка, а запись экрана. Ролик вертикальный,
-       а превью широкое: поэтому он не растягивается на весь кадр, а стоит по
-       центру на зелёной подложке, углы скруглены. Подложка и скругление живут
-       здесь, а не запечены в файл: так один и тот же ролик годится и в широкое
-       превью на ПК, и в разворот под плашкой на телефоне, где места больше */
-    .cases__video {
-      display: none;
-      place-items: center;
-      background: url(fon-video.webp) center / cover no-repeat;
-    }
-    /* ролик и кнопка запуска лежат в одной клетке — кнопка поверх кадра */
-    .cases__video > *,
-    .lightbox__video > * { grid-area: 1 / 1; }
     /* Кнопка запуска. Родной пульт браузера — тёмная плашка во всю ширину
        ролика, поверх акварели она грубовата. До первого нажатия пульта нет:
        в кадре стоит постер и этот кружок. Нажали — кружок уходит навсегда,
@@ -1209,301 +1129,8 @@
     @media (prefers-reduced-motion: reduce) {
       .video-play:hover { transform: none; }
     }
-    /* снимок и ролик делят одно место в кадре: показан всегда ровно один */
-    .cases__shot.is-video .cases__video { display: grid; }
-    .cases__shot.is-video #casesShot { display: none; }
-    .cases__shot .cases__video { position: absolute; inset: 0; }
-    /* В кадре ролик стоит абсолютом, а не ячейкой грида: у грида строка
-       разъезжается под натуральную высоту постера (848px) и видео вылезает
-       за кадр. Абсолют считает проценты от самого кадра */
-    .cases__shot .cases__video video,
-    .cases__shot .cases__video .video-play {
-      position: absolute;
-      /* Лесенка плашек лежит абсолютом поверх всей раскладки и перехватывала бы
-         и кнопку, и пульт — поднимаем их над ней, как это уже сделано с
-         точками. Поднимаем именно их, а не подложку: та во весь кадр и
-         накрыла бы плашки, а ролик стоит в левой трети и им не мешает.
-         Проявления у подложки поэтому и нет: filter от анимации завёл бы на
-         ней свой слой, и этот z-index заперся бы внутри него */
-      z-index: 2;
-      /* Не по центру кадра, а там же, где стоит работа на остальных снимках:
-         правую треть кадра накрывает лесенка плашек, а нижние 14% — полоса
-         под подпись со стрелкой. Ролик вертикальный, поэтому ведущая у него
-         высота: ширина набегает сама */
-      left: 44%;
-      top: 45%;
-      transform: translate(-50%, -50%);
-      height: 80%;
-      max-width: 60%;
-    }
-    .cases__shot .cases__video video {
-      border-radius: 14px;
-      box-shadow: 0 8px 26px rgba(26,26,26,0.3);
-    }
-    /* кнопка круглая — доли кадра ей ни к чему, размер у неё свой */
-    .cases__shot .cases__video .video-play { height: 64px; }
-    /* Робот и его тень лежат в общей обёртке: место и размер задаются тремя
-       числами на ней одной, тень внутри привязана к роботу и едет вместе с
-       ним. Фон у картинки вырезан, подложка кадра сквозь неё не читается */
-    .cases__stub-wrap {
-      position: absolute;
-      /* left/top — это центр робота, а не левый верхний угол: от смены
-         width он остаётся на том же месте. По центру кадра было бы 50/50 */
-      left: 38%;
-      top: 54%;
-      width: 67.5%;
-      transform: translate(-50%, -50%);
-      pointer-events: none;
-    }
-    .cases__shot.is-open .cases__stub-wrap { display: none; }
-    .cases__stub-pic { display: block; }
-    .cases__shot .cases__stub {
-      width: 100%;
-      height: auto;
-      /* Маятник: ноги стоят, корпус качается. Точка вращения — ступни робота,
-         а не низ картинки: по альфе он занимает 50.3% ширины и кончается
-         на 97.8% высоты. Темп заметно живее, чем у парящего робота в услугах (4.5s) */
-      transform-origin: 50.3% 97.8%;
-      animation: stub-swing 3.0s ease-in-out infinite;
-    }
-    @keyframes stub-swing {
-      0%, 100% { transform: rotate(-3deg); }
-      50%      { transform: rotate(3deg); }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .cases__shot .cases__stub { animation: none; }
-    }
-    /* Тень отдельным пятном, а не drop-shadow: тот копирует силуэт, и тень
-       поднятой таблички ложилась в просветы между руками и головой — робот
-       выглядел замазанным. Здесь свет падает с верхней правой точки, поэтому
-       тень лежит на полу слева от ступней. Проценты — от обёртки, то есть от
-       самого робота; aspect-ratio вместо height, чтобы вытянутость не зависела
-       от того, как разрешится высота обёртки.
-       Ступни при качании стоят на месте, значит и тень никуда не едет */
-    .cases__stub-shadow {
-      position: absolute;
-      left: 38%;
-      top: 98.1%;
-      width: 56%;
-      aspect-ratio: 16 / 1;
-      transform: translate(-50%, -50%);
-      background: radial-gradient(closest-side,
-                                  rgba(26,26,26,0.20),
-                                  rgba(26,26,26,0));
-    }
-    /* Рукописные «ТЫК» со стрелками: подсказка, что плашки нажимаются.
-       Лежат в .cases__layout, а не в кадре: кадр обрезает всё за своими
-       66%, а стрелки тычут в лесенку правее. Ширина в процентах от
-       раскладки, высота сама по пропорциям картинки */
-    .cases__tik {
-      position: absolute;
-      z-index: 3;
-      pointer-events: none;
-      /* Стартуют невидимыми, показывает их .is-live у раскладки. Раньше здесь
-         стояло 0.85, и это правило перебивало начальный ноль в блоке анимации —
-         стрелки просто всегда были на месте. Ход длинный, как у робота: с общим
-         --transition в 0.25s они вспыхивали мгновенно */
-      opacity: 0;
-      transition: opacity .7s ease;
-    }
-    .cases__tik--1 { left: 39.6%; top: 0;     width: 11%; }
-    .cases__tik--2 { left: 42.3%; top: 29.3%; width: 10.5%; }
-    .cases__tik--3 { left: 39.9%; top: 67.7%; width: 8.9%; }
-    /* работа открылась — подсказка своё отработала. Задержку обнуляем, иначе
-       стрелки гасли бы вразнобой, доигрывая очередь появления */
-    .cases__layout:has(.cases__shot.is-open) .cases__tik {
-      opacity: 0;
-      transition-delay: 0s;
-    }
-
-    /* Очередь появления — только на первый раз. Как только кадр хоть раз
-       открывался, скрипт вешает .is-shown, и подсказки возвращаются мгновенно:
-       закрыл работу или увёл мышь с плашки — они уже на месте. Иначе каждый
-       раз доигрывалась вся очередь на 1.9s и сбивала с толку.
-       :not(:has(...)) — чтобы правило работало только на возврат: уход
-       подсказок при открытии кадра по-прежнему плавный */
-    .cases__layout.is-shown:not(:has(.cases__shot.is-open)) .cases__tik {
-      transition: none;
-    }
-    }
-
-    /* Робот с табличкой на планшетах — на четверть меньше.
-       Диапазон 700-900 это ветка мобильного робота: он держит табличку над
-       головой и занимает весь кадр. Сюда попадают iPad Mini 768, iPad Air 820
-       и Zenbook Fold 853 — внутри ветки они ведут себя одинаково, отделить
-       одну модель от другой нечем.
-       Выше 900 работает десктопный робот, там размер прежний.
-       Нижняя граница 700px — чтобы не задеть телефоны: у них кадр и так
-       узкий, робот в нём не великоват */
-    @media (min-width: 700px) and (max-width: 900px) {
-      /* Селектор с .cases__shot нарочно: правило блока max-width: 900px
-         стоит ниже по файлу и с одинаковым весом перебивало бы это.
-         Блок там статичный, поэтому при ширине меньше 100% его надо
-         возвращать в середину кадра вручную */
-      .cases__shot .cases__stub-wrap { width: 75%; margin-inline: auto; }
-    }
-    /* Появление снимка — «Цвет» (28) из подборки _anim-demo.html: кадр входит
-       обесцвеченным и пересвеченным, за время анимации набирает цвет и
-       плотность. Разворачивается весь кадр разом, поэтому ни точки старта,
-       ни отдельной вспышки тут нет — в отличие от прежнего кинескопа */
-    /* не путать с --reveal-delay: та переменная про выезд блоков при скролле */
-    .cases__shot { --shot-reveal: 1.8s; }
-    @keyframes cases-color {
-      from { opacity: 0; filter: grayscale(1) contrast(1.5) brightness(1.35); }
-      to   { opacity: 1; filter: none; }
-    }
-    .cases__shot.is-playing img {
-      animation: cases-color var(--shot-reveal) ease-out both;
-    }
-    /* Точки догоняют кадр к середине проявления: раньше они висели бы на
-       пустом поле, позже — уже на готовой картинке */
-    .cases__shot.is-playing .cases__dots {
-      /* доля от длительности, а не своя секунда: меняешь --shot-reveal —
-         точки остаются на той же половине проявления */
-      animation: cases-dots 0.32s ease calc(var(--shot-reveal) * 0.43) backwards;
-    }
-    @keyframes cases-dots { from { opacity: 0; } }
-    @media (prefers-reduced-motion: reduce) {
-      .cases__shot.is-playing img,
-      .cases__shot.is-playing .cases__dots { animation: none; }
-    }
-    /* Точки слайдера: показывают, на каком снимке проекта мы сейчас.
-       Стоят в строку сразу за остриём белой стрелки «смотреть ещё и описание».
-       Стрелка нарисована на самих снимках работ, поэтому привязка идёт не к
-       ширине страницы, а к боксу картинки в процентах: у .cases__shot жёсткий
-       aspect-ratio 12/7, значит кадр масштабируется равномерно и одна и та же
-       точка рисунка на любой ширине экрана лежит по тем же процентам.
-       --dots-x / --dots-y — якорь, снят на глаз со скриншота;
-       если ряд чуть мимо острия, правится этими двумя числами.
-
-       Якорь стоит на СЕРЕДИНЕ ряда, а не на его левом крае: 54% — левый край
-       ряда из пяти точек, +43px — его половина (5 × 10px + 4 зазора × 9px = 86px).
-       Вместе с translateX(-50%) это значит, что точек можно поставить
-       3, 4, 6 — сколько угодно: ряд разойдётся в обе стороны от той же
-       середины и с места не сдвинется. Количество меняется только в разметке,
-       здесь трогать нечего */
-    .cases__dots {
-      --dots-x: calc(54% + 43px);
-      --dots-y: 94.6%;
-      position: absolute;
-      left: var(--dots-x);
-      top: var(--dots-y);
-      transform: translate(-50%, -50%);
-      /* лесенка плашек лежит абсолютом поверх всей раскладки и перехватывала бы
-         клики по точкам — поднимаем их над ней */
-      z-index: 2;
-      display: flex;
-      gap: 9px;
-    }
-    /* display: flex перебивает hidden — гасим явно */
-    .cases__dots[hidden] { display: none; }
-    .cases__dot {
-      width: 10px;
-      height: 10px;
-      padding: 0;
-      border: none;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.6);
-      /* на светлом кадре белая точка потерялась бы */
-      box-shadow: 0 1px 4px rgba(26,26,26,0.35);
-      cursor: pointer;
-      transition: background var(--transition), transform var(--transition);
-    }
-    .cases__dot:hover { transform: scale(1.2); }
-    .cases__dot.is-active { background: var(--accent2); }
-    /* Крестик за концом ряда: закрывает открытую работу и возвращает робота.
-       Кружок крупнее точек, чтобы читался как отдельное действие, а не как
-       ещё один кадр.
-       Из потока вынесен нарочно: ряд центрирован по якорю, и будь крестик
-       обычной ячейкой флекса, он растянул бы ряд и сдвинул точки влево —
-       на стрелку. Абсолют от правого края ряда: точки стоят там же, где
-       стояли, при любом их количестве */
-    .cases__close {
-      position: absolute;
-      left: 100%;
-      top: 50%;
-      transform: translateY(-50%);
-      /* отступ от последней точки — вдвое против зазора между точками */
-      margin-left: 18px;
-      width: 36px;
-      height: 36px;
-      padding: 0;
-      border: none;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.6);
-      box-shadow: 0 1px 4px rgba(26,26,26,0.35);
-      cursor: pointer;
-      transition: background var(--transition), transform var(--transition);
-    }
-    .cases__close:hover { background: #fff; transform: translateY(-50%) scale(1.15); }
-    .cases__close::before,
-    .cases__close::after {
-      content: '';
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      width: 18px;
-      height: 3px;
-      border-radius: 2px;
-      background: var(--text);
-    }
-    .cases__close::before { transform: translate(-50%, -50%) rotate(45deg); }
-    .cases__close::after  { transform: translate(-50%, -50%) rotate(-45deg); }
-    /* Строки занимают всю высоту картинки и прижаты друг к другу:
-       белое поле сливается в одну лесенку с чётким левым краем */
-    .cases__list {
-      position: absolute;
-      /* Снизу бокс уходит на 34px ниже картинки. Маска режет всё, что
-         выходит за границы списка (mask-clip по умолчанию border-box),
-         а там как раз живут нижняя линия рамки последней плашки
-         (она торчит на 1px из-за margin-bottom: -1px) и её тень.
-         Строки этот запас не занимают — его съедает распорка ::after,
-         34px попадают в пустой нижний отступ секции */
-      inset: 0 0 -34px;
-      display: flex;
-      flex-direction: column;
-      list-style: none;
-      /* Общий сдвиг всей лесенки вправо — двигается одной цифрой.
-         Потолок — 14%: самая правая плашка (--off: 52%) не должна вылезти
-         за правый край картинки (66%), иначе покажется её прямой обрез.
-         12% оставляют 2% запаса */
-      --shift: 12%;
-      /* Растворение задано маской на весь список, а не на каждую плашку:
-         белое держится плотным до 74% ширины экрана — то есть заведомо
-         дальше правого края картинки (66%), чтобы она нигде не просвечивала.
-         Растворение при этом длинное, до 96%: хвосты самых длинных названий
-         («…ветклиники „ЮниВет“», «…для досок референсов») попадают в него,
-         но белого под ними хватает — буквы читаются, а поле мягко тает.
-         Границу мерил шрифтом Involve на 17px */
-      -webkit-mask-image: linear-gradient(90deg, #000 0 74%, transparent 96%);
-              mask-image: linear-gradient(90deg, #000 0 74%, transparent 96%);
-    }
-    /* распорка: забирает те самые 34px, чтобы строки делили ровно
-       высоту картинки, как раньше */
-    .cases__list::after { content: ''; flex: none; height: 34px; }
-    .cases__item { display: flex; flex: 1; }
-    /* --off — сдвиг плашки вправо, из него и складывается лесенка */
-    .cases__item:nth-child(1 ) { --off: 41.5%; }
-    .cases__item:nth-child(2 ) { --off: 49.7%; }
-    .cases__item:nth-child(3 ) { --off: 46.0%; }
-    .cases__item:nth-child(4 ) { --off: 38.4%; }
-    .cases__item:nth-child(5 ) { --off: 43.2%; }
-    .cases__item:nth-child(6 ) { --off: 52.0%; }
-    .cases__item:nth-child(7 ) { --off: 43.0%; }
-    .cases__item:nth-child(8 ) { --off: 48.5%; }
-    .cases__item:nth-child(9 ) { --off: 35.9%; }
-    /* низ лесенки чуть левее верха, разброс между соседями 4.5–8%
-       вместо 3–5%: ступени внизу читаются резче, но веером не расходятся */
-    .cases__item:nth-child(10) { --off: 43.5%; }
-    .cases__item:nth-child(11) { --off: 50.0%; }
-    .cases__item:nth-child(12) { --off: 45.8%; }
-    .cases__item:nth-child(13) { --off: 48.5%; }
-    .cases__item:nth-child(14) { --off: 40.5%; }
-    /* добор до 16 работ: тот же разброс между соседями, 5.5–7.5% */
-    .cases__item:nth-child(15) { --off: 47.0%; }
-    .cases__item:nth-child(16) { --off: 39.5%; }
-    .cases__item:nth-child(17) { --off: 46.5%; }
-    .cases__item:nth-child(18) { --off: 41.0%; }
+    /* Плашки — у прайсов под услугами: лесенкой портфолио они были раньше,
+       отсюда и название класса */
     .case-plate {
       flex: 1;
       margin-left: calc(var(--off, 0%) + var(--shift, 0%));
@@ -1592,131 +1219,8 @@
       /* свечение, рамку и заливку оставляем — выделение не теряется */
       .case-plate:hover { transform: none; }
     }
-    /* пустая плашка — разделитель между категориями работ, не подсвечивается */
-    .cases__item--gap .case-plate { cursor: default; }
-    .cases__item--gap .case-plate::after { content: none; }
-    .cases__item--gap .case-plate:hover { transform: none; box-shadow: none; }
-    /* Снимок, раскрытый прямо под плашкой. Нужен только на узком экране,
-       где общего превью нет; на ПК лежит скрытым */
-    .cases__inline-shot { display: none; position: relative; }
-    /* Открытая работа сама подтягивается в экран. Зазор сверху — под
-       липкую шапку, чтобы она не накрывала верх снимка */
-    .cases__shot,
-    .cases__inline-shot { scroll-margin: 80px 0 24px; }
-    /* Стрелки листания поверх снимка. Без кружка — белый шеврон с тенью
-       читается и на светлом кадре, и на тёмном. Крайняя стрелка не гаснет,
-       а убирается совсем: слева до первого шага вперёд, справа на последнем */
-    .cases__arrow {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 46px;
-      height: 46px;
-      padding: 0;
-      border: none;
-      background: none;
-      color: #fff;
-      filter: drop-shadow(0 1px 3px rgba(0,0,0,0.6));
-      cursor: pointer;
-    }
-    .cases__arrow[hidden] { display: none; }
-    .cases__arrow--prev { left: 0; }
-    .cases__arrow--next { right: 0; }
-    /* «Смотреть больше ...» — только для узкого экрана: на ПК лесенка
-       показывает все работы сразу. Не кнопка, а строка обычного текста
-       и обычного цвета: от белых плашек её и так отличает голое поле */
-    .cases__more {
-      display: none;
-      margin: 14px 16px 0;
-      padding: 6px 0;
-      width: calc(100% - 32px);
-      border: none;
-      background: none;
-      font-family: var(--font-body);
-      font-size: 16px;
-      color: var(--text);
-      cursor: pointer;
-    }
     @media (max-width: 900px) {
-      /* Плашки до своего выхода стоят на ширину экрана правее — Safari на
-         телефоне считает это шириной страницы и даёт ход вбок. clip, а не
-         hidden: hidden сделал бы секцию контейнером прокрутки */
-      #cases { overflow-x: clip; }
-      /* Лесенка не помещается, и постоянное превью убрано совсем:
-         плашки идут простым списком, а снимок проекта раскрывается
-         под той плашкой, которую нажали.
-         От кадра остаётся только робот с табличкой — он встаёт перед
-         списком работ. Стрелки «ТЫК» тут не нужны: на телефоне и так
-         понятно, что по плашке надо ткнуть пальцем */
-      .cases__shot {
-        display: block;
-        width: 42%;
-        margin: 0 auto;
-        aspect-ratio: auto;
-        overflow: visible;
-      }
-      .cases__shot.is-open { background: none; }
-      /* снимок открывается под плашкой, в кадре ему делать нечего */
-      .cases__shot #casesShot { display: none; }
-      /* робот занимает весь кадр и остаётся на месте, когда работа открыта */
-      .cases__stub-wrap { position: static; width: 100%; transform: none; }
-      /* у мобильного робота ноги по центру кадра, а не слева, как у того,
-         что на ПК — точка качания и тень переезжают под него */
-      .cases__shot .cases__stub { transform-origin: 50% 98%; }
-      .cases__stub-shadow { left: 50%; width: 42%; }
-      .cases__shot.is-open .cases__stub-wrap { display: block; }
-      /* точки листали общее превью — без него им негде жить */
-      .cases__dots { display: none; }
-      /* стрелки тычут в лесенку по диагонали — в столбик это бессмысленно */
-      .cases__tik { display: none; }
-      .cases__list {
-        position: static;
-        display: block;
-        margin-top: 16px;
-        --shift: 0%;
-        -webkit-mask-image: none;
-                mask-image: none;
-      }
-      /* маски нет — запас под тень не нужен */
-      .cases__list::after { display: none; }
-      .cases__item { display: block; --off: 0%; }
-      .cases__item--gap { display: none; }
-      .case-plate {
-        width: 100%;
-        margin-bottom: 6px;
-        margin-left: 0;
-        /* плашка выше и кегль крупнее: пальцем попадать, а не ногтем */
-        padding: 17px 18px;
-        background: #fff;
-        justify-content: center;
-        text-align: center;
-        /* лесенки здесь нет, строка не сжата — шрифт полного размера */
-        font-size: 19px;
-        /* четыре самых длинных названия в строку не влезают: balance делит
-           их пополам, иначе на вторую строку падало одно слово */
-        text-wrap: balance;
-      }
-      .cases__inline-shot { display: block; width: 100%; margin: 8px 0 14px; }
-      /* общего превью на телефоне нет — вместе с ним из кадра уходит и ролик */
-      .cases__shot.is-video .cases__video { display: none; }
-      /* Ролик под плашкой: подложка та же, но места больше — видео встаёт во
-         всю ширину блока, лишь бы влезло в экран по высоте */
-      .cases__inline-shot.is-video .cases__video { display: grid; }
-      .cases__inline-shot.is-video img { display: none; }
-      .cases__inline-shot .cases__video { padding: 12px; }
-      .cases__inline-shot .cases__video video {
-        max-width: 100%;
-        max-height: 72vh;
-        border-radius: 12px;
-      }
-      /* Свёрнутый список: сразу видно восемь работ, остальные под кнопкой.
-         Раскрылись — кнопка уходит, второй раз сворачивать нечего */
-      .cases__item--more { display: none; }
-      .cases__list.is-expanded .cases__item--more { display: block; }
-      .cases__more { display: block; }
+      .case-plate { width: 100%; margin-left: 0; }
     }
     /* Подпись под портфолио. Текстовый шрифт, а не заголовочный: строка
        читается как реплика от себя, а не как ещё один заголовок.
@@ -1772,127 +1276,6 @@
       animation: sign-caret 0.9s step-end infinite;
     }
     @keyframes sign-caret { 50% { opacity: 0; } }
-
-    /* ── Полноэкранный просмотр работы ── */
-    /* Тап по снимку под плашкой разворачивает кадр на весь экран. Широкий
-       разворот в вертикальном экране кладётся на бок: повернула телефон —
-       и он стоит ровно во всю ширину. Листание то же, что и под плашкой:
-       стрелки по краям кадра и смахивание */
-    .cases__inline-shot img { cursor: zoom-in; }
-    .lightbox {
-      position: fixed;
-      inset: 0;
-      z-index: 200;
-      display: none;
-      background: rgba(12,12,12,0.95);
-      /* смахивание листает кадры, а не таскает страницу под оверлеем */
-      touch-action: none;
-      overscroll-behavior: contain;
-    }
-    .lightbox.is-open { display: block; }
-    body.lightbox-open { overflow: hidden; }
-    /* Центрируем абсолютом, а не флексом: повёрнутый кадр шире экрана,
-       и у флекса центр такого элемента съезжает. Здесь середина сцены
-       прибита к середине экрана при любом размере кадра */
-    .lightbox__stage {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      display: flex;
-    }
-    .lightbox__img {
-      display: block;
-      max-width: 100vw;
-      max-height: 100vh;
-      max-width: 100dvw;
-      max-height: 100dvh;
-      object-fit: contain;
-    }
-    /* Ролик на весь экран: подложка та же зелёная, поля по краям — чтобы
-       скруглённые углы не упирались в границу экрана */
-    .lightbox__video {
-      display: none;
-      place-items: center;
-      padding: 10px;
-      background: url(fon-video.webp) center / cover no-repeat;
-    }
-    .lightbox.is-video .lightbox__video { display: grid; }
-    .lightbox.is-video .lightbox__img { display: none; }
-    /* пальцем по ролику ведут ползунок перемотки, а не листают кадры */
-    .lightbox.is-video { touch-action: auto; }
-    /* Не во всю ширину: ролик, упёртый в кромки, читается как сам экран,
-       а не как кадр внутри него — по краям оставлено тёмное поле.
-       Полный экран есть только на телефоне (открывает его разворот под
-       плашкой, а тот на ПК скрыт), поэтому медиазапрос здесь не нужен */
-    .lightbox__video video {
-      display: block;
-      max-width: 78vw;
-      max-height: 78vh;
-      max-width: 78dvw;
-      max-height: 78dvh;
-      border-radius: 12px;
-    }
-    /* Поворот только там, где кадр шире, чем выше, а экран наоборот.
-       Предельные размеры меняются местами: по высоте экрана — ширина кадра */
-    @media (orientation: portrait) {
-      .lightbox--rotate .lightbox__stage {
-        transform: translate(-50%, -50%) rotate(90deg);
-      }
-      .lightbox--rotate .lightbox__img {
-        max-width: 100vh;
-        max-height: 100vw;
-        max-width: 100dvh;
-        max-height: 100dvw;
-      }
-    }
-    /* На весь экран стрелки крупнее и на тёмном кружке: на кадрах, где
-       поверх снимка нарисована своя стрелка, тонкий белый шеврон с ней
-       путался — кружок сразу читается как кнопка листания */
-    .lightbox .cases__arrow {
-      width: 54px;
-      height: 54px;
-      background: rgba(12,12,12,0.5);
-      border-radius: 50%;
-      filter: none;
-      box-shadow: 0 1px 6px rgba(0,0,0,0.45);
-    }
-    .lightbox .cases__arrow svg {
-      width: 30px;
-      height: 30px;
-      stroke-width: 3;
-    }
-    .lightbox .cases__arrow--prev { left: 8px; }
-    .lightbox .cases__arrow--next { right: 8px; }
-
-    /* стрелки и крестик лежат в сцене — крутятся вместе с кадром и остаются
-       на его краях, как их видит глаз после поворота телефона */
-    .lightbox__close {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      width: 40px;
-      height: 40px;
-      padding: 0;
-      border: none;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.75);
-      box-shadow: 0 1px 4px rgba(0,0,0,0.4);
-      cursor: pointer;
-    }
-    .lightbox__close::before,
-    .lightbox__close::after {
-      content: '';
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      width: 18px;
-      height: 3px;
-      border-radius: 2px;
-      background: var(--text);
-    }
-    .lightbox__close::before { transform: translate(-50%, -50%) rotate(45deg); }
-    .lightbox__close::after  { transform: translate(-50%, -50%) rotate(-45deg); }
 
     /* ── Форма заявки (живёт в блоке контактов) ── */
     .booking-form__grid {
@@ -2500,8 +1883,614 @@
     .is-idle.is-idle,
     .is-idle.is-idle::before,
     .is-idle.is-idle::after,
-    .is-idle.is-idle svg,
-    .is-idle.is-idle .cases__stub { animation-play-state: paused; }
+    .is-idle.is-idle svg { animation-play-state: paused; }
+
+    /* ── Портфолио: окно-папка (демо) ── */
+    .sr-only {
+      position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+      overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+    }
+    /* Геометрия папки. Контур (рамка + язычки вкладок) рисует скрипт одним
+       SVG-путём по этим цифрам и по реальным размерам кнопок:
+       --F    высота полосы вкладок, по её низу проходит верх рамки
+       --h-lo / --h-hi  высота язычка обычной и нажатой вкладки
+       --b    толщина стеклянной рамки вокруг панели
+       --flare  ширина S-образного спуска справа от язычка
+       --foot   скругление «впадины», из которой растёт следующий язычок
+       --R / --r  радиус углов рамки и верхних углов язычков */
+    .cw {
+      --F: 62px;
+      --h-lo: 44px;
+      --h-hi: 58px;
+      --b: 22px;
+      --flare: 44px;
+      --foot: 10px;
+      --R: 34px;
+      --r: 12px;
+      /* подписи папки — текстовым шрифтом сайта, как и все тексты */
+      --font-mono: var(--font-body);
+      --cw-ink: #2F2F2D;                    /* графитовый текст на сером стекле */
+      --cw-cream: #F4EDD9;                  /* кремовый на акварели */
+      position: relative;
+      /* ближе к квадрату: вытянутый прямоугольник не нужен */
+      max-width: 920px;
+      margin: 0 auto;
+      padding: calc(var(--F) + var(--b)) var(--b) var(--b);
+      font-family: var(--font-mono);
+      color: var(--cw-ink);
+    }
+
+    /* ── слои корпуса: тень, матовое стекло, блики ── */
+    .cw__shadow,
+    .cw__glass,
+    .cw__rim {
+      position: absolute;
+      left: 0; top: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+    .cw__shadow, .cw__rim { overflow: visible; }
+    .cw__shadow { z-index: 0; }
+    /* само стекло: чуть тёплый оливковый тон, как у референса, и размытие
+       того, что за ним. Форму ему задаёт clip-path из того же пути */
+    .cw__glass {
+      z-index: 1;
+      background:
+        linear-gradient(180deg, rgba(250,250,249,0.46) 0%, rgba(236,236,234,0.30) 30%, rgba(224,224,222,0.28) 100%);
+      -webkit-backdrop-filter: blur(6px) saturate(1.4);
+      backdrop-filter: blur(6px) saturate(1.4);
+    }
+    .cw__rim { z-index: 2; }
+
+    /* ── вкладки ── */
+    .cw__tabs {
+      position: absolute;
+      z-index: 3;
+      left: 0; right: 0; top: 0;
+      height: var(--F);
+      display: flex;
+      align-items: flex-end;
+      /* между кнопками — место под S-спуск и впадину */
+      gap: calc(var(--flare) + var(--foot));
+    }
+    .cw__lights {
+      flex: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 88px;
+      height: var(--h-lo);
+      padding-left: 22px;
+    }
+    .cw__light {
+      width: 13px;
+      height: 13px;
+      padding: 0;
+      border: none;
+      border-radius: 50%;
+      /* точки тоже выпуклые: блик сверху, тень снизу */
+      box-shadow: inset 0 -1.5px 2px rgba(0,0,0,0.18), inset 0 1.5px 1.5px rgba(255,255,255,0.45),
+                  0 0.5px 1px rgba(0,0,0,0.2);
+    }
+    .cw__light--close { background: #E0605A; cursor: pointer; position: relative; }
+    .cw__light--min   { background: var(--accent2); }
+    .cw__light--max   { background: var(--accent-soft); }
+    /* Открыли раздел — красная точка превращается в красный крестик,
+       крупнее самой точки: так видно, чем закрыть папку. Точка гаснет и
+       сжимается, перекладины крестика вырастают из её центра.
+       Отрицательные поля дают крестику зону нажатия побольше, а соседние
+       точки при этом остаются на месте */
+    .cw__light--close {
+      box-sizing: content-box;
+      background-clip: content-box;
+      transition: background-color 0.35s, box-shadow 0.35s;
+    }
+    .cw__light--close::before,
+    .cw__light--close::after {
+      content: '';
+      position: absolute;
+      left: 50%; top: 50%;
+      width: 22px; height: 2.6px;
+      border-radius: 2px;
+      background: #E0605A;
+      box-shadow: 0 1px 1.5px rgba(0,0,0,0.18);
+      opacity: 0;
+      transition: opacity 0.3s, transform 0.4s cubic-bezier(.3,1.5,.5,1);
+    }
+    .cw__light--close::before { transform: translate(-50%,-50%) rotate(0deg) scaleX(0.3); }
+    .cw__light--close::after  { transform: translate(-50%,-50%) rotate(0deg) scaleX(0.3); }
+    .cw.is-open .cw__light--close {
+      padding: 6px;
+      margin: -6px;
+      background-color: transparent;
+      box-shadow: none;
+    }
+    .cw.is-open .cw__light--close::before,
+    .cw.is-open .cw__light--close::after { opacity: 1; }
+    .cw.is-open .cw__light--close::before { transform: translate(-50%,-50%) rotate(45deg); }
+    .cw.is-open .cw__light--close::after  { transform: translate(-50%,-50%) rotate(-45deg); }
+    .cw.is-open .cw__light--close:hover::before,
+    .cw.is-open .cw__light--close:hover::after { background: #C8443E; }
+
+    /* Кнопка — только прозрачная область над язычком: сам язычок рисует
+       SVG-контур по её высоте. Высота меняется плавно, контур идёт следом
+       каждый кадр — так нажатая вкладка «выдвигается» выше остальных */
+    .cw__tab {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      height: var(--h-lo);
+      /* текст по центру видимого язычка, а он шире кнопки на S-спуск */
+      padding: 2px 0 0 calc(var(--flare) * 0.55);
+      border: none;
+      background: none;
+      /* вкладки — главная навигация папки: текст крупнее и полной
+         плотности, чтобы не терялись рядом с бархатным заголовком */
+      font: 500 15px/1 var(--font-mono);
+      color: var(--cw-ink);
+      cursor: pointer;
+      opacity: 1;
+      transition: height 0.55s cubic-bezier(.3,1.45,.45,1), opacity var(--transition), color var(--transition);
+    }
+    /* последняя уходит в скруглённый угол рамки — отступ от края */
+    .cw__tab:last-child { padding: 2px 18px 0 0; flex-grow: 1.15; }
+    /* иконка — как у карточек услуг: те же четыре услуги, тот же значок
+       в светло-зелёном квадратике */
+    .cw__tab svg {
+      flex: none;
+      box-sizing: content-box;
+      width: 18px; height: 18px;
+      padding: 7px;
+      border-radius: 8px;
+      /* квадратик выпуклый, как кнопка: белый кант и тень снизу */
+      box-shadow: inset 0 1px 0 #fff, 0 1px 2px rgba(30,30,30,0.15);
+      background: var(--accent-light);
+      color: var(--accent);
+      fill: none; stroke: currentColor; stroke-width: 1.8;
+      stroke-linecap: round; stroke-linejoin: round;
+    }
+    .cw__tab:hover { opacity: 1; height: calc(var(--h-lo) + 4px); color: var(--accent); }
+    .cw__tab[aria-selected="true"] {
+      opacity: 1;
+      height: var(--h-hi);
+      color: var(--accent);
+    }
+    .cw__tab-short { display: none; }
+    /* «тычок» курсора-подсказки */
+    .cw__tab.is-poked { opacity: 1; height: calc(var(--h-lo) + 7px); }
+
+    /* ── панель внутри рамки ──
+       Как в референсе: сквозь стекло видна сцена — здесь это та же акварель,
+       только размытая и притемнённая. Светлая кромка по контуру и тень
+       внутрь — панель чуть утоплена в выпуклую рамку */
+    .cw__body {
+      position: relative;
+      z-index: 3;
+      padding: 18px 22px 16px;
+      border-radius: 12px;
+      overflow: hidden;
+      isolation: isolate;
+      color: var(--cw-ink);
+      /* прозрачное зелёное стекло, как в референсе: без картинки,
+         сквозь него видны рамка и пятна за папкой */
+      background: linear-gradient(170deg, rgba(255,255,255,0.30), rgba(240,240,237,0.38));
+      box-shadow:
+        inset 0 0 0 1.5px rgba(255,255,255,0.8),
+        inset 0 3px 12px rgba(20,20,20,0.28),
+        inset 0 -1px 8px rgba(255,255,240,0.12),
+        0 1px 0 rgba(255,255,255,0.55),
+        0 -1px 0 rgba(45,45,45,0.18);
+    }
+    /* блик по стеклу: проходит один раз, когда окно появляется */
+    .cw__body::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(105deg, transparent 35%, rgba(255,255,255,0.22) 48%, transparent 60%);
+      transform: translateX(-110%);
+      pointer-events: none;
+    }
+    .cw.is-live .cw__body::after { animation: cw-sheen 1.6s 0.5s cubic-bezier(.4,0,.2,1) both; }
+    @keyframes cw-sheen { to { transform: translateX(110%); } }
+
+    /* светлая подсветка под буквами: текст читается и на светлых местах фрески */
+    .cw__meta, .cw__side, .cw__foot, .cw__cover { text-shadow: 0 1px 1px rgba(255,255,245,0.45); }
+    .cw__meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 2px 4px 14px;
+      margin-bottom: 16px;
+      /* пунктир, как в референсе, — из точек, а не штрихов */
+      background: radial-gradient(circle, rgba(47,47,45,0.45) 1px, transparent 1.3px) 0 100% / 6px 3px repeat-x;
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      line-height: 1.55;
+    }
+    .cw__meta p { display: flex; flex-direction: column; min-width: 0; }
+    .cw__meta-r { text-align: right; }
+    .cw__meta-k { opacity: 0.85; }
+    .cw__meta-v {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      transition: opacity 0.25s;
+    }
+    .cw.is-swapping .cw__meta-v { opacity: 0; }
+
+    .cw__main {
+      display: grid;
+      grid-template-columns: 236px 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    /* ── боковая панель ── */
+    .cw__side { position: relative; min-width: 0; }
+    .cw__files { display: none; list-style: none; margin: 0; padding: 0; }
+    .cw__files.is-current { display: flex; flex-direction: column; gap: 4px; }
+    .cw__files li {
+      /* пункты раздела въезжают по очереди при каждой смене вкладки */
+      animation: cw-file-in 0.45s calc(var(--i, 0) * 55ms) cubic-bezier(.2,.8,.2,1) both;
+    }
+    @keyframes cw-file-in { from { opacity: 0; transform: translateX(-10px); } }
+    .cw__file {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      background: none;
+      text-align: left;
+      color: inherit;
+      cursor: pointer;
+      transition: background var(--transition), border-color var(--transition),
+                  box-shadow var(--transition), transform var(--transition);
+    }
+    .cw__num {
+      flex: none;
+      font: 500 12px/1 var(--font-mono);
+      letter-spacing: 0.08em;
+      opacity: 0.75;
+    }
+    .cw__fname {
+      font: 15px/1.3 var(--font-body);
+      text-wrap: balance;
+    }
+    .cw__file--dir .cw__fname {
+      font: 500 13px/1.3 var(--font-mono);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .cw__file:hover { background: rgba(255,255,245,0.35); border-color: rgba(255,255,245,0.6); }
+    .cw__file.is-active {
+      background: #FAFAF8;
+      border-color: #fff;
+      color: var(--cw-ink);
+      box-shadow: 0 8px 20px -8px rgba(15,15,15,0.6), inset 0 1px 0 #fff;
+      transform: translateX(4px);
+    }
+    .cw__file.is-active .cw__num { opacity: 1; color: var(--accent); }
+    .cw__file[data-wip] .cw__fname { opacity: 0.6; font-style: italic; }
+
+    /* ── экран ── */
+    .cw__screen {
+      position: relative;
+      /* кадры мобильные (1400 × 960) — работа в них по центру */
+      aspect-ratio: 35 / 24;
+      border-radius: 8px;
+      overflow: hidden;
+      background: rgba(30,30,30,0.18);
+      box-shadow: 0 0 0 1px rgba(244,237,217,0.5), 0 12px 28px -10px rgba(15,15,15,0.65);
+      transition: box-shadow 0.4s, background 0.4s;
+      isolation: isolate;
+    }
+    .cw__screen > * { position: absolute; }
+
+    .cw:not(.is-open) .cw__cover { position: relative; padding: clamp(34px, 6vw, 80px) 0 clamp(28px, 5vw, 66px); }
+    .cw__cover {
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: clamp(6px, 1.2vw, 14px);
+      text-align: center;
+      color: var(--cw-ink);
+      transition: opacity 0.5s, transform 0.6s cubic-bezier(.2,.8,.2,1), filter 0.5s;
+    }
+    .cw.is-open .cw__cover { opacity: 0; transform: scale(1.04); filter: blur(6px); pointer-events: none; }
+
+    /* На обложке экран прозрачный — надписи стоят прямо на стекле панели,
+       а список слева убран: папка ещё не открыта, выбирать нечего.
+       Высота — по тексту: пустоты над и под надписями нет */
+    .cw__main { container-type: inline-size; }
+    .cw:not(.is-open) .cw__main { grid-template-columns: 1fr; }
+    .cw:not(.is-open) .cw__side { display: none; }
+    .cw:not(.is-open) .cw__screen {
+      aspect-ratio: auto;
+      height: auto;
+      background: none;
+      box-shadow: none;
+      overflow: visible;
+    }
+
+    /* ── надписи обложки ── */
+    .cw__title {
+      /* кегль, капслок и разрядка — как у «КАТЕРИНА» в первом экране */
+      /* чуть меньше имени в первом экране — чтобы не перетягивал вкладки */
+      font: 600 clamp(40px, 7.5vw, 96px)/0.85 var(--font-heading);
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      /* Чёрный бархат — тот же, что у «КАТЕРИНА» в первом экране: имя и
+         название папки рифмуются, у блока появляется тёмный якорь.
+         Блик и искры — общие ::before/::after с .hero__name */
+      position: relative;
+      color: transparent;
+      background-color: #0b0b0f;
+      background-image: url('velvet.webp');
+      background-size: 140% auto;
+      background-position: 50% 40%;
+      -webkit-background-clip: text;
+              background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 1px 1px rgba(0,0,0,.55))
+              drop-shadow(0 0 5px rgba(120,110,150,.2));
+      /* светлая подсветка текста обложки просвечивала бы сквозь
+         прозрачные буквы и красила бархат в серый */
+      text-shadow: none;
+    }
+    .cw__script {
+      margin-top: clamp(4px, 1vw, 12px);
+      /* у Vasek мелкие строчные — кегль крупнее, чем кажется нужным */
+      font: clamp(38px, 5.4vw, 72px)/1.1 var(--font-script);
+      color: var(--accent);
+    }
+    /* пояснение — как под заголовками разделов: 16px, обычными буквами */
+    .cw__sub { font: 16px/1.6 var(--font-body); }
+    /* строки поднимаются по очереди, когда папка доехала */
+    .cw__cover > * {
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.9s, transform 0.9s cubic-bezier(.2,.8,.2,1);
+    }
+    .cw.is-live .cw__cover > * { opacity: 1; transform: none; }
+    .cw.is-live .cw__cover > :nth-child(1) { transition-delay: 0.35s; }
+    .cw.is-live .cw__cover > :nth-child(2) { transition-delay: 0.55s; }
+    .cw.is-live .cw__cover > :nth-child(3) { transition-delay: 0.7s; }
+
+    /* разделитель со звёздочкой — у титульника второго демо */
+    .cw__rule {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      width: min(62%, 520px);
+      margin: clamp(16px, 2.4vw, 28px) 0 clamp(12px, 1.8vw, 20px);
+    }
+    .cw__rule::before, .cw__rule::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(47,47,45,0.35));
+    }
+    .cw__rule::after { transform: scaleX(-1); }
+    /* звёздочка-ромб: зелёный контур, внутри прозрачно */
+    .cw__rule svg { width: 26px; height: 26px; fill: none; stroke: var(--accent); stroke-width: 1.3; stroke-linejoin: round; overflow: visible; }
+
+    .cw__shot {
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.45s, filter 0.5s, transform 0.6s cubic-bezier(.2,.8,.2,1);
+    }
+    /* невидимый кадр лежит поверх обложки — без этого он ловил мышь
+       над роботом: всплывала подпись и клик уводил на страницу работы */
+    .cw__shot { pointer-events: none; }
+    .cw.is-open.is-shot .cw__shot { opacity: 1; pointer-events: auto; }
+    /* Подпись у курсора — в стиле золотой кнопки «Смотреть портфолио»
+       (.btn--gold): светлая заливка, золотая рамка и буквы.
+       Координаты ставит скрипт, пока мышь над кадром */
+    .cw__tip {
+      left: 0; top: 0;
+      z-index: 3;
+      padding: 9px 16px;
+      border: 1.5px solid var(--accent2-hover);
+      border-radius: 8px;
+      background: var(--accent2-light);
+      box-shadow: 0 8px 22px -8px rgba(15,15,15,0.55);
+      font: 14px/1 var(--font-body);
+      white-space: nowrap;
+      color: var(--accent2);
+      pointer-events: none;
+      opacity: 0;
+      transform: translate(var(--tx, 0), var(--ty, 0)) scale(0.9);
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .cw__tip.is-on {
+      opacity: 1;
+      transform: translate(var(--tx, 0), var(--ty, 0));
+      /* за курсором — без задержки, иначе подпись отстаёт */
+      transition: opacity 0.2s;
+    }
+    /* смена кадра: старый гаснет в дымку, новый проявляется из неё */
+    .cw.is-shot .cw__shot.is-loading { opacity: 0; filter: blur(8px); transform: scale(1.015); }
+
+    .cw__video {
+      inset: 0;
+      display: none;
+      place-items: center;
+      padding: 4%;
+    }
+    .cw__video > * { grid-area: 1 / 1; }
+    .cw.is-video .cw__video { display: grid; }
+    .cw.is-video .cw__shot { display: none; }
+    .cw__video video {
+      max-width: 100%;
+      max-height: 100%;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(25,25,25,0.35);
+    }
+    .is-started .video-play { display: none; }
+
+    .cw__empty {
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 10%;
+      text-align: center;
+      font: 500 13px/1.8 var(--font-mono);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--cw-cream);
+      background: rgba(30,30,30,0.35);
+    }
+    .cw.is-empty .cw__empty { display: flex; }
+
+    /* стрелки — стеклянные кружки, чтобы не путались с нарисованными в кадре */
+    .cw__arrow {
+      top: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      padding: 0;
+      border: 1px solid rgba(255,255,255,0.7);
+      border-radius: 50%;
+      background: rgba(250,250,249,0.6);
+      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(8px);
+      color: var(--cw-ink);
+      cursor: pointer;
+      transform: translateY(-50%);
+      opacity: 0;
+      transition: opacity var(--transition), background var(--transition), transform var(--transition);
+    }
+    .cw__arrow[hidden] { display: none; }
+    .cw__arrow svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+    .cw__arrow--prev { left: 14px; }
+    .cw__arrow--next { right: 14px; }
+    .cw__screen:hover .cw__arrow, .cw__arrow:focus-visible { opacity: 1; }
+    .cw__arrow:hover { background: #fff; transform: translateY(-50%) scale(1.08); }
+
+    /* ── подвал окна ── */
+    .cw__foot {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 12px;
+      margin-top: 16px;
+      padding: 14px 4px 0;
+      border-top: 1px solid rgba(47,47,45,0.25);
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .cw__foot svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+    .cw__foot-l { display: flex; align-items: center; gap: 10px; }
+    .cw__foot-c { font-variant-numeric: tabular-nums; }
+    .cw__foot-r { justify-self: end; text-align: right; white-space: nowrap; }
+
+    /* ── курсор-подсказка ── */
+    .cw__hint {
+      position: absolute;
+      left: 0; top: 0;
+      z-index: 5;
+      width: 32px;
+      height: 32px;
+      fill: #fff;
+      stroke: #1A1A1A;
+      stroke-width: 1.4;
+      stroke-linejoin: round;
+      filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3));
+      opacity: 0;
+      pointer-events: none;
+    }
+
+
+    /* ── появление окна: папка въезжает целиком ── */
+    .cw {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.8s, transform 0.9s cubic-bezier(.2,.8,.2,1);
+    }
+    .cw.is-live { opacity: 1; transform: none; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .cw, .cw *, .cw *::before, .cw *::after { animation: none !important; transition: none !important; }
+      .cw, .cw__cover > * { opacity: 1; transform: none; }
+      .cw__hint { display: none; }
+    }
+
+    /* ── узкий экран ── */
+    @media (max-width: 900px) {
+      .cw {
+        --F: 66px;
+        --h-lo: 52px;
+        --h-hi: 62px;
+        --b: 10px;
+        --flare: 16px;
+        --foot: 6px;
+        --R: 22px;
+        --r: 12px;
+      }
+      .cw__lights { display: none; }
+      .cw__tab {
+        flex-direction: column;
+        gap: 5px;
+        padding: 4px 0 0 calc(var(--flare) * 0.4);
+        font-size: 13px;
+      }
+      .cw__tab-long { display: none; }
+      .cw__tab-short { display: inline; }
+      .cw__meta-r { max-width: 58%; }
+      .cw__body { padding: 14px 12px 12px; border-radius: 12px; }
+      .cw__meta { font-size: 10.5px; padding: 0 2px 12px; margin-bottom: 12px; }
+      .cw__main { grid-template-columns: 1fr; gap: 12px; }
+      /* список работ — лента под пальцем над экраном */
+      .cw__side { order: -1; margin: 0 -12px; }
+      .cw__files.is-current {
+        flex-direction: row;
+        gap: 6px;
+        overflow-x: auto;
+        padding: 2px 12px 6px;
+        scroll-snap-type: x proximity;
+        scrollbar-width: none;
+        -webkit-mask: linear-gradient(90deg, transparent, #000 12px, #000 calc(100% - 24px), transparent);
+        mask: linear-gradient(90deg, transparent, #000 12px, #000 calc(100% - 24px), transparent);
+      }
+      .cw__files.is-current::-webkit-scrollbar { display: none; }
+      .cw__files li { flex: none; scroll-snap-align: start; }
+      @keyframes cw-file-in { from { opacity: 0; transform: translateY(6px); } }
+      .cw__file {
+        max-width: 240px;
+        padding: 9px 12px;
+        background: rgba(255,255,245,0.3);
+        border-color: rgba(255,255,245,0.6);
+      }
+      .cw__file.is-active { transform: none; }
+      .cw__fname { font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .cw__screen { aspect-ratio: 35 / 24; border-radius: 8px; }
+
+      .cw__arrow { opacity: 1; width: 38px; height: 38px; }
+      .cw__arrow--prev { left: 8px; }
+      .cw__arrow--next { right: 8px; }
+      .cw__foot { font-size: 10.5px; margin-top: 12px; padding-top: 12px; gap: 8px; }
+      .cw__foot-l svg { display: none; }
+      .cw__hint { display: none; }
+    }
+
   </style>
 </head>
 <body>
@@ -2671,66 +2660,171 @@
 </section>
 
 <!-- ── Cases ── -->
-<section class="section" id="cases" aria-labelledby="cases-title">
+<section class="section cw-section" id="cases" aria-labelledby="cases-title">
   <div class="container">
     <div class="cases__header">
       <p class="section-label">Кейсы</p>
       <h2 class="section-title" id="cases-title">Портфолио</h2>
-      <p class="section-desc">Собрала для вас посмотреть-полистать.</p>
     </div>
-  </div>
 
-  <!-- выходит за .container: картинка прижата к левому краю экрана -->
-  <div class="cases__layout">
-    <!-- подсказки «ТЫК»: тычут в лесенку, поэтому лежат вне кадра -->
-    <img class="cases__tik cases__tik--1" src="tik1.webp" alt="" aria-hidden="true" width="802" height="415" decoding="async" />
-    <img class="cases__tik cases__tik--2" src="tik2.webp" alt="" aria-hidden="true" width="737" height="303" decoding="async" />
-    <img class="cases__tik cases__tik--3" src="tik3.webp" alt="" aria-hidden="true" width="624" height="699" decoding="async" />
-    <div class="cases__shot">
-      <!-- заглушка до первого клика: тень идёт первой, чтобы лежать под роботом -->
-      <div class="cases__stub-wrap" aria-hidden="true">
-        <span class="cases__stub-shadow"></span>
-        <!-- На телефоне робот другой: держит табличку двумя руками над
-             головой. Подменяет его <source>, на ПК грузится прежний -->
-        <picture class="cases__stub-pic">
-          <source media="(max-width: 900px)" srcset="robot-cases-m.webp?v=2" width="552" height="695" />
-          <img class="cases__stub" src="port-robot.webp" alt="" width="1000" height="558" decoding="async" />
-        </picture>
+    <!-- Окно-папка: четыре вкладки по видам услуг. До первого клика в окне
+         обложка с названием, вкладка открывает свой список работ -->
+    <div class="cw" id="casesWin">
+      <!-- Корпус папки. Все слои берут один и тот же путь (рамка + язычки),
+           его пересчитывает скрипт по размерам кнопок-вкладок -->
+      <svg class="cw__shadow" aria-hidden="true">
+        <defs>
+          <filter id="cwShadowFar" filterUnits="userSpaceOnUse" x="-300" y="-300" width="4000" height="4000"><feGaussianBlur stdDeviation="22"/></filter>
+          <filter id="cwShadowNear" filterUnits="userSpaceOnUse" x="-300" y="-300" width="4000" height="4000"><feGaussianBlur stdDeviation="3"/></filter>
+        </defs>
+        <mask id="cwShadowMask" maskUnits="userSpaceOnUse" x="-200" y="-200" width="4000" height="4000">
+          <rect x="-200" y="-200" width="4000" height="4000" fill="#fff"/>
+          <path class="cw__sh-hole" fill="#000"/>
+        </mask>
+        <g mask="url(#cwShadowMask)">
+          <path class="cw__sh-far" fill="rgb(30,30,30)" fill-opacity="0.22" transform="translate(0 22)" filter="url(#cwShadowFar)"/>
+          <path class="cw__sh-near" fill="rgb(30,30,30)" fill-opacity="0.16" transform="translate(0 3)" filter="url(#cwShadowNear)"/>
+        </g>
+      </svg>
+      <div class="cw__glass"></div>
+      <svg class="cw__rim" aria-hidden="true">
+        <defs>
+          <clipPath id="cwClip"><path class="cw__clip" clip-rule="evenodd"/></clipPath>
+          <!-- общий свет сверху: верх стекла ярче, к низу гаснет -->
+          <linearGradient id="cwSheen" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#fff" stop-opacity="0.6"/>
+            <stop offset="0.14" stop-color="#fff" stop-opacity="0.16"/>
+            <stop offset="0.6" stop-color="#fff" stop-opacity="0"/>
+            <stop offset="1" stop-color="#fff" stop-opacity="0.12"/>
+          </linearGradient>
+          <!-- задние вкладки темнеют к основанию — уходят за рамку -->
+          <linearGradient id="cwTabShade" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="62">
+            <stop offset="0" stop-color="rgb(35,35,35)" stop-opacity="0"/>
+            <stop offset="1" stop-color="rgb(35,35,35)" stop-opacity="0.12"/>
+          </linearGradient>
+          <filter id="cwSoft" x="-5%" y="-5%" width="110%" height="110%"><feGaussianBlur stdDeviation="2.5"/></filter>
+          <filter id="cwSofter" x="-5%" y="-5%" width="110%" height="110%"><feGaussianBlur stdDeviation="5"/></filter>
+        </defs>
+        <g clip-path="url(#cwClip)">
+          <path class="cw__p-sheen" fill="url(#cwSheen)" fill-rule="evenodd"/>
+          <!-- полоса вкладок — белая, как панель: прямоугольник до верха рамки,
+               форму язычков ему даёт общий clip-path -->
+          <rect class="cw__p-tabs" x="0" y="0" width="0" height="0" fill="#fff" fill-opacity="0.4"/>
+          <path class="cw__p-tabshade" fill="url(#cwTabShade)"/>
+          <!-- объём: светлая кромка по внешнему краю и тень у панели —
+               стекло рамки читается выпуклым, скатывается к панели -->
+          <path class="cw__p-glow" fill="none" stroke="#fff" stroke-opacity="0.9" stroke-width="8" filter="url(#cwSoft)"/>
+          <rect class="cw__p-shade" fill="none" stroke="rgb(35,35,35)" stroke-opacity="0.3" stroke-width="12" filter="url(#cwSofter)"/>
+          <rect class="cw__p-lip" fill="none" stroke="#fff" stroke-opacity="0.75" stroke-width="4" filter="url(#cwSoft)"/>
+          <!-- линия основания под задними вкладками: светлая + тень под ней -->
+          <path class="cw__p-base2" fill="none" stroke="rgb(35,35,35)" stroke-opacity="0.16" stroke-width="1.4"/>
+          <path class="cw__p-base" fill="none" stroke="#fff" stroke-opacity="0.95" stroke-width="1.3"/>
+        </g>
+        <path class="cw__p-hair" fill="none" stroke="rgb(45,45,45)" stroke-opacity="0.2" stroke-width="2.4"/>
+        <path class="cw__p-rim" fill="none" stroke="#fff" stroke-opacity="0.95" stroke-width="1.3"/>
+      </svg>
+
+      <div class="cw__tabs" role="tablist" aria-label="Разделы портфолио">
+        <!-- «светофор»: красная точка закрывает раздел и возвращает обложку -->
+        <div class="cw__lights">
+          <button type="button" class="cw__light cw__light--close" aria-label="Закрыть раздел"></button>
+          <span class="cw__light cw__light--min"></span>
+          <span class="cw__light cw__light--max"></span>
+        </div>
+        <button type="button" class="cw__tab" role="tab" aria-selected="false" data-tab="sites" data-name="Сайты">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+          <span class="cw__tab-long">Сайты</span><span class="cw__tab-short">Сайты</span>
+        </button>
+        <button type="button" class="cw__tab" role="tab" aria-selected="false" data-tab="bots" data-name="Чат-боты">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <span class="cw__tab-long">Чат-боты</span><span class="cw__tab-short">Боты</span>
+        </button>
+        <button type="button" class="cw__tab" role="tab" aria-selected="false" data-tab="design" data-name="Дизайн">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>
+          <span class="cw__tab-long">Дизайн</span><span class="cw__tab-short">Дизайн</span>
+        </button>
+        <button type="button" class="cw__tab" role="tab" aria-selected="false" data-tab="crm" data-name="Интеграции">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          <span class="cw__tab-long">Интеграции</span><span class="cw__tab-short">CRM</span>
+        </button>
       </div>
-      <!-- src подставляет скрипт при первом клике по плашке -->
-      <img alt="" id="casesShot" decoding="async" />
-      <!-- Точки слайдера: появляются вместе с картинкой проекта.
-           Лежат внутри .cases__shot — проценты нужны от кадра, чтобы
-           держаться острия белой стрелки на любой ширине экрана.
-           Сами точки рисует скрипт: их столько, сколько снимков
-           у нажатого проекта -->
-      <div class="cases__dots" id="casesDots" hidden></div>
-    </div>
-    <ul class="cases__list">
-      <li class="cases__item"><button type="button" class="case-plate" data-shots="img/sait-unumgarden/1.jpg" data-shots-m="img/sait-unumgarden/m1.jpg,img/sait-unumgarden/m2.jpg,img/sait-unumgarden/m3.jpg,img/sait-unumgarden/m4.jpg"><span class="case-plate__text">Сайт ландшафтного архитектора на Tilda</span></button></li>
-      <li class="cases__item"><button type="button" class="case-plate" data-shots="img/sait-adminka/1.jpg,img/sait-adminka/2.jpg" data-shots-m="img/sait-adminka/m1.jpg,img/sait-adminka/m2.jpg"><span class="case-plate__text">Сайт-админка для досок референсов</span></button></li>
-      <li class="cases__item cases__item--more"><button type="button" class="case-plate"><span class="case-plate__text">сайт (в разработке)</span></button></li>
-      <li class="cases__item cases__item--gap"><span class="case-plate"></span></li>
-      <li class="cases__item"><button type="button" class="case-plate" data-shots="img/spravochnik/1.jpg,img/spravochnik/2.jpg,img/spravochnik/3.jpg,img/spravochnik/4.jpg,img/spravochnik/5.jpg,img/spravochnik/6.jpg" data-shots-m="img/spravochnik/m1.jpg,img/spravochnik/m2.jpg,img/spravochnik/m3.jpg,img/spravochnik/m4.jpg,img/spravochnik/m5.jpg,img/spravochnik/m6.jpg"><span class="case-plate__text">Справочник «Лечение животных травами»</span></button></li>
-      <li class="cases__item cases__item--more"><button type="button" class="case-plate" data-shots="img/present/1.jpg,img/present/2.jpg,img/present/3.jpg" data-shots-m="img/present/m1.jpg,img/present/m2.jpg,img/present/m3.jpg"><span class="case-plate__text">Презентация для справочника</span></button></li>
-      <li class="cases__item"><button type="button" class="case-plate" data-shots="img/albom/1.jpg,img/albom/2.jpg,img/albom/3.jpg,img/albom/4.jpg" data-shots-m="img/albom/m1.jpg,img/albom/m2.jpg,img/albom/m3.jpg,img/albom/m4.jpg"><span class="case-plate__text">Альбом ландшафтного проекта</span></button></li>
-      <li class="cases__item cases__item--more"><button type="button" class="case-plate" data-shots="img/kupon/1.jpg,img/kupon/2.jpg,img/kupon/3.jpg" data-shots-m="img/kupon/m1.jpg,img/kupon/m2.jpg,img/kupon/m3.jpg"><span class="case-plate__text">Подарочные купоны для UNUM</span></button></li>
-      <li class="cases__item cases__item--more"><button type="button" class="case-plate" data-shots="img/pechat/1.jpg" data-shots-m="img/pechat/m1.jpg"><span class="case-plate__text">Графика на заказ</span></button></li>
-      <li class="cases__item"><button type="button" class="case-plate" data-shots="img/vk-unum/1.jpg,img/vk-unum/2.jpg" data-shots-m="img/vk-unum/m1.jpg,img/vk-unum/m2.jpg"><span class="case-plate__text">Группа ВКонтакте студии дизайна</span></button></li>
-      <li class="cases__item cases__item--more"><button type="button" class="case-plate" data-shots="img/vk-univet/1.jpg,img/vk-univet/2.jpg,img/vk-univet/3.jpg,img/vk-univet/4.jpg,img/vk-univet/5.jpg" data-shots-m="img/vk-univet/m1.jpg,img/vk-univet/m2.jpg,img/vk-univet/m3.jpg,img/vk-univet/m4.jpg,img/vk-univet/m5.jpg"><span class="case-plate__text">Группа ВКонтакте ветклиники «ЮниВет»</span></button></li>
-      <li class="cases__item cases__item--gap"><span class="case-plate"></span></li>
-      <li class="cases__item"><button type="button" class="case-plate" data-shots="img/bot/1.jpg" data-shots-m="img/bot/m1.jpg"><span class="case-plate__text">Бот с проверкой подписки</span></button></li>
-      <li class="cases__item"><button type="button" class="case-plate" data-shots="img/bot/2.jpg" data-shots-m="img/bot/m2.jpg" data-video="img/bot/cards.mp4"><span class="case-plate__text">Бот «Гадание на метаморфозных картах»</span></button></li>
-      <li class="cases__item cases__item--more"><button type="button" class="case-plate" data-shots="img/bot/3-1.jpg,img/bot/3-2.jpg,img/bot/3-3.jpg,img/bot/3-4.jpg" data-shots-m="img/bot/m3-1.jpg,img/bot/m3-2.jpg,img/bot/m3-3.jpg,img/bot/m3-4.jpg"><span class="case-plate__text">Бот клуба по подписке</span></button></li>
-      <li class="cases__item cases__item--more"><button type="button" class="case-plate" data-shots="img/bot/4-1.jpg,img/bot/4-2.jpg" data-shots-m="img/bot/m4-1.jpg,img/bot/m4-2.jpg" data-video="img/bot/salon.mp4"><span class="case-plate__text">Бот для салона красоты</span></button></li>
-      <li class="cases__item"><button type="button" class="case-plate" data-shots="img/bot/5.jpg" data-shots-m="img/bot/m5.jpg"><span class="case-plate__text">Бот с подключением AI</span></button></li>
-      <li class="cases__item cases__item--more"><button type="button" class="case-plate" data-shots="img/bot/6-1.jpg,img/bot/6-2.jpg" data-shots-m="img/bot/m6-1.jpg,img/bot/m6-2.jpg"><span class="case-plate__text">Бот-опросник</span></button></li>
-    </ul>
-    <!-- На телефоне список свёрнут до восьми работ: остальные раскрывает кнопка.
-         Живёт вне <ul>, чтобы не сбить нумерацию :nth-child лесенки на ПК -->
-    <button type="button" class="cases__more" id="casesMore" aria-expanded="false">Смотреть больше ...</button>
-  </div>
 
+      <div class="cw__body">
+        <!-- шапка окна: слева раздел, справа счётчик — как «location / date» в референсе -->
+        <div class="cw__meta">
+          <p><span class="cw__meta-k" id="cwMetaLk">Откуда:</span><span class="cw__meta-v" id="cwMetaLv">Сибирь, Россия</span></p>
+          <p class="cw__meta-r"><span class="cw__meta-k" id="cwMetaRk">Обновлено:</span><span class="cw__meta-v" id="cwMetaRv">Сентябрь 2026</span></p>
+        </div>
+
+        <div class="cw__main">
+          <!-- Боковая панель: на обложке — папки разделов, во вкладке — работы -->
+          <nav class="cw__side" aria-label="Работы раздела">
+            <ul class="cw__files is-current" data-list="home">
+              <li><button type="button" class="cw__file cw__file--dir" data-open="sites"><span class="cw__num">01</span><span class="cw__fname">Сайты</span></button></li>
+              <li><button type="button" class="cw__file cw__file--dir" data-open="bots"><span class="cw__num">02</span><span class="cw__fname">Чат-боты</span></button></li>
+              <li><button type="button" class="cw__file cw__file--dir" data-open="design"><span class="cw__num">03</span><span class="cw__fname">Графический дизайн</span></button></li>
+              <li><button type="button" class="cw__file cw__file--dir" data-open="crm"><span class="cw__num">04</span><span class="cw__fname">Интеграции и CRM</span></button></li>
+            </ul>
+            <ul class="cw__files" data-list="sites">
+              <li><button type="button" class="cw__file" data-shots="img/sait-unumgarden/1.jpg" data-shots-m="img/sait-unumgarden/m1.jpg,img/sait-unumgarden/m2.jpg,img/sait-unumgarden/m3.jpg,img/sait-unumgarden/m4.jpg"><span class="cw__num">01</span><span class="cw__fname">Сайт ландшафтного архитектора на Tilda</span></button></li>
+              <li><button type="button" class="cw__file" data-shots="img/sait-adminka/1.jpg,img/sait-adminka/2.jpg" data-shots-m="img/sait-adminka/m1.jpg,img/sait-adminka/m2.jpg"><span class="cw__num">02</span><span class="cw__fname">Сайт-админка для досок референсов</span></button></li>
+              <li><button type="button" class="cw__file" data-wip="1"><span class="cw__num">03</span><span class="cw__fname">Сайт-портфолио для ландшафтного архитектора</span></button></li>
+            </ul>
+            <ul class="cw__files" data-list="bots">
+              <li><button type="button" class="cw__file" data-shots="img/bot/1.jpg" data-shots-m="img/bot/m1.jpg"><span class="cw__num">01</span><span class="cw__fname">Бот с проверкой подписки</span></button></li>
+              <li><button type="button" class="cw__file" data-shots="img/bot/2.jpg" data-shots-m="img/bot/m2.jpg" data-video="img/bot/cards.mp4"><span class="cw__num">02</span><span class="cw__fname">Бот «Гадание на метаморфозных картах»</span></button></li>
+              <li><button type="button" class="cw__file" data-shots="img/bot/3-1.jpg,img/bot/3-2.jpg,img/bot/3-3.jpg,img/bot/3-4.jpg" data-shots-m="img/bot/m3-1.jpg,img/bot/m3-2.jpg,img/bot/m3-3.jpg,img/bot/m3-4.jpg"><span class="cw__num">03</span><span class="cw__fname">Бот клуба по подписке</span></button></li>
+              <li><button type="button" class="cw__file" data-shots="img/bot/4-1.jpg,img/bot/4-2.jpg" data-shots-m="img/bot/m4-1.jpg,img/bot/m4-2.jpg" data-video="img/bot/salon.mp4"><span class="cw__num">04</span><span class="cw__fname">Бот для салона красоты</span></button></li>
+              <li><button type="button" class="cw__file" data-shots="img/bot/5.jpg" data-shots-m="img/bot/m5.jpg"><span class="cw__num">05</span><span class="cw__fname">Бот с подключением AI</span></button></li>
+              <li><button type="button" class="cw__file" data-shots="img/bot/6-1.jpg,img/bot/6-2.jpg" data-shots-m="img/bot/m6-1.jpg,img/bot/m6-2.jpg"><span class="cw__num">06</span><span class="cw__fname">Бот-опросник</span></button></li>
+            </ul>
+            <ul class="cw__files" data-list="crm">
+              <li><button type="button" class="cw__file" data-wip="1"><span class="cw__num">01</span><span class="cw__fname">[Проект по интеграциям]</span></button></li>
+            </ul>
+            <ul class="cw__files" data-list="design">
+              <li><button type="button" class="cw__file" data-shots="img/spravochnik/1.jpg,img/spravochnik/2.jpg,img/spravochnik/3.jpg,img/spravochnik/4.jpg,img/spravochnik/5.jpg,img/spravochnik/6.jpg" data-shots-m="img/spravochnik/m1.jpg,img/spravochnik/m2.jpg,img/spravochnik/m3.jpg,img/spravochnik/m4.jpg,img/spravochnik/m5.jpg,img/spravochnik/m6.jpg"><span class="cw__num">01</span><span class="cw__fname">Справочник «Лечение животных травами»</span></button></li>
+              <li><button type="button" class="cw__file" data-shots="img/present/1.jpg,img/present/2.jpg,img/present/3.jpg" data-shots-m="img/present/m1.jpg,img/present/m2.jpg,img/present/m3.jpg"><span class="cw__num">02</span><span class="cw__fname">Презентация для справочника</span></button></li>
+              <li><button type="button" class="cw__file" data-shots="img/albom/1.jpg,img/albom/2.jpg,img/albom/3.jpg,img/albom/4.jpg" data-shots-m="img/albom/m1.jpg,img/albom/m2.jpg,img/albom/m3.jpg,img/albom/m4.jpg"><span class="cw__num">03</span><span class="cw__fname">Альбом ландшафтного проекта</span></button></li>
+              <li><button type="button" class="cw__file" data-shots="img/kupon/1.jpg,img/kupon/2.jpg,img/kupon/3.jpg" data-shots-m="img/kupon/m1.jpg,img/kupon/m2.jpg,img/kupon/m3.jpg"><span class="cw__num">04</span><span class="cw__fname">Подарочные купоны для UNUM</span></button></li>
+              <li><button type="button" class="cw__file" data-shots="img/pechat/1.jpg" data-shots-m="img/pechat/m1.jpg"><span class="cw__num">05</span><span class="cw__fname">Графика на заказ</span></button></li>
+              <li><button type="button" class="cw__file" data-shots="img/vk-unum/1.jpg,img/vk-unum/2.jpg" data-shots-m="img/vk-unum/m1.jpg,img/vk-unum/m2.jpg"><span class="cw__num">06</span><span class="cw__fname">Группа ВКонтакте студии дизайна</span></button></li>
+              <li><button type="button" class="cw__file" data-shots="img/vk-univet/1.jpg,img/vk-univet/2.jpg,img/vk-univet/3.jpg,img/vk-univet/4.jpg,img/vk-univet/5.jpg" data-shots-m="img/vk-univet/m1.jpg,img/vk-univet/m2.jpg,img/vk-univet/m3.jpg,img/vk-univet/m4.jpg,img/vk-univet/m5.jpg"><span class="cw__num">07</span><span class="cw__fname">Группа ВКонтакте ветклиники «ЮниВет»</span></button></li>
+            </ul>
+          </nav>
+
+          <!-- Экран окна: обложка, снимок работы или ролик -->
+          <div class="cw__screen" id="cwScreen">
+            <div class="cw__cover">
+              <p class="cw__title" data-text="ПРОЕКТЫ">Проекты</p>
+              <div class="cw__rule" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M12 0c.8 6.4 5.6 11.2 12 12-6.4.8-11.2 5.6-12 12-.8-6.4-5.6-11.2-12-12C6.4 11.2 11.2 6.4 12 0z"/></svg>
+              </div>
+              <p class="cw__sub">Сайты, боты, дизайн и интеграции.<br />Собрала всё в одном месте.</p>
+            </div>
+            <img class="cw__shot" id="cwShot" alt="" decoding="async" />
+            <!-- подпись едет за курсором по кадру: клик ведёт на страницу работы -->
+            <span class="cw__tip" id="cwTip" aria-hidden="true">Смотреть детали и описание</span>
+            <div class="cw__video" id="cwVideo">
+              <video playsinline preload="none"></video>
+              <button type="button" class="video-play" aria-label="Смотреть ролик"><svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></button>
+            </div>
+            <p class="cw__empty" id="cwEmpty"></p>
+            <button type="button" class="cw__arrow cw__arrow--prev" id="cwPrev" aria-label="Предыдущий кадр" hidden><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+            <button type="button" class="cw__arrow cw__arrow--next" id="cwNext" aria-label="Следующий кадр" hidden><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
+          </div>
+        </div>
+
+        <div class="cw__foot">
+          <span class="cw__foot-l"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span id="cwFootL">15 работ</span></span>
+          <span class="cw__foot-c" id="cwFootC">В дизайне с 2014</span>
+          <span class="cw__foot-r" id="cwFootR">Техспец с 2025</span>
+        </div>
+      </div>
+
+      <!-- курсор-подсказка: на обложке сам «тыкает» во вкладку -->
+      <svg class="cw__hint" id="cwHint" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 2l16 11.2-7 1.3 4 7.6-3 1.5-4-7.6L4.6 21z"/></svg>
+    </div>
+  </div>
   <!-- Подпись под портфолио: сайт собран руками, а не в конструкторе.
        Скобки — часть строки, поэтому живут в тексте, а не в псевдоэлементах -->
   <div class="container">
@@ -3215,30 +3309,6 @@
     io.observe(box);
   })();
 
-  // Портфолио: появление блока — робот и подсказки проявляются, плашки
-  // въезжают по очереди справа. Всё остальное делает CSS по классу is-live
-  (function () {
-    const layout = document.querySelector('.cases__layout');
-    if (!layout) return;
-    // очередь считаем только по видимым плашкам: на телефоне часть списка
-    // скрыта под «Смотреть больше», и по сквозному индексу в очереди
-    // получались бы дыры
-    let step = 0;
-    layout.querySelectorAll('.cases__item').forEach((el) => {
-      el.style.setProperty('--in', el.offsetParent === null ? 0 : step++);
-    });
-    if (!('IntersectionObserver' in window)) { layout.classList.add('is-live'); return; }
-    // въехали — и стоят: прокрутил мимо и вернулся, плашки на месте
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach(e => {
-        if (!e.isIntersecting) return;
-        layout.classList.add('is-live');
-        io.unobserve(e.target);
-      });
-    }, { threshold: 0.15, rootMargin: '0px 0px -10% 0px' });
-    io.observe(layout);
-  })();
-
   // Подпись под портфолио печатается по буквам, когда доходит до кадра
   (function () {
     const live = document.querySelector('.cases__signature-live');
@@ -3304,345 +3374,379 @@
     io.observe(live);
   })();
 
-  // Портфолио на телефоне: «Смотреть больше» раскрывает остальные работы
+  // Портфолио-окно (демо): вкладки разделов, список работ, экран с кадрами
   (function () {
-    const more = document.getElementById('casesMore');
-    const list = document.querySelector('.cases__list');
-    if (!more || !list) return;
-    more.addEventListener('click', () => {
-      const open = list.classList.toggle('is-expanded');
-      more.textContent = open ? 'Свернуть' : 'Смотреть больше ...';
-      more.setAttribute('aria-expanded', String(open));
-      // после сворачивания список короче на пол-экрана, и кнопка оказалась
-      // бы далеко вверху — возвращаем её под палец
-      if (!open) more.scrollIntoView({ block: 'center' });
-    });
-  })();
+    const win = document.getElementById('casesWin');
+    if (!win) return;
+    const $ = (id) => document.getElementById(id);
+    const tabs   = [...win.querySelectorAll('.cw__tab')];
+    const lists  = [...win.querySelectorAll('.cw__files')];
+    const shot   = $('cwShot');
+    const vBox   = $('cwVideo');
+    const vid    = vBox.querySelector('video');
+    const play   = vBox.querySelector('.video-play');
+    const empty  = $('cwEmpty');
+    const screen = $('cwScreen');
+    const prev   = $('cwPrev');
+    const next   = $('cwNext');
+    const meta   = { lk: $('cwMetaLk'), lv: $('cwMetaLv'), rk: $('cwMetaRk'), rv: $('cwMetaRv') };
+    const foot   = { l: $('cwFootL'), c: $('cwFootC'), r: $('cwFootR') };
 
-  // Портфолио: клик по плашке подставляет снимки проекта и собирает точки
-  (function () {
-    const shot = document.getElementById('casesShot');
-    const dots = document.getElementById('casesDots');
-    if (!shot || !dots) return;
 
-    // Точек рисуем на две больше, чем снимков: это места под кадры, которые
-    // ещё не отсняты. Такая точка листается, но картинку не меняет — нечего
-    const SPARE = 2;
-
-    // Крестик в конце ряда точек. Элемент один: dots.textContent = '' его
-    // выносит вместе с точками, поэтому при каждой сборке ряда дописываем
-    // заново — и всегда последним, чтобы индексы точек не поехали
-    const closeBtn = document.createElement('button');
-    closeBtn.type = 'button';
-    closeBtn.className = 'cases__close';
-    closeBtn.setAttribute('aria-label', 'Закрыть работу');
-
-    // На узком экране общего превью нет — снимок раскрывается под плашкой.
-    // Элемент один на всё портфолио: appendChild сам уносит его с прошлого
-    // места, поэтому открытым всегда остаётся ровно один. На ПК он скрыт CSS
-    const inline = document.createElement('div');
-    inline.className = 'cases__inline-shot';
-    const inlineImg = document.createElement('img');
-    inlineImg.alt = '';
-
-    // Кадром работы может быть и снимок, и ролик: у двух ботов это запись
-    // экрана. В каждом из трёх мест, где живёт кадр (превью на ПК, разворот
-    // под плашкой, полный экран), рядом с картинкой лежит своё видео на
-    // зелёной подложке — показан всегда ровно один из двоих.
-    // preload='none': файл начинает грузиться только по нажатию play,
-    // до этого в кадре висит постер — первый осмысленный кадр ролика
-    const isVideo = (src) => src.endsWith('.mp4');
-    const makeVideo = (cls) => {
-      const box = document.createElement('div');
-      box.className = cls;
-      const v = document.createElement('video');
-      v.playsInline = true;
-      v.preload = 'none';
-      // Пульт появляется только после запуска: до него в кадре постер и
-      // круглая кнопка, а тёмная плашка пульта не лежит поверх акварели
-      const play = document.createElement('button');
-      play.type = 'button';
-      play.className = 'video-play';
-      play.setAttribute('aria-label', 'Смотреть ролик');
-      play.innerHTML = '<svg width="26" height="26" viewBox="0 0 24 24" '
-        + 'fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>';
-      play.addEventListener('click', () => {
-        box.classList.add('is-started');
-        v.controls = true;
-        v.play();
+    // ── Форма папки ──
+    // Один путь на всё: рамка и язычки вкладок. Первый язычок (с точками)
+    // растёт прямо из левого края рамки, последний уходит в правый край,
+    // у остальных справа плавный S-спуск к впадине, из которой поднимается
+    // следующий. Тем же путём режется стекло и рисуются блики и тень
+    const q = (s) => win.querySelector(s);
+    const P = {
+      clip: q('.cw__clip'), sheen: q('.cw__p-sheen'), glow: q('.cw__p-glow'),
+      hair: q('.cw__p-hair'), rim: q('.cw__p-rim'), far: q('.cw__sh-far'), near: q('.cw__sh-near'),
+      tabshade: q('.cw__p-tabshade'), base: q('.cw__p-base'), base2: q('.cw__p-base2'),
+      shade: q('.cw__p-shade'), lip: q('.cw__p-lip'), shHole: q('.cw__sh-hole')
+    };
+    const glass = q('.cw__glass');
+    const bodyEl = q('.cw__body');
+    const tabGrad = document.getElementById('cwTabShade');
+    const shape = () => {
+      const cs = getComputedStyle(win);
+      const v = (n) => parseFloat(cs.getPropertyValue(n));
+      const F = v('--F'), flare = v('--flare'), foot = v('--foot'), R = v('--R'), rad = v('--r');
+      const W = win.clientWidth, H = win.clientHeight;
+      const els = [...win.querySelectorAll('.cw__tabs > *')].filter(e => e.offsetWidth);
+      if (!els.length || !W) return;
+      let d = `M0 ${H - R}`, base = '', base2 = '', shadeP = '';
+      els.forEach((el, i) => {
+        const xl = el.offsetLeft, xr = xl + el.offsetWidth, h = el.offsetHeight;
+        const t = F - h, r = Math.min(rad, h / 2);
+        const last = i === els.length - 1;
+        const back = el.getAttribute('aria-selected') !== 'true';
+        const rise = i === 0
+          ? ` L0 ${t + r}`
+          : ` L${xl - foot} ${F} Q${xl} ${F} ${xl} ${F - foot} L${xl} ${t + r}`;
+        const top = ` A${r} ${r} 0 0 1 ${xl + r} ${t}`;
+        const k = flare * 0.58;
+        const fall = last
+          ? ` L${W - r} ${t} A${r} ${r} 0 0 1 ${W} ${t + r}`
+          : ` L${xr} ${t} C${xr + k} ${t} ${xr + flare - k} ${F} ${xr + flare} ${F}`;
+        d += rise + top + fall;
+        if (back) {
+          const x0 = i === 0 ? 0 : xl - foot, x1 = last ? W : xr + flare;
+          base += `M${x0} ${F}H${x1}`;
+          base2 += `M${x0} ${F + 1.4}H${x1}`;
+          shadeP += `M${i === 0 ? 0 : xl} ${F} L${i === 0 ? 0 : xl} ${t + r}` + top + fall + ` L${x1} ${F}Z`;
+        }
       });
-      box.append(v, play);
-      return [box, v];
+      d += ` L${W} ${H - R} A${R} ${R} 0 0 1 ${W - R} ${H} L${R} ${H} A${R} ${R} 0 0 1 0 ${H - R}Z`;
+      // Окно под панель: стекло рамки, блик и тень в этом месте вырезаны,
+      // чтобы сквозь прозрачную панель была видна фреска, а не матовый слой
+      const bx = bodyEl.offsetLeft, by = bodyEl.offsetTop, bw = bodyEl.offsetWidth, bh = bodyEl.offsetHeight;
+      const hr = parseFloat(getComputedStyle(bodyEl).borderTopLeftRadius);
+      const hole = ` M${bx + hr} ${by} H${bx + bw - hr} A${hr} ${hr} 0 0 1 ${bx + bw} ${by + hr}`
+        + ` V${by + bh - hr} A${hr} ${hr} 0 0 1 ${bx + bw - hr} ${by + bh} H${bx + hr}`
+        + ` A${hr} ${hr} 0 0 1 ${bx} ${by + bh - hr} V${by + hr} A${hr} ${hr} 0 0 1 ${bx + hr} ${by}Z`;
+      ['glow', 'hair', 'rim', 'far', 'near'].forEach(k => P[k].setAttribute('d', d));
+      ['clip', 'sheen'].forEach(k => P[k].setAttribute('d', d + hole));
+      const tabsBg = win.querySelector('.cw__p-tabs');
+      tabsBg.setAttribute('width', W);
+      tabsBg.setAttribute('height', F);
+      P.shHole.setAttribute('d', hole);
+      P.tabshade.setAttribute('d', shadeP);
+      P.base.setAttribute('d', base);
+      P.base2.setAttribute('d', base2);
+      tabGrad.setAttribute('y1', F - v('--h-hi'));
+      tabGrad.setAttribute('y2', F);
+      glass.style.clipPath = `path(evenodd, '${d + hole}')`;
+      const br = parseFloat(getComputedStyle(bodyEl).borderTopLeftRadius);
+      [P.shade, P.lip].forEach((rc, j) => {
+        // тень ложится на рамку у самой панели, светлая губа — чуть снаружи
+        const o = j ? 2.5 : 0;
+        rc.setAttribute('x', bodyEl.offsetLeft - o);
+        rc.setAttribute('y', bodyEl.offsetTop - o);
+        rc.setAttribute('width', bodyEl.offsetWidth + o * 2);
+        rc.setAttribute('height', bodyEl.offsetHeight + o * 2);
+        rc.setAttribute('rx', br + o);
+      });
     };
-    const [shotVidBox,   shotVid]   = makeVideo('cases__video');
-    const [inlineVidBox, inlineVid] = makeVideo('cases__video');
-    const [lbVidBox,     lbVid]     = makeVideo('lightbox__video');
-    shot.insertAdjacentElement('afterend', shotVidBox);
-
-    const arrow = (dir, label, path) => {
-      const b = document.createElement('button');
-      b.type = 'button';
-      b.className = 'cases__arrow cases__arrow--' + dir;
-      b.setAttribute('aria-label', label);
-      b.innerHTML = '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" '
-        + 'stroke="currentColor" stroke-width="2" stroke-linecap="round" '
-        + 'stroke-linejoin="round"><path d="' + path + '"/></svg>';
-      return b;
+    // Высоту вкладок ведёт CSS-переход, контур догоняет его каждый кадр
+    let shapeUntil = 0, shapeRaf = 0;
+    const shapeLoop = () => {
+      shape();
+      shapeRaf = performance.now() < shapeUntil ? requestAnimationFrame(shapeLoop) : 0;
     };
-    const prevBtn = arrow('prev', 'Предыдущий кадр', 'M15 5l-7 7 7 7');
-    const nextBtn = arrow('next', 'Следующий кадр', 'M9 5l7 7-7 7');
-    inline.append(inlineImg, inlineVidBox, prevBtn, nextBtn);
-
-    // Полноэкранный просмотр: тап по снимку под плашкой. Оверлей один на всё
-    // портфолио, лежит в конце body и до первого тапа ничего не грузит
-    const lb = document.createElement('div');
-    lb.className = 'lightbox';
-    const lbStage = document.createElement('div');
-    lbStage.className = 'lightbox__stage';
-    const lbImg = document.createElement('img');
-    lbImg.className = 'lightbox__img';
-    lbImg.alt = '';
-    const lbPrev = arrow('prev', 'Предыдущий кадр', 'M15 5l-7 7 7 7');
-    const lbNext = arrow('next', 'Следующий кадр', 'M9 5l7 7-7 7');
-    const lbClose = document.createElement('button');
-    lbClose.type = 'button';
-    lbClose.className = 'lightbox__close';
-    lbClose.setAttribute('aria-label', 'Закрыть просмотр');
-    lbStage.append(lbImg, lbVidBox, lbPrev, lbNext, lbClose);
-    lb.appendChild(lbStage);
-    document.body.appendChild(lb);
-
-    // Кладём кадр на бок, только если он и правда широкий. Мобильные снимки
-    // вертикальные — их поворачивать незачем, класс просто не встаёт
-    const fitRotate = () => {
-      lb.classList.toggle('lightbox--rotate',
-                          !lb.classList.contains('is-video')
-                          && lbImg.naturalWidth > lbImg.naturalHeight);
+    const kick = (ms = 800) => {
+      shapeUntil = Math.max(shapeUntil, performance.now() + ms);
+      if (!shapeRaf) shapeRaf = requestAnimationFrame(shapeLoop);
     };
-    lbImg.addEventListener('load', fitRotate);
+    if ('ResizeObserver' in window) new ResizeObserver(() => kick(60)).observe(win);
+    else window.addEventListener('resize', () => kick(60));
+    document.fonts?.ready.then(() => kick(60));
+    shape();
 
-    // Листание снимков: кадры того проекта, что сейчас открыт. Стрелки под
-    // плашкой и стрелки в полном экране ходят по одному и тому же счётчику
-    let strip = [];
-    let frameIdx = 0;
-    // Ставит кадр в одно место: снимок — в картинку, ролик — в видео, а класс
-    // is-video на обёртке решает, кто из двоих виден
-    const setFrame = (box, img, vid, src) => {
-      box.classList.toggle('is-video', isVideo(src));
-      if (!isVideo(src)) { vid.pause(); img.src = src; return; }
-      // src переприсваиваем только при смене ролика: иначе начатый просмотр
-      // сбрасывался бы на ноль при каждом возврате на эту точку
-      if (vid.dataset.src === src) return;
-      vid.dataset.src = src;
-      vid.controls = false;
-      vid.parentElement.classList.remove('is-started');
-      vid.poster = src.replace('.mp4', '-poster.webp');
-      vid.src = src;
+    const pad = (n) => String(n).padStart(2, '0');
+    // «1 работа / 3 работы / 7 работ»
+    const plural = (n, one, few, many) => {
+      const a = n % 10, b = n % 100;
+      return n + ' ' + (a === 1 && b !== 11 ? one : a >= 2 && a <= 4 && (b < 10 || b >= 20) ? few : many);
     };
-    const putLb = (src) => { setFrame(lb, lbImg, lbVid, src); fitRotate(); };
-    const syncArrows = () => {
-      prevBtn.hidden = lbPrev.hidden = frameIdx <= 0;
-      nextBtn.hidden = lbNext.hidden = frameIdx >= strip.length - 1;
-    };
-    const step = (d) => {
-      frameIdx = Math.min(Math.max(frameIdx + d, 0), strip.length - 1);
-      setFrame(inline, inlineImg, inlineVid, strip[frameIdx]);
-      putLb(strip[frameIdx]);
-      syncArrows();
-    };
-    prevBtn.addEventListener('click', () => step(-1));
-    nextBtn.addEventListener('click', () => step(1));
-    lbPrev.addEventListener('click', () => step(-1));
-    lbNext.addEventListener('click', () => step(1));
-
-    const lbIsOpen = () => lb.classList.contains('is-open');
-    const openLb = () => {
-      if (!strip.length) return;
-      putLb(strip[frameIdx]);
-      if (lbImg.complete) fitRotate();
-      lb.classList.add('is-open');
-      document.body.classList.add('lightbox-open');
-      syncArrows();
-    };
-    const closeLb = () => {
-      lbVid.pause();
-      lb.classList.remove('is-open');
-      document.body.classList.remove('lightbox-open');
-    };
-    inlineImg.addEventListener('click', openLb);
-    lbClose.addEventListener('click', closeLb);
-    // мимо кадра — закрыть; по самому кадру закрытия нет, чтобы не ловить
-    // случайное касание при листании
-    lb.addEventListener('click', (e) => { if (e.target === lb) closeLb(); });
-    document.addEventListener('keydown', (e) => {
-      if (!lbIsOpen()) return;
-      if (e.key === 'Escape')     closeLb();
-      if (e.key === 'ArrowLeft')  step(-1);
-      if (e.key === 'ArrowRight') step(1);
-    });
-
-    // Смахивание. Оси у страницы не поворачиваются вместе с картинкой:
-    // когда кадр лежит на боку, «влево» для глаза — это движение вверх
-    let touchX = 0, touchY = 0;
-    lb.addEventListener('touchstart', (e) => {
-      touchX = e.changedTouches[0].clientX;
-      touchY = e.changedTouches[0].clientY;
-    }, { passive: true });
-    lb.addEventListener('touchend', (e) => {
-      // по самому ролику палец ведёт ползунок перемотки — не листание
-      if (e.target.closest('video')) return;
-      const rotated = lb.classList.contains('lightbox--rotate')
-        && window.matchMedia('(orientation: portrait)').matches;
-      const d = rotated
-        ? e.changedTouches[0].clientY - touchY
-        : e.changedTouches[0].clientX - touchX;
-      if (Math.abs(d) < 40) return;
-      step(d < 0 ? 1 : -1);
-    }, { passive: true });
-
-    const show = (list, i) => {
-      if (i >= list.length) return;
-      setFrame(frame, shot, shotVid, list[i]);
-      setFrame(inline, inlineImg, inlineVid, list[i]);
-      strip = list;
-      frameIdx = i;
-      syncArrows();
-    };
-
-    // Появление снимка: скрипт только вешает классы, всё остальное делает CSS.
-    // Ждём, пока снимок догрузится, иначе проявляться будет пустое место
-    const frame = shot.closest('.cases__shot');
-    const playReveal = () => {
-      // Кадр открылся хоть раз — подсказки «ТЫК» своё отработали. Дальше они
-      // возвращаются мгновенно, без очереди появления (см. .is-shown в стилях)
-      frame.closest('.cases__layout')?.classList.add('is-shown');
-      frame.classList.add('is-open');
-      // без сброса и принудительного пересчёта повторный клик по той же
-      // плашке анимацию не переиграет — класс-то уже висит
-      frame.classList.remove('is-playing');
-      void frame.offsetWidth;
-      frame.classList.add('is-playing');
-    };
-
-    // Клик браузер сопровождает своей прокруткой — подтягивает нажатую
-    // кнопку в экран. Пока она идёт, мерить положение кадра бессмысленно:
-    // ждём, пока страница остановится (два одинаковых кадра подряд)
-    const afterScroll = (fn) => {
-      let last = -1, still = 0, frames = 0;
-      const tick = () => {
-        if (window.scrollY === last) { if (++still >= 2) return fn(); }
-        else { still = 0; last = window.scrollY; }
-        if (++frames < 40) requestAnimationFrame(tick); else fn();
-      };
-      requestAnimationFrame(tick);
-    };
-
-    // Кадр открывается не там, где палец: на ПК общее превью висит выше ряда
-    // плашек, на телефоне снимок разворачивается под плашкой и у нижних работ
-    // уезжает за кромку экрана — клик срабатывал, а показать было нечего.
-    // Подтягиваем кадр к глазам, но только если он сам не поместился: иначе
-    // страница дёргалась бы на каждой работе, когда их перебирают подряд
-    const HEAD = 72;
-    const bringIntoView = () => afterScroll(() => {
-      const box = isNarrow() ? inline : frame;
-      const r = box.getBoundingClientRect();
-      if (!r.height) return;
-      if (r.top >= HEAD && r.bottom <= window.innerHeight) return;
-      box.scrollIntoView({ block: r.height > window.innerHeight - HEAD ? 'start' : 'center' });
-    });
-
-    // На узком экране берём мобильные кадры (data-shots-m), если они сняты,
-    // иначе те же, что на ПК: широкий разворот под плашкой мелковат, но тап
-    // разворачивает его на весь экран на бок — там всё читается.
-    // На ПК data-shots-m не читается вовсе
     const isNarrow = () => window.matchMedia('(max-width: 900px)').matches;
-    const shotsOf = (plate) => {
-      const src = (isNarrow() && plate.dataset.shotsM) || plate.dataset.shots;
+    const isVideo = (src) => src.endsWith('.mp4');
+    const shotsOf = (btn) => {
+      // в окне-папке и на ПК берём мобильные кадры: они 35:24 и работа в них по центру
+      const src = btn.dataset.shotsM || btn.dataset.shots;
       const list = src ? src.split(',') : [];
-      // Ролик идёт последним кадром — и встаёт на предпоследнюю точку ряда
-      if (plate.dataset.video) list.push(plate.dataset.video);
+      if (btn.dataset.video) list.push(btn.dataset.video);
       return list;
     };
 
-    document.querySelectorAll('.case-plate[data-shots], .case-plate[data-shots-m]').forEach(plate => {
-      plate.addEventListener('click', () => {
-        // На телефоне ряда точек с крестиком нет, закрывать снимок нечем —
-        // это делает повторный клик по той же плашке. На ПК крестик есть,
-        // и повторный клик по-прежнему переигрывает появление снимка
-        if (plate.classList.contains('is-active') && isNarrow()) {
-          closeShot();
-          return;
-        }
-        const list = shotsOf(plate);
-        // подсветка остаётся на открытой плашке — видно, где мы в портфолио
-        document.querySelectorAll('.case-plate.is-active')
-          .forEach(p => p.classList.remove('is-active'));
-        plate.classList.add('is-active');
-        // работа без снимка — остаётся только подсветка, прошлый снимок убираем
-        if (!list.length) {
-          shotVid.pause();
-          frame.classList.remove('is-open', 'is-playing', 'is-video');
-          dots.hidden = true;
-          dots.textContent = '';
-          inline.remove();
-          return;
-        }
-        // разворот переезжает под нажатую плашку до показа кадра: к моменту
-        // проявления он уже на месте, и его есть куда подтягивать
-        plate.closest('.cases__item').appendChild(inline);
-        show(list, 0);
-        // onload переприсваиваем, а не копим слушателей: если щёлкать по
-        // плашкам быстро, отработает только последняя
-        const start = () => { shot.onload = null; playReveal(); };
-        shot.onload = start;
-        // у ролика события load нет — проявляем сразу
-        if (shot.complete || isVideo(list[0])) start();
-        // ряд пересобираем под текущий проект: у каждого своё число кадров.
-        // Ряд центрирован по якорю, поэтому от смены количества не съезжает
-        dots.textContent = '';
-        // Ролик не удлиняет ряд, а занимает одно из запасных мест: так у работ
-        // с видео оно всегда стоит на предпоследней точке
-        const spare = SPARE - (plate.dataset.video ? 1 : 0);
-        for (let i = 0; i < list.length + spare; i++) {
-          const d = document.createElement('button');
-          d.type = 'button';
-          d.className = i ? 'cases__dot' : 'cases__dot is-active';
-          d.setAttribute('aria-label', 'Слайд ' + (i + 1));
-          dots.appendChild(d);
-        }
-        dots.appendChild(closeBtn);
-        dots.hidden = false;
-        bringIntoView();
-      });
-    });
+    // очередь въезда пунктов списка
+    lists.forEach(ul => [...ul.children].forEach((li, i) => li.style.setProperty('--i', i)));
+    const total = win.querySelectorAll('.cw__file:not(.cw__file--dir):not([data-wip])').length;
 
-    // Возврат к роботу: снимаем is-open — CSS сам прячет снимок и показывает
-    // заглушку. src не трогаем, чтобы повторное открытие той же работы
-    // не ждало загрузки
-    const closeShot = () => {
-      shotVid.pause();
-      inlineVid.pause();
-      frame.classList.remove('is-open', 'is-playing', 'is-video');
-      dots.hidden = true;
-      dots.textContent = '';
-      document.querySelectorAll('.case-plate.is-active')
-        .forEach(p => p.classList.remove('is-active'));
-      inline.remove();
+    let tab = null, file = null, strip = [], idx = 0;
+
+    // Смена подписей в шапке — через короткое затухание, чтобы текст не прыгал
+    const setMeta = (lk, lv, rk, rv) => {
+      win.classList.add('is-swapping');
+      setTimeout(() => {
+        meta.lk.textContent = lk; meta.lv.textContent = lv;
+        meta.rk.textContent = rk; meta.rv.textContent = rv;
+        win.classList.remove('is-swapping');
+      }, 180);
     };
 
-    dots.addEventListener('click', (e) => {
-      if (e.target.closest('.cases__close')) { closeShot(); return; }
-      const dot = e.target.closest('.cases__dot');
-      if (!dot) return;
-      const all = [...dots.children];
-      all.forEach(d => d.classList.remove('is-active'));
-      dot.classList.add('is-active');
-      const open = document.querySelector('.case-plate.is-active');
-      // через shotsOf, а не dataset.shots напрямую: на узком экране
-      // у работы могут быть свои кадры, и точки должны листать их же
-      if (open) show(shotsOf(open), all.indexOf(dot));
-    });
+    const showList = (name) => {
+      lists.forEach(ul => {
+        const on = ul.dataset.list === name;
+        ul.classList.toggle('is-current', on);
+        // перезапуск очереди въезда: без этого анимация сыграет только раз
+        if (on) ul.querySelectorAll('li').forEach(li => {
+          li.style.animation = 'none'; void li.offsetWidth; li.style.animation = '';
+        });
+      });
+    };
 
+    const syncFoot = () => {
+      prev.hidden = idx <= 0;
+      next.hidden = idx >= strip.length - 1;
+      foot.c.textContent = strip.length ? 'Кадр ' + pad(idx + 1) + ' / ' + pad(strip.length) : '—';
+    };
+
+    // Кадр: снимок проявляется из дымки, ролик встаёт на место снимка
+    const setFrame = (src) => {
+      const v = isVideo(src);
+      win.classList.toggle('is-video', v);
+      if (v) {
+        if (vid.dataset.src !== src) {
+          vid.dataset.src = src;
+          vid.controls = false;
+          vBox.classList.remove('is-started');
+          vid.poster = src.replace('.mp4', '-poster.webp');
+          vid.src = src;
+        }
+        return;
+      }
+      vid.pause();
+      if (shot.getAttribute('src') === src) return;
+      shot.classList.add('is-loading');
+      const img = new Image();
+      img.src = src;
+      const put = () => {
+        // кадр могли уже перелистнуть, пока грузился
+        if (strip[idx] !== src) return;
+        shot.src = src;
+        requestAnimationFrame(() => shot.classList.remove('is-loading'));
+      };
+      (img.decode ? img.decode() : Promise.resolve()).then(put, put);
+    };
+
+    const go = (d) => {
+      const n = Math.min(Math.max(idx + d, 0), strip.length - 1);
+      if (n === idx) return;
+      idx = n;
+      setFrame(strip[idx]);
+      syncFoot();
+    };
+
+    const openFile = (btn) => {
+      file = btn;
+      win.querySelectorAll('.cw__file.is-active').forEach(b => b.classList.remove('is-active'));
+      btn.classList.add('is-active');
+      strip = shotsOf(btn);
+      idx = 0;
+      win.classList.add('is-open');
+      const name = btn.querySelector('.cw__fname').textContent;
+      if (!strip.length) {
+        win.classList.remove('is-shot', 'is-video');
+        win.classList.add('is-empty');
+        vid.pause();
+        empty.textContent = tab === 'crm'
+          ? '[Здесь появятся проекты по интеграциям и CRM]'
+          : 'В работе — покажу, когда будет готово';
+      } else {
+        win.classList.remove('is-empty');
+        win.classList.add('is-shot');
+        setFrame(strip[0]);
+      }
+      const t = tabs.find(x => x.dataset.tab === tab);
+      setMeta('Раздел:', t.dataset.name, 'Открыто:', name);
+      syncFoot();
+      // на телефоне активная работа подъезжает в видимую часть ленты
+      if (isNarrow()) btn.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+    };
+
+    const openTab = (name) => {
+      stopHint();
+      tab = name;
+      tabs.forEach(t => t.setAttribute('aria-selected', String(t.dataset.tab === name)));
+      showList(name);
+      const files = [...win.querySelectorAll('.cw__files[data-list="' + name + '"] .cw__file')];
+      foot.l.textContent = plural(files.length, 'работа', 'работы', 'работ');
+      foot.r.textContent = '2014 / 2025';
+      openFile(files[0]);
+    };
+
+    const home = () => {
+      tab = file = null;
+      strip = [];
+      vid.pause();
+      tabs.forEach(t => t.setAttribute('aria-selected', 'false'));
+      win.classList.remove('is-open', 'is-shot', 'is-video', 'is-empty');
+      showList('home');
+      setMeta('Откуда:', 'Сибирь, Россия', 'Обновлено:', 'Сентябрь 2026');
+      foot.l.textContent = plural(total, 'работа', 'работы', 'работ');
+      foot.c.textContent = 'В дизайне с 2014';
+      foot.r.textContent = 'Техспец с 2025';
+      prev.hidden = next.hidden = true;
+    };
+
+    tabs.forEach(t => {
+      t.addEventListener('click', () => { openTab(t.dataset.tab); kick(); });
+      t.addEventListener('pointerenter', () => kick());
+      t.addEventListener('pointerleave', () => kick());
+    });
+    win.querySelector('.cw__light--close').addEventListener('click', () => { home(); kick(); startHint(2500); });
+    win.querySelector('.cw__side').addEventListener('click', (e) => {
+      const b = e.target.closest('.cw__file');
+      if (!b) return;
+      if (b.dataset.open) { openTab(b.dataset.open); kick(); }
+      else if (b !== file) openFile(b);
+    });
+    prev.addEventListener('click', () => go(-1));
+    next.addEventListener('click', () => go(1));
+    play.addEventListener('click', () => { vBox.classList.add('is-started'); vid.controls = true; vid.play(); });
+
+    // смахивание по экрану на телефоне
+    let tx = 0;
+    screen.addEventListener('touchstart', (e) => { tx = e.changedTouches[0].clientX; }, { passive: true });
+    screen.addEventListener('touchend', (e) => {
+      if (!strip.length || e.target.closest('video')) return;
+      const d = e.changedTouches[0].clientX - tx;
+      if (Math.abs(d) > 40) go(d < 0 ? 1 : -1);
+    }, { passive: true });
+
+    // Клик по кадру — страница работы. Адрес: раздел и номер работы в нём
+    const caseUrl = () => {
+      if (!file || !tab) return '';
+      const list = [...win.querySelectorAll('.cw__files[data-list="' + tab + '"] .cw__file')];
+      return 'case.html#' + tab + '-' + (list.indexOf(file) + 1);
+    };
+    shot.addEventListener('click', () => { const u = caseUrl(); if (u) location.href = u; });
+
+    // Подпись «Смотреть детали и описание» едет за курсором. Только для мыши:
+    // на телефоне наведения нет, там кадр открывается сразу по тапу
+    const tip = $('cwTip');
+    if (window.matchMedia('(hover: hover)').matches) {
+      shot.addEventListener('pointermove', (e) => {
+        if (!win.classList.contains('is-open')) return;
+        const r = screen.getBoundingClientRect();
+        // у правого края подпись переезжает налево от курсора
+        const w = tip.offsetWidth;
+        let x = e.clientX - r.left + 18, y = e.clientY - r.top + 22;
+        if (x + w > r.width - 8) x = e.clientX - r.left - w - 12;
+        if (y + tip.offsetHeight > r.height - 8) y = e.clientY - r.top - tip.offsetHeight - 14;
+        tip.style.setProperty('--tx', x + 'px');
+        tip.style.setProperty('--ty', y + 'px');
+        tip.classList.add('is-on');
+      });
+      shot.addEventListener('pointerleave', () => tip.classList.remove('is-on'));
+    }
+    // ── Курсор-подсказка: пока папка закрыта, сам тычет во вкладки по
+    // очереди — Сайты, Чат-боты, Дизайн, Интеграции — и так по кругу,
+    // пока по вкладке не нажмут. Закрыли папку крестиком — снова начинает.
+    // Когда над папкой настоящая мышь, подсказка не мешает и ждёт
+    const hint = $('cwHint');
+    const HINT_EVERY = 4500;   // мс от начала одного «тычка» до следующего
+    let hintTimer = 0, hintAnim = null, hintOff = false, hintN = 0, mouseIn = false;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const stopHint = () => {
+      hintOff = true;
+      clearTimeout(hintTimer);
+      hintAnim?.cancel();
+      tabs.forEach(t => t.classList.remove('is-poked'));
+    };
+    const startHint = (delay) => {
+      if (reduce) return;
+      hintOff = false;
+      clearTimeout(hintTimer);
+      hintTimer = setTimeout(poke, delay);
+    };
+    const poke = () => {
+      if (hintOff || tab || !hint.animate) return;
+      hintTimer = setTimeout(poke, HINT_EVERY);
+      if (isNarrow() || mouseIn) return;
+      const target = tabs[hintN++ % tabs.length];
+      const w = win.getBoundingClientRect();
+      const t = target.getBoundingClientRect();
+      const sx = w.width * 0.62, sy = w.height * 0.6;
+      const ex = t.left - w.left + t.width * 0.5, ey = t.top - w.top + t.height * 0.5;
+      hintAnim = hint.animate([
+        { opacity: 0, transform: `translate(${sx}px, ${sy + 20}px)` },
+        { opacity: 1, transform: `translate(${sx}px, ${sy}px)`, offset: 0.12 },
+        { opacity: 1, transform: `translate(${ex}px, ${ey}px)`, offset: 0.55, easing: 'ease-out' },
+        { opacity: 1, transform: `translate(${ex}px, ${ey}px) scale(0.8)`, offset: 0.62 },
+        { opacity: 1, transform: `translate(${ex}px, ${ey}px)`, offset: 0.7 },
+        { opacity: 0, transform: `translate(${ex}px, ${ey}px)` }
+      ], { duration: 2600, easing: 'cubic-bezier(.45,0,.2,1)' });
+      setTimeout(() => { if (!hintOff) { target.classList.add('is-poked'); kick(); } }, 2600 * 0.58);
+      setTimeout(() => { target.classList.remove('is-poked'); kick(); }, 2600 * 0.72);
+    };
+    win.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') mouseIn = true; });
+    win.addEventListener('pointerleave', () => { mouseIn = false; });
+
+    home();
+
+    // Возврат со страницы работы: адрес index.html#cases-design-3 — папка
+    // сразу открыта на той работе, где закончили листать, и стоит в кадре.
+    // Адрес потом чистим до #cases, чтобы обновление страницы не повторяло
+    const back = location.hash.match(/^#cases-([a-z]+)-(\d+)$/);
+    if (back) {
+      const [, t, num] = back;
+      const btn = win.querySelectorAll('.cw__files[data-list="' + t + '"] .cw__file')[num - 1];
+      if (btn) {
+        win.classList.add('is-live', 'is-settled');
+        hintOff = true;
+        openTab(t);
+        openFile(btn);
+        kick();
+        history.replaceState(null, '', '#cases');
+        // после раскладки страницы — иначе позиция папки ещё не та
+        requestAnimationFrame(() => win.scrollIntoView({ block: 'center' }));
+        return;
+      }
+    }
+
+    if (!('IntersectionObserver' in window)) { win.classList.add('is-live', 'is-settled'); return; }
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (!e.isIntersecting) return;
+        win.classList.add('is-live');
+        setTimeout(() => win.classList.add('is-settled'), 1400);
+        startHint(2200);
+        io.unobserve(win);
+      });
+    }, { threshold: 0.3 });
+    io.observe(win);
   })();
 
   // Скролл: полоска прогресса в шапке + скрытие стрелки-подсказки
@@ -3803,7 +3907,7 @@
   (function () {
     if (!('IntersectionObserver' in window)) return;
     const targets = document.querySelectorAll(
-      '.hero__name, .hero__scroll, .services__robot, .cases__shot,' +
+      '.hero__name, .cw__title, .hero__scroll, .services__robot,' +
       '.contacts__status, .cases__signature-live, .btn--primary'
     );
     if (!targets.length) return;

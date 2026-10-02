@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Работа — Катерина Степанова</title>
+  <meta name="robots" content="noindex" />
+  <link rel="icon" href="favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" href="favicon-32.png" sizes="32x32" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <!-- фон-фреска, шрифты, бейдж и заголовок — общие с прайсами -->
+  <link rel="stylesheet" href="price.css" />
+  <style>
+    @font-face {
+      font-family: 'Vasek';
+      src: url('Vasek-Italic.woff2') format('woff2');
+      font-display: swap;
+    }
+    :root {
+      --accent: #417339;
+      --accent-hover: #325B2D;
+      --accent-soft: #81B470;
+      --font-script: 'Vasek', cursive;
+      /* место под картинку, пока её нет, — тон крафта */
+      --ph: #B9A890;
+    }
+    /* страницу закрывают кнопки внизу — курсор-крестик прайсов не нужен */
+    body { cursor: auto; }
+
+    /* ── Раскладка: всё в один экран ──
+       Коллаж задаётся одной высотой --ch — она считается от высоты окна */
+    .case {
+      /* коллаж растёт с высотой окна быстрее остального: на низком экране
+         ему уступают текст и шапка, на высоком — он забирает свободное место */
+      /* коллаж растёт с высотой окна быстрее остального: на низком экране
+         ему уступают текст и шапка, на высоком — он забирает свободное место */
+      /* коллаж растёт с высотой окна быстрее остального: на низком экране
+         ему уступают текст и шапка, на высоком — он забирает свободное место */
+      --ch: min(calc(100vh * 1.5 - 810px), calc(100vh - 420px));
+      --ch: min(calc(100dvh * 1.5 - 810px), calc(100dvh - 420px));
+      /* ширина коллажа — по ней же стоит колонка описания */
+      --cw: calc(var(--ch) * 0.889 + 14px + (var(--ch) - 12px) / 1.6187);
+      margin: 0 auto;
+      padding: 26px 24px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    /* шапка — как у разделов на главной: золотой бейдж и заголовок */
+    .case__head { display: flex; flex-direction: column; align-items: center; }
+    /* бейдж — как «Кейсы», «Услуги» на главной (.section-label):
+       белый, с бледной золотой рамкой, а не залитый, как у прайсов */
+    .head__label {
+      margin-bottom: 14px;
+      padding: 4px 14px;
+      background: #fff;
+      border: 1px solid rgba(232,168,0,0.3);
+      color: var(--accent2);
+    }
+    .case__title {
+      max-width: 18em;
+      margin-bottom: 22px;
+      /* на низком экране заголовок чуть меньше — место нужнее коллажу */
+      font: 500 clamp(32px, min(4vw, 6vh), 52px)/1.1 var(--font-heading);
+      color: var(--text);
+      text-wrap: balance;
+    }
+
+    /* Коллаж: большая карточка 0.889 : 1, справа две карточки —
+       вместе с зазором ровно в её высоту */
+    .cg { display: flex; gap: 14px; align-items: stretch; }
+    .cg__side {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      width: calc((var(--ch) - 12px) / 1.6187);
+    }
+    .card {
+      display: block;
+      overflow: hidden;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 1px 2px rgba(26,26,26,0.08), 0 18px 40px -18px rgba(26,26,26,0.35);
+      cursor: zoom-in;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    .card:hover { transform: translateY(-3px); box-shadow: 0 1px 2px rgba(26,26,26,0.08), 0 24px 46px -18px rgba(26,26,26,0.45); }
+    .card img { display: block; width: 100%; height: 100%; object-fit: cover; }
+    .cg__main { height: var(--ch); aspect-ratio: 0.889; }
+    .cg__side .card:first-child { aspect-ratio: 0.889; }
+    .cg__side .card:last-child { aspect-ratio: 2.02; }
+    .card.is-empty {
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, rgba(255,255,255,0.18), transparent 60%), var(--ph);
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.85);
+      cursor: default;
+    }
+    .card.is-empty:hover { transform: none; }
+
+    /* описание — рукописным */
+    .case__text {
+      /* не шире коллажа: колонка внутри него, с полями по бокам */
+      padding: 0 4%;
+      /* у Vasek мелкие строчные — кегль вдвое крупнее обычного текста,
+         интервал плотный, чтобы абзац читался одним куском */
+      font: 32px/0.8 var(--font-script);
+      color: var(--text);
+    }
+    .case__text p + p { margin-top: 0.25em; }
+
+    /* ── кнопки внизу: одинаковые белые, при наведении — как
+       «Написать в Telegram»: зелёный перелив и белый текст ── */
+    /* Низ страницы — три колонки: боковые делят остаток ширины поровну,
+       кнопка стоит посередине своей; средняя — ровно ширина коллажа */
+    .case__foot {
+      display: grid;
+      grid-template-columns: 1fr var(--cw) 1fr;
+      align-items: end;
+      width: 100%;
+      margin-top: 20px;
+    }
+    .case__foot .case__btn { justify-self: center; }
+    .case__short { display: none; }
+    /* Кнопки — один в один «Написать в Telegram» (.btn--primary на главной):
+       зелёный перелив всё время, при наведении — темнее и чуть выше */
+    .case__btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 28px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 500;
+      color: #fff;
+      background: linear-gradient(120deg, var(--accent), var(--accent-soft), var(--accent));
+      background-size: 200% 100%;
+      animation: btn-flow 7s ease-in-out infinite;
+      transition: transform 0.2s ease;
+    }
+    .case__btn svg { flex: none; transition: transform 0.2s; }
+    .case__btn:hover {
+      background: linear-gradient(120deg, var(--accent-hover), var(--accent-soft), var(--accent-hover));
+      background-size: 200% 100%;
+      transform: translateY(-1px);
+    }
+    @keyframes btn-flow {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .case__btn--back:hover svg { transform: translateX(-3px); }
+    .case__btn--next:hover svg { transform: translateX(3px); }
+
+    /* появление по очереди */
+    .case > * {
+      opacity: 0;
+      transform: translateY(16px);
+      animation: case-in 0.9s cubic-bezier(.2,.8,.2,1) forwards;
+    }
+    .case > :nth-child(2) { animation-delay: 0.15s; }
+    .case > :nth-child(3) { animation-delay: 0.35s; }
+    .case > :nth-child(4) { animation-delay: 0.5s; }
+    @keyframes case-in { to { opacity: 1; transform: none; } }
+    @media (prefers-reduced-motion: reduce) {
+      .case > * { animation: none; opacity: 1; transform: none; }
+      .case__btn { animation: none; }
+    }
+
+    /* ── просмотр на весь экран ── */
+    .lb {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: none;
+      place-items: center;
+      background: rgba(12,12,12,0.92);
+      /* смахивание листает картинки, а не таскает страницу */
+      touch-action: none;
+    }
+    .lb.is-open { display: grid; }
+    body.lb-open { overflow: hidden; }
+    .lb img { display: block; max-width: 92vw; max-height: 88vh; max-height: 88dvh; border-radius: 12px; }
+    .lb button {
+      position: absolute;
+      display: grid;
+      place-items: center;
+      width: 52px;
+      height: 52px;
+      padding: 0;
+      border: none;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.14);
+      color: #fff;
+      cursor: pointer;
+    }
+    .lb button:hover { background: rgba(255,255,255,0.28); }
+    .lb button[hidden] { display: none; }
+    .lb__prev { left: 16px; top: 50%; transform: translateY(-50%); }
+    .lb__next { right: 16px; top: 50%; transform: translateY(-50%); }
+    .lb__close { right: 16px; top: 16px; }
+
+    /* ── телефон: столбик и прокрутка ── */
+    @media (max-width: 860px) {
+      .case { --ch: auto; display: block; padding: 40px 16px 48px; text-align: left; }
+      .case__head { align-items: flex-start; }
+      .cg { flex-direction: column; }
+      .cg__main { height: auto; width: 100%; }
+      .cg__side { width: 100%; gap: 14px; }
+      /* воздух: от картинок до описания и от описания до кнопок */
+      .case__foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 32px 14px; margin-top: 32px; }
+      .case__text { order: -1; width: 100%; padding: 0; }
+      /* на телефоне подписи короче — обе кнопки встают в один ряд */
+      .case__long { display: none; }
+      .case__short { display: inline; }
+      .case__btn { padding: 11px 14px; font-size: 14px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="page-bg" aria-hidden="true"></div>
+
+<main class="case">
+  <header class="case__head">
+    <span class="head__label" id="cLabel">Портфолио</span>
+    <h1 class="case__title" id="cTitle">[Название работы]</h1>
+  </header>
+  <div class="cg">
+    <div class="card cg__main" id="c0"></div>
+    <div class="cg__side">
+      <div class="card" id="c1"></div>
+      <div class="card" id="c2"></div>
+    </div>
+  </div>
+  <!-- низ: кнопки по бокам, описание по центру — шириной коллажа -->
+  <div class="case__foot">
+    <a class="case__btn case__btn--back" id="cBack" href="index.html#cases"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg><span>Вернуться<span class="case__long"> на главную</span></span></a>
+    <div class="case__text" id="cText"><p>[Описание работы: задача, что сделано, результат]</p></div>
+    <a class="case__btn case__btn--next" id="cNext" href="#"><span class="case__long">Смотреть дальше</span><span class="case__short">Дальше</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+  </div>
+</main>
+
+<div class="lb" id="lb" role="dialog" aria-label="Просмотр">
+  <img id="lbImg" alt="" />
+  <button type="button" class="lb__prev" id="lbPrev" aria-label="Предыдущая"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+  <button type="button" class="lb__next" id="lbNext" aria-label="Следующая"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
+  <button type="button" class="lb__close" id="lbClose" aria-label="Закрыть просмотр"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+</div>
+
+<script>
+  // Одна страница на все работы: какая открыта — из адреса (case.html#design-2).
+  // Порядок разделов и работ — как во вкладках папки на главной.
+  // У работы: [название, описание (абзацы), три картинки коллажа]
+  const DATA = {
+    sites:  ['Сайты', [
+      ['Сайт ландшафтного архитектора на Tilda'],
+      ['Сайт-админка для досок референсов'],
+      ['Сайт-портфолио для ландшафтного архитектора']]],
+    bots:   ['Чат-боты', [
+      ['Бот с проверкой подписки'],
+      ['Бот «Гадание на метаморфозных картах»'],
+      ['Бот клуба по подписке'],
+      ['Бот для салона красоты'],
+      ['Бот с подключением AI'],
+      ['Бот-опросник']]],
+    design: ['Дизайн', [
+      ['Справочник «Лечение животных травами»'],
+      ['Презентация для справочника «Лечение животных травами»', [
+        'Презентация к защите справочника «Лечение животных травами». В том же стиле, что и справочник: крафт, фотографии на булавках, засушенные травы.',
+        '18 слайдов: цель и задачи проекта, свойства лекарственных растений, их влияние на иммунитет животных и сочетание с синтетическими препаратами, выводы.'],
+       ['img/present-case/1.webp', 'img/present-case/2.webp', 'img/present-case/3.webp']],
+      ['Альбом ландшафтного проекта'],
+      ['Подарочные купоны для UNUM'],
+      ['Графика на заказ'],
+      ['Группа ВКонтакте студии дизайна'],
+      ['Группа ВКонтакте ветклиники «ЮниВет»']]],
+    crm:    ['Интеграции', [
+      ['[Проект по интеграциям]']]]
+  };
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+
+  const all = Object.keys(DATA).flatMap(k => DATA[k][1].map((_, i) => k + '-' + (i + 1)));
+  const id = all.includes(location.hash.slice(1)) ? location.hash.slice(1) : all[0];
+  const [key, n] = id.split('-');
+  const [title, text, pics] = DATA[key][1][n - 1];
+
+  $('cLabel').textContent = 'Портфолио · ' + DATA[key][0];
+  $('cTitle').textContent = title;
+  document.title = title + ' — Катерина Степанова';
+  if (text) $('cText').innerHTML = text.map(t => '<p>' + esc(t) + '</p>').join('');
+  [0, 1, 2].forEach(i => {
+    const el = $('c' + i);
+    if (pics && pics[i]) el.innerHTML = '<img src="' + pics[i] + '" alt="" decoding="async" />';
+    else { el.classList.add('is-empty'); el.textContent = '[картинка]'; }
+  });
+
+  // «Вернуться на главную» — в папку, открытую на этой самой работе
+  $('cBack').href = 'index.html#cases-' + id;
+
+  // «Смотреть дальше» — следующая работа, после последней снова первая.
+  // replace, а не переход: листание не копит историю, «назад» ведёт на сайт
+  $('cNext').addEventListener('click', (e) => {
+    e.preventDefault();
+    location.replace('#' + all[(all.indexOf(id) + 1) % all.length]);
+    location.reload();
+  });
+
+  // ── Просмотр: картинки коллажа открываются крупно и листаются
+  const srcs = pics ? pics.filter(Boolean) : [];
+  let cur = 0;
+  const show = (i) => {
+    cur = Math.max(0, Math.min(srcs.length - 1, i));
+    $('lbImg').src = srcs[cur];
+    $('lbPrev').hidden = cur === 0;
+    $('lbNext').hidden = cur === srcs.length - 1;
+  };
+  const lbOpen = () => $('lb').classList.contains('is-open');
+  const openLb = (i) => { show(i); $('lb').classList.add('is-open'); document.body.classList.add('lb-open'); };
+  const closeLb = () => { $('lb').classList.remove('is-open'); document.body.classList.remove('lb-open'); };
+  [0, 1, 2].forEach(i => {
+    if (pics && pics[i]) $('c' + i).addEventListener('click', () => openLb(srcs.indexOf(pics[i])));
+  });
+  $('lbPrev').addEventListener('click', () => show(cur - 1));
+  $('lbNext').addEventListener('click', () => show(cur + 1));
+  $('lbClose').addEventListener('click', closeLb);
+  $('lb').addEventListener('click', (e) => { if (e.target.id === 'lb') closeLb(); });
+  let tx = 0;
+  $('lb').addEventListener('touchstart', (e) => { tx = e.changedTouches[0].clientX; }, { passive: true });
+  $('lb').addEventListener('touchend', (e) => {
+    const d = e.changedTouches[0].clientX - tx;
+    if (Math.abs(d) > 40) show(cur + (d < 0 ? 1 : -1));
+  }, { passive: true });
+  document.addEventListener('keydown', (e) => {
+    if (!lbOpen()) return;
+    if (e.key === 'Escape') closeLb();
+    if (e.key === 'ArrowLeft') show(cur - 1);
+    if (e.key === 'ArrowRight') show(cur + 1);
+  });
+</script>
+</body>
+</html>
