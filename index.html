@@ -1101,34 +1101,6 @@
     /* ── Портфолио ──
        Окно-папка — стили ниже, в блоке «Портфолио: окно-папка» */
     .cases__header { margin-bottom: 18px; }
-    /* Кнопка запуска. Родной пульт браузера — тёмная плашка во всю ширину
-       ролика, поверх акварели она грубовата. До первого нажатия пульта нет:
-       в кадре стоит постер и этот кружок. Нажали — кружок уходит навсегда,
-       дальше перемоткой и полным экраном заведует обычный пульт */
-    .video-play {
-      z-index: 1;
-      justify-self: center;
-      align-self: center;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 64px;
-      height: 64px;
-      /* треугольник рисуется от центра, а оптически центр у него правее */
-      padding-left: 4px;
-      border: none;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.9);
-      color: var(--accent);
-      box-shadow: 0 4px 16px rgba(26,26,26,0.35);
-      cursor: pointer;
-      transition: transform var(--transition), background var(--transition);
-    }
-    .video-play:hover { transform: scale(1.08); background: #fff; }
-    .is-started .video-play { display: none; }
-    @media (prefers-reduced-motion: reduce) {
-      .video-play:hover { transform: none; }
-    }
     /* Плашки — у прайсов под услугами: лесенкой портфолио они были раньше,
        отсюда и название класса */
     .case-plate {
@@ -1221,6 +1193,101 @@
     }
     @media (max-width: 900px) {
       .case-plate { width: 100%; margin-left: 0; }
+    }
+    /* ── Портфолио на телефоне ──
+       Окно-папка на узком экране прячется, вместо неё робот с табличкой
+       и работы списком плашек. Плашка ведёт на страницу работы, как кадр
+       в папке на ПК. Плашки собирает скрипт из списков папки */
+    .mcases { display: none; }
+    @keyframes stub-swing {
+      0%, 100% { transform: rotate(-3deg); }
+      50%      { transform: rotate(3deg); }
+    }
+    @media (max-width: 767px) {
+      /* только телефон: планшет с 768px видит папку, как ПК */
+      /* Плашки до выхода стоят на ширину экрана правее. clip, а не
+         hidden: hidden сделал бы секцию контейнером прокрутки */
+      #cases { overflow-x: clip; }
+      /* с id: правило самой папки стоит ниже по файлу и перебило бы */
+      #cases .cw { display: none; }
+      .mcases { display: block; }
+      .mcases__robot {
+        position: relative;
+        width: 42%;
+        margin: 0 auto;
+        opacity: 0;
+        transition: opacity .9s ease .2s;
+      }
+      .mcases__robot img {
+        position: relative;
+        display: block;
+        width: 100%;
+        height: auto;
+        /* маятник: ноги стоят, корпус качается */
+        transform-origin: 50% 98%;
+        animation: stub-swing 3.0s ease-in-out infinite;
+      }
+      /* тень пятном на полу под ступнями */
+      .mcases__shadow {
+        position: absolute;
+        left: 50%;
+        top: 98.1%;
+        width: 42%;
+        aspect-ratio: 16 / 1;
+        transform: translate(-50%, -50%);
+        background: radial-gradient(closest-side, rgba(26,26,26,0.20), rgba(26,26,26,0));
+      }
+      .mcases__list { margin: 16px 0 0; padding: 0; list-style: none; }
+      .mcases__item {
+        transform: translateX(100vw);
+        opacity: 0;
+        /* --in ставит скрипт по порядку плашек, отсюда очередь */
+        transition: transform 1.15s cubic-bezier(0.22, 0.9, 0.25, 1) calc(var(--in, 0) * 115ms),
+                    opacity   .65s  ease                             calc(var(--in, 0) * 115ms);
+      }
+      .mcases.is-live .mcases__robot { opacity: 1; }
+      .mcases.is-live .mcases__item { transform: none; opacity: 1; }
+      .mcases .case-plate {
+        width: 100%;
+        margin: 0 0 6px;
+        /* плашка высокая и кегль крупный: пальцем попадать, а не ногтем */
+        padding: 17px 18px;
+        justify-content: center;
+        text-align: center;
+        font-size: 19px;
+        /* длинные названия делятся пополам, а не роняют одно слово вниз */
+        text-wrap: balance;
+      }
+      /* работа ещё в разработке: страницы у неё нет, плашка не нажимается */
+      .mcases .case-plate.is-wip { cursor: default; }
+      .mcases .case-plate.is-wip .case-plate__text { opacity: 0.55; }
+      .mcases .case-plate.is-wip::after { content: none; }
+      .mcases .case-plate.is-wip:hover { transform: none; box-shadow: none; }
+      /* Свёрнутый список: сразу видно восемь работ, остальные под кнопкой.
+         Раскрылись — кнопка уходит */
+      .mcases__item.is-more { display: none; }
+      .mcases__list.is-expanded .mcases__item.is-more { display: block; }
+      .mcases__more {
+        display: block;
+        margin: 14px 16px 0;
+        padding: 6px 0;
+        width: calc(100% - 32px);
+        border: none;
+        background: none;
+        font-family: var(--font-body);
+        font-size: 16px;
+        color: var(--text);
+        cursor: pointer;
+      }
+      .mcases__more[hidden] { display: none; }
+    }
+    @media (min-width: 560px) and (max-width: 767px) {
+      /* экран пошире: робот в 42% уже великоват */
+      .mcases__robot { width: 32%; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .mcases__robot img { animation: none; }
+      .mcases__robot, .mcases__item { transition: none; transform: none; opacity: 1; }
     }
     /* Подпись под портфолио. Текстовый шрифт, а не заголовочный: строка
        читается как реплика от себя, а не как ещё один заголовок.
@@ -2178,7 +2245,7 @@
       transform: translateX(4px);
     }
     .cw__file.is-active .cw__num { opacity: 1; color: var(--accent); }
-    .cw__file[data-wip] .cw__fname { opacity: 0.6; font-style: italic; }
+    .cw__file[data-wip] .cw__fname { opacity: 0.6; }
 
     /* ── экран ── */
     .cw__screen {
@@ -2325,22 +2392,19 @@
     /* смена кадра: старый гаснет в дымку, новый проявляется из неё */
     .cw.is-shot .cw__shot.is-loading { opacity: 0; filter: blur(8px); transform: scale(1.015); }
 
+    /* Титульный ролик: собран в кадр 35:24 вместе с фоном, как титульные
+       картинки, и встаёт на весь экран папки. Крутится сам, без звука */
     .cw__video {
       inset: 0;
       display: none;
-      place-items: center;
-      padding: 4%;
+      cursor: pointer;
     }
-    .cw__video > * { grid-area: 1 / 1; }
-    .cw.is-video .cw__video { display: grid; }
+    .cw.is-video .cw__video { display: block; }
     .cw.is-video .cw__shot { display: none; }
-    .cw__video video {
-      max-width: 100%;
-      max-height: 100%;
-      border-radius: 12px;
-      box-shadow: 0 10px 30px rgba(25,25,25,0.35);
-    }
-    .is-started .video-play { display: none; }
+    /* pointer-events: none — мышь не попадает в сам ролик, и Edge не
+       выводит поверх свои кнопки («в отдельное окно», «улучшить видео»).
+       Клик ловит обёртка .cw__video */
+    .cw__video video { display: block; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
 
     .cw__empty {
       inset: 0;
@@ -2357,32 +2421,6 @@
     }
     .cw.is-empty .cw__empty { display: flex; }
 
-    /* стрелки — стеклянные кружки, чтобы не путались с нарисованными в кадре */
-    .cw__arrow {
-      top: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 44px;
-      height: 44px;
-      padding: 0;
-      border: 1px solid rgba(255,255,255,0.7);
-      border-radius: 50%;
-      background: rgba(250,250,249,0.6);
-      -webkit-backdrop-filter: blur(8px);
-      backdrop-filter: blur(8px);
-      color: var(--cw-ink);
-      cursor: pointer;
-      transform: translateY(-50%);
-      opacity: 0;
-      transition: opacity var(--transition), background var(--transition), transform var(--transition);
-    }
-    .cw__arrow[hidden] { display: none; }
-    .cw__arrow svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
-    .cw__arrow--prev { left: 14px; }
-    .cw__arrow--next { right: 14px; }
-    .cw__screen:hover .cw__arrow, .cw__arrow:focus-visible { opacity: 1; }
-    .cw__arrow:hover { background: #fff; transform: translateY(-50%) scale(1.08); }
 
     /* ── подвал окна ── */
     .cw__foot {
@@ -2482,10 +2520,6 @@
       .cw__file.is-active { transform: none; }
       .cw__fname { font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
       .cw__screen { aspect-ratio: 35 / 24; border-radius: 8px; }
-
-      .cw__arrow { opacity: 1; width: 38px; height: 38px; }
-      .cw__arrow--prev { left: 8px; }
-      .cw__arrow--next { right: 8px; }
       .cw__foot { font-size: 10.5px; margin-top: 12px; padding-top: 12px; gap: 8px; }
       .cw__foot-l svg { display: none; }
       .cw__hint { display: none; }
@@ -2766,29 +2800,29 @@
               <li><button type="button" class="cw__file cw__file--dir" data-open="crm"><span class="cw__num">04</span><span class="cw__fname">Интеграции и CRM</span></button></li>
             </ul>
             <ul class="cw__files" data-list="sites">
-              <li><button type="button" class="cw__file" data-shots="img/sait-unumgarden/1.jpg" data-shots-m="img/sait-unumgarden/m1.jpg,img/sait-unumgarden/m2.jpg,img/sait-unumgarden/m3.jpg,img/sait-unumgarden/m4.jpg"><span class="cw__num">01</span><span class="cw__fname">Сайт ландшафтного архитектора на Tilda</span></button></li>
-              <li><button type="button" class="cw__file" data-shots="img/sait-adminka/1.jpg,img/sait-adminka/2.jpg" data-shots-m="img/sait-adminka/m1.jpg,img/sait-adminka/m2.jpg"><span class="cw__num">02</span><span class="cw__fname">Сайт-админка для досок референсов</span></button></li>
-              <li><button type="button" class="cw__file" data-wip="1"><span class="cw__num">03</span><span class="cw__fname">Сайт-портфолио для ландшафтного архитектора</span></button></li>
+              <li><button type="button" class="cw__file" data-shots="img/sait-unumgarden/tit.mp4"><span class="cw__num">01</span><span class="cw__fname">Сайт ландшафтного архитектора на Tilda</span></button></li>
+              <li><button type="button" class="cw__file" data-shots="img/sait-adminka/tit.jpg"><span class="cw__num">02</span><span class="cw__fname">Сайт-админка для досок референсов</span></button></li>
+              <li><button type="button" class="cw__file" data-shots="img/sait-portfolio-unum/tit.jpg"><span class="cw__num">03</span><span class="cw__fname">Сайт-портфолио для ландшафтного архитектора</span></button></li>
             </ul>
             <ul class="cw__files" data-list="bots">
-              <li><button type="button" class="cw__file" data-shots="img/bot/1.jpg" data-shots-m="img/bot/m1.jpg"><span class="cw__num">01</span><span class="cw__fname">Бот с проверкой подписки</span></button></li>
-              <li><button type="button" class="cw__file" data-shots="img/bot/2.jpg" data-shots-m="img/bot/m2.jpg" data-video="img/bot/cards.mp4"><span class="cw__num">02</span><span class="cw__fname">Бот «Гадание на метаморфозных картах»</span></button></li>
-              <li><button type="button" class="cw__file" data-shots="img/bot/3-1.jpg,img/bot/3-2.jpg,img/bot/3-3.jpg,img/bot/3-4.jpg" data-shots-m="img/bot/m3-1.jpg,img/bot/m3-2.jpg,img/bot/m3-3.jpg,img/bot/m3-4.jpg"><span class="cw__num">03</span><span class="cw__fname">Бот клуба по подписке</span></button></li>
-              <li><button type="button" class="cw__file" data-shots="img/bot/4-1.jpg,img/bot/4-2.jpg" data-shots-m="img/bot/m4-1.jpg,img/bot/m4-2.jpg" data-video="img/bot/salon.mp4"><span class="cw__num">04</span><span class="cw__fname">Бот для салона красоты</span></button></li>
-              <li><button type="button" class="cw__file" data-shots="img/bot/5.jpg" data-shots-m="img/bot/m5.jpg"><span class="cw__num">05</span><span class="cw__fname">Бот с подключением AI</span></button></li>
-              <li><button type="button" class="cw__file" data-shots="img/bot/6-1.jpg,img/bot/6-2.jpg" data-shots-m="img/bot/m6-1.jpg,img/bot/m6-2.jpg"><span class="cw__num">06</span><span class="cw__fname">Бот-опросник</span></button></li>
+              <li><button type="button" class="cw__file" data-shots="img/bot/tit1.jpg"><span class="cw__num">01</span><span class="cw__fname">Бот с проверкой подписки</span></button></li>
+              <li><button type="button" class="cw__file" data-shots="img/bot/tit2.jpg"><span class="cw__num">02</span><span class="cw__fname">Бот «Гадание на метаморфозных картах»</span></button></li>
+              <li><button type="button" class="cw__file" data-shots="img/bot/tit3.jpg"><span class="cw__num">03</span><span class="cw__fname">Бот клуба по подписке</span></button></li>
+              <li><button type="button" class="cw__file" data-shots="img/bot/tit4.jpg"><span class="cw__num">04</span><span class="cw__fname">Бот для салона красоты</span></button></li>
+              <li><button type="button" class="cw__file" data-shots="img/bot/tit5.jpg"><span class="cw__num">05</span><span class="cw__fname">Бот с подключением AI</span></button></li>
+              <li><button type="button" class="cw__file" data-shots="img/bot/tit6.jpg"><span class="cw__num">06</span><span class="cw__fname">Бот-опросник</span></button></li>
             </ul>
             <ul class="cw__files" data-list="crm">
               <li><button type="button" class="cw__file" data-wip="1"><span class="cw__num">01</span><span class="cw__fname">[Проект по интеграциям]</span></button></li>
             </ul>
             <ul class="cw__files" data-list="design">
-              <li><button type="button" class="cw__file" data-shots="img/spravochnik/1.jpg,img/spravochnik/2.jpg,img/spravochnik/3.jpg,img/spravochnik/4.jpg,img/spravochnik/5.jpg,img/spravochnik/6.jpg" data-shots-m="img/spravochnik/m1.jpg,img/spravochnik/m2.jpg,img/spravochnik/m3.jpg,img/spravochnik/m4.jpg,img/spravochnik/m5.jpg,img/spravochnik/m6.jpg"><span class="cw__num">01</span><span class="cw__fname">Справочник «Лечение животных травами»</span></button></li>
+              <li><button type="button" class="cw__file" data-shots="img/spravochnik/tit.jpg"><span class="cw__num">01</span><span class="cw__fname">Справочник «Лечение животных травами»</span></button></li>
               <li><button type="button" class="cw__file" data-shots="img/present/1.jpg,img/present/2.jpg,img/present/3.jpg" data-shots-m="img/present/m1.jpg,img/present/m2.jpg,img/present/m3.jpg"><span class="cw__num">02</span><span class="cw__fname">Презентация для справочника</span></button></li>
-              <li><button type="button" class="cw__file" data-shots="img/albom/1.jpg,img/albom/2.jpg,img/albom/3.jpg,img/albom/4.jpg" data-shots-m="img/albom/m1.jpg,img/albom/m2.jpg,img/albom/m3.jpg,img/albom/m4.jpg"><span class="cw__num">03</span><span class="cw__fname">Альбом ландшафтного проекта</span></button></li>
-              <li><button type="button" class="cw__file" data-shots="img/kupon/1.jpg,img/kupon/2.jpg,img/kupon/3.jpg" data-shots-m="img/kupon/m1.jpg,img/kupon/m2.jpg,img/kupon/m3.jpg"><span class="cw__num">04</span><span class="cw__fname">Подарочные купоны для UNUM</span></button></li>
-              <li><button type="button" class="cw__file" data-shots="img/pechat/1.jpg" data-shots-m="img/pechat/m1.jpg"><span class="cw__num">05</span><span class="cw__fname">Графика на заказ</span></button></li>
-              <li><button type="button" class="cw__file" data-shots="img/vk-unum/1.jpg,img/vk-unum/2.jpg" data-shots-m="img/vk-unum/m1.jpg,img/vk-unum/m2.jpg"><span class="cw__num">06</span><span class="cw__fname">Группа ВКонтакте студии дизайна</span></button></li>
-              <li><button type="button" class="cw__file" data-shots="img/vk-univet/1.jpg,img/vk-univet/2.jpg,img/vk-univet/3.jpg,img/vk-univet/4.jpg,img/vk-univet/5.jpg" data-shots-m="img/vk-univet/m1.jpg,img/vk-univet/m2.jpg,img/vk-univet/m3.jpg,img/vk-univet/m4.jpg,img/vk-univet/m5.jpg"><span class="cw__num">07</span><span class="cw__fname">Группа ВКонтакте ветклиники «ЮниВет»</span></button></li>
+              <li><button type="button" class="cw__file" data-shots="img/albom/1.jpg,img/albom/2.jpg,img/albom/3.jpg,img/albom/4.jpg" data-shots-m="img/albom/m1.jpg,img/albom/m2.jpg,img/albom/m3.jpg,img/albom/m4.jpg"><span class="cw__num">03</span><span class="cw__fname">Вёрстка альбома ландшафтного проекта</span></button></li>
+              <li><button type="button" class="cw__file" data-shots="img/kupon/tit.jpg"><span class="cw__num">04</span><span class="cw__fname">Подарочные купоны для UNUM</span></button></li>
+              <li><button type="button" class="cw__file" data-shots="img/vk-unum/tit.jpg"><span class="cw__num">05</span><span class="cw__fname">Группа ВКонтакте студии дизайна</span></button></li>
+              <li><button type="button" class="cw__file" data-shots="img/vk-univet/tit.jpg"><span class="cw__num">06</span><span class="cw__fname">Группа ВКонтакте ветклиники «ЮниВет»</span></button></li>
+              <li><button type="button" class="cw__file" data-shots="img/pechat/tit.jpg"><span class="cw__num">07</span><span class="cw__fname">Графика на заказ</span></button></li>
             </ul>
           </nav>
 
@@ -2805,12 +2839,9 @@
             <!-- подпись едет за курсором по кадру: клик ведёт на страницу работы -->
             <span class="cw__tip" id="cwTip" aria-hidden="true">Смотреть детали и описание</span>
             <div class="cw__video" id="cwVideo">
-              <video playsinline preload="none"></video>
-              <button type="button" class="video-play" aria-label="Смотреть ролик"><svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></button>
+              <video playsinline muted loop preload="none" disablepictureinpicture disableremoteplayback></video>
             </div>
             <p class="cw__empty" id="cwEmpty"></p>
-            <button type="button" class="cw__arrow cw__arrow--prev" id="cwPrev" aria-label="Предыдущий кадр" hidden><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
-            <button type="button" class="cw__arrow cw__arrow--next" id="cwNext" aria-label="Следующий кадр" hidden><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
           </div>
         </div>
 
@@ -2823,6 +2854,18 @@
 
       <!-- курсор-подсказка: на обложке сам «тыкает» во вкладку -->
       <svg class="cw__hint" id="cwHint" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 2l16 11.2-7 1.3 4 7.6-3 1.5-4-7.6L4.6 21z"/></svg>
+    </div>
+
+    <!-- Телефон: вместо папки робот с табличкой и список работ.
+         Плашки собирает скрипт из списков папки выше: название и номер
+         работы правятся там, здесь ничего дублировать не надо -->
+    <div class="mcases" id="mCases">
+      <div class="mcases__robot" aria-hidden="true">
+        <span class="mcases__shadow"></span>
+        <img src="robot-cases-m.webp?v=2" width="552" height="695" alt="" loading="lazy" decoding="async" />
+      </div>
+      <ul class="mcases__list" id="mCasesList"></ul>
+      <button type="button" class="mcases__more" id="mCasesMore" aria-expanded="false" hidden>Смотреть больше ...</button>
     </div>
   </div>
   <!-- Подпись под портфолио: сайт собран руками, а не в конструкторе.
@@ -3374,6 +3417,64 @@
     io.observe(live);
   })();
 
+  // Портфолио на телефоне: плашки из списков папки, каждая ведёт на страницу
+  // работы. Порядок разделов как в старом списке: сайты, дизайн, боты
+  (function () {
+    const box = document.getElementById('mCases');
+    const win = document.getElementById('casesWin');
+    if (!box || !win) return;
+    const list = document.getElementById('mCasesList');
+    const more = document.getElementById('mCasesMore');
+    const SHOW = 8;   // сколько работ видно до кнопки «Смотреть больше»
+    let n = 0, target = null;
+    const back = location.hash.match(/^#cases-([a-z]+-\d+)$/);
+
+    ['sites', 'design', 'bots', 'crm'].forEach(tab => {
+      win.querySelectorAll('.cw__files[data-list="' + tab + '"] .cw__file').forEach((btn, i) => {
+        const id = tab + '-' + (i + 1);
+        const li = document.createElement('li');
+        li.className = 'mcases__item' + (n >= SHOW ? ' is-more' : '');
+        li.style.setProperty('--in', Math.min(n, SHOW));
+        const plate = document.createElement(btn.dataset.wip ? 'span' : 'a');
+        plate.className = 'case-plate' + (btn.dataset.wip ? ' is-wip' : '');
+        if (!btn.dataset.wip) plate.href = 'case.html#' + id;
+        plate.innerHTML = '<span class="case-plate__text"></span>';
+        plate.firstChild.textContent = btn.querySelector('.cw__fname').textContent;
+        li.appendChild(plate);
+        list.appendChild(li);
+        if (back && back[1] === id) target = plate;
+        n++;
+      });
+    });
+
+    if (n > SHOW) {
+      more.hidden = false;
+      more.addEventListener('click', () => {
+        list.classList.add('is-expanded');
+        more.setAttribute('aria-expanded', 'true');
+        more.hidden = true;
+      });
+    }
+
+    const narrow = window.matchMedia('(max-width: 767px)').matches;
+    // Возврат со страницы работы: список уже на месте, плашка подсвечена
+    if (target && narrow) {
+      box.classList.add('is-live');
+      target.classList.add('is-active');
+      if (target.parentNode.classList.contains('is-more')) more.click();
+      requestAnimationFrame(() => target.scrollIntoView({ block: 'center' }));
+      return;
+    }
+
+    if (!('IntersectionObserver' in window)) { box.classList.add('is-live'); return; }
+    // Робот проявляется, плашки въезжают справа по очереди — каждый раз,
+    // как блок заходит в кадр
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => box.classList.toggle('is-live', e.isIntersecting));
+    }, { threshold: 0.15 });
+    io.observe(box);
+  })();
+
   // Портфолио-окно (демо): вкладки разделов, список работ, экран с кадрами
   (function () {
     const win = document.getElementById('casesWin');
@@ -3384,11 +3485,8 @@
     const shot   = $('cwShot');
     const vBox   = $('cwVideo');
     const vid    = vBox.querySelector('video');
-    const play   = vBox.querySelector('.video-play');
     const empty  = $('cwEmpty');
     const screen = $('cwScreen');
-    const prev   = $('cwPrev');
-    const next   = $('cwNext');
     const meta   = { lk: $('cwMetaLk'), lv: $('cwMetaLv'), rk: $('cwMetaRk'), rv: $('cwMetaRv') };
     const foot   = { l: $('cwFootL'), c: $('cwFootC'), r: $('cwFootR') };
 
@@ -3491,12 +3589,12 @@
     };
     const isNarrow = () => window.matchMedia('(max-width: 900px)').matches;
     const isVideo = (src) => src.endsWith('.mp4');
+    // В папке у работы один кадр — титульный: листать здесь нечего,
+    // все снимки и описание — на странице работы, по клику на кадр.
+    // Берём мобильный: он 35:24, работа в нём по центру
     const shotsOf = (btn) => {
-      // в окне-папке и на ПК берём мобильные кадры: они 35:24 и работа в них по центру
       const src = btn.dataset.shotsM || btn.dataset.shots;
-      const list = src ? src.split(',') : [];
-      if (btn.dataset.video) list.push(btn.dataset.video);
-      return list;
+      return src ? [src.split(',')[0]] : [];
     };
 
     // очередь въезда пунктов списка
@@ -3527,9 +3625,7 @@
     };
 
     const syncFoot = () => {
-      prev.hidden = idx <= 0;
-      next.hidden = idx >= strip.length - 1;
-      foot.c.textContent = strip.length ? 'Кадр ' + pad(idx + 1) + ' / ' + pad(strip.length) : '—';
+      foot.c.textContent = strip.length ? 'Подробнее — по клику' : '—';
     };
 
     // Кадр: снимок проявляется из дымки, ролик встаёт на место снимка
@@ -3539,11 +3635,11 @@
       if (v) {
         if (vid.dataset.src !== src) {
           vid.dataset.src = src;
-          vid.controls = false;
-          vBox.classList.remove('is-started');
           vid.poster = src.replace('.mp4', '-poster.webp');
           vid.src = src;
         }
+        vid.muted = true;
+        vid.play().catch(() => {});
         return;
       }
       vid.pause();
@@ -3558,14 +3654,6 @@
         requestAnimationFrame(() => shot.classList.remove('is-loading'));
       };
       (img.decode ? img.decode() : Promise.resolve()).then(put, put);
-    };
-
-    const go = (d) => {
-      const n = Math.min(Math.max(idx + d, 0), strip.length - 1);
-      if (n === idx) return;
-      idx = n;
-      setFrame(strip[idx]);
-      syncFoot();
     };
 
     const openFile = (btn) => {
@@ -3617,7 +3705,6 @@
       foot.l.textContent = plural(total, 'работа', 'работы', 'работ');
       foot.c.textContent = 'В дизайне с 2014';
       foot.r.textContent = 'Техспец с 2025';
-      prev.hidden = next.hidden = true;
     };
 
     tabs.forEach(t => {
@@ -3632,18 +3719,6 @@
       if (b.dataset.open) { openTab(b.dataset.open); kick(); }
       else if (b !== file) openFile(b);
     });
-    prev.addEventListener('click', () => go(-1));
-    next.addEventListener('click', () => go(1));
-    play.addEventListener('click', () => { vBox.classList.add('is-started'); vid.controls = true; vid.play(); });
-
-    // смахивание по экрану на телефоне
-    let tx = 0;
-    screen.addEventListener('touchstart', (e) => { tx = e.changedTouches[0].clientX; }, { passive: true });
-    screen.addEventListener('touchend', (e) => {
-      if (!strip.length || e.target.closest('video')) return;
-      const d = e.changedTouches[0].clientX - tx;
-      if (Math.abs(d) > 40) go(d < 0 ? 1 : -1);
-    }, { passive: true });
 
     // Клик по кадру — страница работы. Адрес: раздел и номер работы в нём
     const caseUrl = () => {
@@ -3651,13 +3726,15 @@
       const list = [...win.querySelectorAll('.cw__files[data-list="' + tab + '"] .cw__file')];
       return 'case.html#' + tab + '-' + (list.indexOf(file) + 1);
     };
-    shot.addEventListener('click', () => { const u = caseUrl(); if (u) location.href = u; });
+    const toCase = () => { const u = caseUrl(); if (u) location.href = u; };
+    shot.addEventListener('click', toCase);
+    vBox.addEventListener('click', toCase);
 
     // Подпись «Смотреть детали и описание» едет за курсором. Только для мыши:
     // на телефоне наведения нет, там кадр открывается сразу по тапу
     const tip = $('cwTip');
     if (window.matchMedia('(hover: hover)').matches) {
-      shot.addEventListener('pointermove', (e) => {
+      const moveTip = (e) => {
         if (!win.classList.contains('is-open')) return;
         const r = screen.getBoundingClientRect();
         // у правого края подпись переезжает налево от курсора
@@ -3668,8 +3745,11 @@
         tip.style.setProperty('--tx', x + 'px');
         tip.style.setProperty('--ty', y + 'px');
         tip.classList.add('is-on');
+      };
+      [shot, vBox].forEach(el => {
+        el.addEventListener('pointermove', moveTip);
+        el.addEventListener('pointerleave', () => tip.classList.remove('is-on'));
       });
-      shot.addEventListener('pointerleave', () => tip.classList.remove('is-on'));
     }
     // ── Курсор-подсказка: пока папка закрыта, сам тычет во вкладки по
     // очереди — Сайты, Чат-боты, Дизайн, Интеграции — и так по кругу,
