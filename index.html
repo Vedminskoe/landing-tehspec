@@ -3041,7 +3041,7 @@
               <li><button type="button" class="cw__file cw__file--dir" data-open="crm"><span class="cw__num">04</span><span class="cw__fname">Интеграции и CRM</span></button></li>
             </ul>
             <ul class="cw__files" data-list="sites">
-              <li><button type="button" class="cw__file" data-shots="img/sait-unumgarden/tit.mp4"><span class="cw__num">01</span><span class="cw__fname">Сайт ландшафтного архитектора на Tilda</span></button></li>
+              <li><button type="button" class="cw__file" data-shots="img/sait-unumgarden/tit.mp4" data-tit-m="img/sait-unumgarden/tit-m.mp4"><span class="cw__num">01</span><span class="cw__fname">Сайт ландшафтного архитектора на Tilda</span></button></li>
               <li><button type="button" class="cw__file" data-shots="img/sait-adminka/tit.jpg"><span class="cw__num">02</span><span class="cw__fname">Сайт-админка для досок референсов</span></button></li>
               <li><button type="button" class="cw__file" data-shots="img/sait-portfolio-unum/tit.jpg"><span class="cw__num">03</span><span class="cw__fname">Сайт-портфолио для ландшафтного архитектора</span></button></li>
             </ul>
@@ -3054,7 +3054,7 @@
               <li><button type="button" class="cw__file" data-shots="img/bot/tit6.jpg"><span class="cw__num">06</span><span class="cw__fname">Бот-опросник</span></button></li>
             </ul>
             <ul class="cw__files" data-list="crm">
-              <li><button type="button" class="cw__file" data-wip="1"><span class="cw__num">01</span><span class="cw__fname">[Проект по интеграциям]</span></button></li>
+              <li><button type="button" class="cw__file" data-wip="1"><span class="cw__num">01</span><span class="cw__fname">Проекты по интеграциям</span></button></li>
             </ul>
             <ul class="cw__files" data-list="design">
               <li><button type="button" class="cw__file" data-shots="img/spravochnik/tit.jpg"><span class="cw__num">01</span><span class="cw__fname">Справочник «Лечение животных травами»</span></button></li>
@@ -3695,8 +3695,9 @@
         li.appendChild(plate);
         // Первый тап по плашке раскрывает под ней титульный кадр, тап по кадру
         // ведёт на страницу работы. Тап по открытой плашке её сворачивает
-        // титульник — тот же кадр, что в папке на ПК
-        const tit = (btn.dataset.shotsM || btn.dataset.shots || '').split(',')[0];
+        // титульник — тот же кадр, что в папке на ПК; у тяжёлых роликов
+        // для телефона свой облегчённый (data-tit-m)
+        const tit = btn.dataset.titM || (btn.dataset.shotsM || btn.dataset.shots || '').split(',')[0];
         if (!btn.dataset.wip && tit) plate.addEventListener('click', (e) => {
           e.preventDefault();
           const open = list.querySelector('.mcases__shot');
@@ -3944,7 +3945,7 @@
         win.classList.add('is-empty');
         vid.pause();
         empty.textContent = tab === 'crm'
-          ? '[Здесь появятся проекты по интеграциям и CRM]'
+          ? 'Скоро здесь появятся проекты по интеграциям и CRM'
           : 'В работе — покажу, когда будет готово';
       } else {
         win.classList.remove('is-empty');
