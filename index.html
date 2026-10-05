@@ -2538,31 +2538,38 @@
       }
       /* столбик кружков стоит над серединой головы (она на 46% ширины
          робота от среза — ровно там, где правый край надписи) */
-      .cw__say--hi i:nth-child(1) { right: -2px; top: 58px; width: 12px; height: 9px; }
-      .cw__say--hi i:nth-child(2) { right: 1px;  top: 80px; width: 9px;  height: 7px; }
-      .cw__say--hi i:nth-child(3) { right: 3px;  top: 98px; width: 6px;  height: 5px; }
+      .cw__say--hi i:nth-of-type(1) { right: -2px; top: 58px; width: 12px; height: 9px; }
+      .cw__say--hi i:nth-of-type(2) { right: 1px;  top: 80px; width: 9px;  height: 7px; }
+      .cw__say--hi i:nth-of-type(3) { right: 3px;  top: 98px; width: 6px;  height: 5px; }
       /* кружки «всплывают» от головы к надписи */
       .cw__peek.say-hi .cw__say--hi i { opacity: 1; }
-      .cw__peek.say-hi .cw__say--hi i:nth-child(3) { transition-delay: 0s; }
-      .cw__peek.say-hi .cw__say--hi i:nth-child(2) { transition-delay: .15s; }
-      .cw__peek.say-hi .cw__say--hi i:nth-child(1) { transition-delay: .3s; }
+      .cw__peek.say-hi .cw__say--hi i:nth-of-type(3) { transition-delay: 0s; }
+      .cw__peek.say-hi .cw__say--hi i:nth-of-type(2) { transition-delay: .15s; }
+      .cw__peek.say-hi .cw__say--hi i:nth-of-type(1) { transition-delay: .3s; }
       .cw__peek.is-right .cw__say { right: auto; left: 24%; transform: translateY(6px) rotate(6deg); }
       /* «шур-шур» из-за папки: крупнее, дальше и ниже, по кусочку —
          «шур-», потом «шур», потом многоточие */
       .cw__say--shur { right: 24%; font-size: 58px; }
       .cw__peek.is-right .cw__say--shur { left: 40%; bottom: 52%; }
-      .cw__say--shur b { display: inline-block; font-weight: inherit; opacity: 0; transition: opacity .6s ease; }
-      /* пока висит, кусочки мелко шевелятся вразнобой — будто шуршит */
-      .cw__peek.say-shur .cw__say--shur b { animation: shur-shake .5s ease-in-out infinite alternate; }
-      .cw__peek.say-shur .cw__say--shur b:nth-child(2) { animation-duration: .43s; animation-delay: -.2s; }
-      .cw__peek.say-shur .cw__say--shur b:nth-child(3) { animation-duration: .57s; animation-delay: -.35s; }
+      /* обе реплики проявляются по кусочку и, пока висят, кусочки мелко
+         шевелятся вразнобой. У «привета» кусочки — слова, они идут после
+         кружков мысли */
+      .cw__say b { display: inline-block; font-weight: inherit; opacity: 0; transition: opacity .6s ease; }
+      .cw__peek.say-shur .cw__say--shur b,
+      .cw__peek.say-hi .cw__say--hi b { opacity: 1; animation: shur-shake .5s ease-in-out infinite alternate; }
+      .cw__peek.say-shur .cw__say--shur b:nth-child(2),
+      .cw__peek.say-hi .cw__say--hi b:nth-child(2) { animation-duration: .43s; animation-delay: -.2s; }
+      .cw__peek.say-shur .cw__say--shur b:nth-child(3),
+      .cw__peek.say-hi .cw__say--hi b:nth-child(3) { animation-duration: .57s; animation-delay: -.35s; }
+      .cw__peek.say-hi .cw__say--hi b:nth-child(1) { transition-delay: .5s; }
+      .cw__peek.say-hi .cw__say--hi b:nth-child(2) { transition-delay: 1.2s; }
+      .cw__peek.say-hi .cw__say--hi b:nth-child(3) { transition-delay: 1.9s; }
       @keyframes shur-shake {
         0%   { transform: translate(0, 0) rotate(-3deg); }
         50%  { transform: translate(1.5px, -2px) rotate(2deg); }
         100% { transform: translate(-1px, 1px) rotate(-1deg); }
       }
       @media (prefers-reduced-motion: reduce) { .cw__say--shur b { animation: none !important; } }
-      .cw__peek.say-shur .cw__say--shur b { opacity: 1; }
       .cw__peek.say-shur .cw__say--shur b:nth-child(2) { transition-delay: .7s; }
       .cw__peek.say-shur .cw__say--shur b:nth-child(3) { transition-delay: 1.4s; }
       .cw__peek.say-hi .cw__say--hi,
@@ -3013,7 +3020,7 @@
         <div class="cw__peek-body"><img src="robot-peek.webp" width="308" height="537" alt="" loading="lazy" decoding="async" /></div>
         <img class="cw__peek-hand" src="robot-peek-hand.webp" width="39" height="112" alt="" loading="lazy" decoding="async" />
         <!-- реплики: «привет» после выхода слева, «шур-шур» перед выходом справа -->
-        <span class="cw__say cw__say--hi">Привет, я Гриша!<i></i><i></i><i></i></span>
+        <span class="cw__say cw__say--hi"><b>Привет,</b> <b>я</b> <b>Гриша!</b><i></i><i></i><i></i></span>
         <span class="cw__say cw__say--shur"><b>шур-</b><b>шур</b><b>…</b></span>
       </div>
     </div>
