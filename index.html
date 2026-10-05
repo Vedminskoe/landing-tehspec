@@ -3058,8 +3058,8 @@
             </ul>
             <ul class="cw__files" data-list="design">
               <li><button type="button" class="cw__file" data-shots="img/spravochnik/tit.jpg"><span class="cw__num">01</span><span class="cw__fname">Справочник «Лечение животных травами»</span></button></li>
-              <li><button type="button" class="cw__file" data-shots="img/present/1.jpg,img/present/2.jpg,img/present/3.jpg" data-shots-m="img/present/m1.jpg,img/present/m2.jpg,img/present/m3.jpg"><span class="cw__num">02</span><span class="cw__fname">Презентация для справочника</span></button></li>
-              <li><button type="button" class="cw__file" data-shots="img/albom/1.jpg,img/albom/2.jpg,img/albom/3.jpg,img/albom/4.jpg" data-shots-m="img/albom/m1.jpg,img/albom/m2.jpg,img/albom/m3.jpg,img/albom/m4.jpg"><span class="cw__num">03</span><span class="cw__fname">Вёрстка альбома ландшафтного проекта</span></button></li>
+              <li><button type="button" class="cw__file" data-shots="img/present/tit.jpg"><span class="cw__num">02</span><span class="cw__fname">Презентация для справочника</span></button></li>
+              <li><button type="button" class="cw__file" data-shots="img/albom/tit.jpg"><span class="cw__num">03</span><span class="cw__fname">Вёрстка альбома ландшафтного проекта</span></button></li>
               <li><button type="button" class="cw__file" data-shots="img/kupon/tit.jpg"><span class="cw__num">04</span><span class="cw__fname">Подарочные купоны для UNUM</span></button></li>
               <li><button type="button" class="cw__file" data-shots="img/vk-unum/tit.jpg"><span class="cw__num">05</span><span class="cw__fname">Группа ВКонтакте студии дизайна</span></button></li>
               <li><button type="button" class="cw__file" data-shots="img/vk-univet/tit.jpg"><span class="cw__num">06</span><span class="cw__fname">Группа ВКонтакте ветклиники «ЮниВет»</span></button></li>
@@ -3695,7 +3695,8 @@
         li.appendChild(plate);
         // Первый тап по плашке раскрывает под ней титульный кадр, тап по кадру
         // ведёт на страницу работы. Тап по открытой плашке её сворачивает
-        const tit = (btn.dataset.shots || '').split(',')[0];
+        // титульник — тот же кадр, что в папке на ПК
+        const tit = (btn.dataset.shotsM || btn.dataset.shots || '').split(',')[0];
         if (!btn.dataset.wip && tit) plate.addEventListener('click', (e) => {
           e.preventDefault();
           const open = list.querySelector('.mcases__shot');
