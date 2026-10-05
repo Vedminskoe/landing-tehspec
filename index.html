@@ -3680,7 +3680,13 @@
       setMeta('Раздел:', t.dataset.name, 'Открыто:', name);
       syncFoot();
       // на телефоне активная работа подъезжает в видимую часть ленты
-      if (isNarrow()) btn.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+      // Ленту работ двигаем саму, а не scrollIntoView: тот прокручивал и
+      // все обёртки вокруг, и окно папки уезжало вбок
+      if (isNarrow()) {
+        const list = btn.closest('.cw__files');
+        const l = list.getBoundingClientRect(), r = btn.getBoundingClientRect();
+        list.scrollTo({ left: list.scrollLeft + (r.left - l.left) - (l.width - r.width) / 2, behavior: 'smooth' });
+      }
     };
 
     const openTab = (name) => {
