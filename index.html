@@ -2564,17 +2564,81 @@
       .cw__peek.say-hi .cw__say--hi b:nth-child(1) { transition-delay: .5s; }
       .cw__peek.say-hi .cw__say--hi b:nth-child(2) { transition-delay: 1.2s; }
       .cw__peek.say-hi .cw__say--hi b:nth-child(3) { transition-delay: 1.9s; }
-      @keyframes shur-shake {
-        0%   { transform: translate(0, 0) rotate(-3deg); }
-        50%  { transform: translate(1.5px, -2px) rotate(2deg); }
-        100% { transform: translate(-1px, 1px) rotate(-1deg); }
-      }
       @media (prefers-reduced-motion: reduce) { .cw__say--shur b { animation: none !important; } }
       .cw__peek.say-shur .cw__say--shur b:nth-child(2) { transition-delay: .7s; }
       .cw__peek.say-shur .cw__say--shur b:nth-child(3) { transition-delay: 1.4s; }
       .cw__peek.say-hi .cw__say--hi,
       .cw__peek.say-shur .cw__say--shur { opacity: 1; transform: rotate(-6deg); }
       .cw__peek.is-right.say-shur .cw__say--shur { transform: rotate(6deg); }
+    }
+    @keyframes shur-shake {
+      0%   { transform: translate(0, 0) rotate(-3deg); }
+      50%  { transform: translate(1.5px, -2px) rotate(2deg); }
+      100% { transform: translate(-1px, 1px) rotate(-1deg); }
+    }
+    /* Планшет: места по бокам папки нет, поэтому Гриша выглядывает из-за
+       правого края экрана над папкой, рядом с заголовком. Сторону не
+       меняет, пальцев нет, перед каждым выходом — «шур-шур» */
+    @media (min-width: 768px) and (max-width: 1099px) {
+      .cw__peek {
+        display: block;
+        position: absolute;
+        /* ноги — на линии вкладок, макушка не залезает под шапку сайта */
+        width: 110px;
+        aspect-ratio: 608 / 1061;
+        right: calc((100% - 100vw) / 2);
+        bottom: 100%;
+        pointer-events: none;
+      }
+      .cw__peek-body { position: absolute; inset: 0; overflow: hidden; }
+      .cw__peek-body img {
+        display: block; width: 100%; height: 100%;
+        transform: translateX(101%);
+        transition: transform .55s cubic-bezier(.5,0,.75,0);
+      }
+      .cw__peek.is-out .cw__peek-body img { transform: translateX(0); transition: transform 1.3s cubic-bezier(.25,.8,.3,1); }
+      .cw__peek-hand { display: none; }
+      /* iPad в альбомной (1024): над папкой места меньше */
+      @media (min-width: 901px) { .cw__peek { width: 84px; } .cw__say { font-size: 30px !important; } }
+      .cw__say b { display: inline-block; font-weight: inherit; opacity: 0; transition: opacity .6s ease; }
+      /* «шур-шур» перед выходом — там же, где потом будет мысль */
+      .cw__say--shur {
+        display: block;
+        position: absolute;
+        right: 70%;
+        bottom: 40%;
+        font: 40px/1 var(--font-script);
+        color: #3c3c3c;
+        white-space: nowrap;
+        transform: rotate(-6deg);
+      }
+      .cw__peek.say-shur .cw__say--shur b { opacity: 1; animation: shur-shake .5s ease-in-out infinite alternate; }
+      .cw__peek.say-shur .cw__say--shur b:nth-child(2) { transition-delay: .7s; animation-duration: .43s; animation-delay: -.2s; }
+      .cw__peek.say-shur .cw__say--shur b:nth-child(3) { transition-delay: 1.4s; animation-duration: .57s; animation-delay: -.35s; }
+      /* мысль — слева от робота, кружки ведут к голове */
+      .cw__say--hi {
+        display: block;
+        position: absolute;
+        right: 92%;
+        bottom: 66%;
+        font: 34px/1 var(--font-script);
+        color: #3c3c3c;
+        white-space: nowrap;
+        opacity: 0;
+        transform: rotate(-6deg);
+        transition: opacity .5s ease;
+      }
+      .cw__say--hi i { position: absolute; border: 1.5px solid #3c3c3c; border-radius: 50%; opacity: 0; transition: opacity .3s ease; }
+      .cw__say--hi i:nth-of-type(1) { right: -14px; top: 40px; width: 11px; height: 8px; }
+      .cw__say--hi i:nth-of-type(2) { right: -24px; top: 54px; width: 8px;  height: 6px; }
+      .cw__say--hi i:nth-of-type(3) { right: -32px; top: 66px; width: 5px;  height: 4px; }
+      .cw__peek.say-hi .cw__say--hi, .cw__peek.say-hi .cw__say--hi i { opacity: 1; }
+      .cw__peek.say-hi .cw__say--hi i:nth-of-type(2) { transition-delay: .15s; }
+      .cw__peek.say-hi .cw__say--hi i:nth-of-type(1) { transition-delay: .3s; }
+      .cw__peek.say-hi .cw__say--hi b { opacity: 1; animation: shur-shake .5s ease-in-out infinite alternate; }
+      .cw__peek.say-hi .cw__say--hi b:nth-child(1) { transition-delay: .5s; }
+      .cw__peek.say-hi .cw__say--hi b:nth-child(2) { transition-delay: 1.2s; animation-duration: .43s; animation-delay: -.2s; }
+      .cw__peek.say-hi .cw__say--hi b:nth-child(3) { transition-delay: 1.9s; animation-duration: .57s; animation-delay: -.35s; }
     }
     @media (prefers-reduced-motion: reduce) {
       .cw__peek { display: none !important; }
@@ -2595,6 +2659,21 @@
     }
     .cw__foot svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
     .cw__foot-l { display: flex; align-items: center; gap: 10px; }
+    .cw__back {
+      display: none;
+      align-items: center;
+      gap: 4px;
+      margin: -6px 0 -6px -6px;
+      padding: 6px;
+      border: none;
+      background: none;
+      font: inherit;
+      letter-spacing: inherit;
+      text-transform: inherit;
+      color: var(--accent);
+      cursor: pointer;
+    }
+    .cw__foot-l .cw__back svg { display: block; width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
     .cw__foot-c { font-variant-numeric: tabular-nums; }
     .cw__foot-r { justify-self: end; text-align: right; white-space: nowrap; }
 
@@ -2681,6 +2760,10 @@
       .cw__foot { font-size: 10.5px; margin-top: 12px; padding-top: 12px; gap: 8px; }
       .cw__foot-l svg { display: none; }
       .cw__hint { display: none; }
+      /* На планшете нет «светофора» с крестиком, поэтому в открытой папке
+         слева внизу вместо числа работ — «Закрыть»: назад на обложку */
+      .cw.is-open #cwFootL { display: none; }
+      .cw.is-open .cw__back { display: inline-flex; }
     }
 
   </style>
@@ -3004,7 +3087,7 @@
         </div>
 
         <div class="cw__foot">
-          <span class="cw__foot-l"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span id="cwFootL">15 работ</span></span>
+          <span class="cw__foot-l"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span id="cwFootL">15 работ</span><button type="button" class="cw__back" id="cwBack"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Закрыть</button></span>
           <span class="cw__foot-c" id="cwFootC">В дизайне с 2014</span>
           <span class="cw__foot-r" id="cwFootR">Техспец с 2025</span>
         </div>
@@ -3910,6 +3993,7 @@
       t.addEventListener('pointerleave', () => kick());
     });
     win.querySelector('.cw__light--close').addEventListener('click', () => { home(); kick(); startHint(2500); });
+    $('cwBack').addEventListener('click', () => { home(); kick(); });
     win.querySelector('.cw__side').addEventListener('click', (e) => {
       const b = e.target.closest('.cw__file');
       if (!b) return;
@@ -4033,7 +4117,13 @@
     if (!peek || !('IntersectionObserver' in window)) return;
     const OUT = 7200, IN = 1600;   // сколько сидит снаружи и сколько спрятан
     const SHUR = 4800;             // «шур-шур» появляется по кусочку (2s) и висит ещё ~3s до выхода справа
+    // на планшете всегда с одной стороны и «шур-шур» перед каждым выходом
+    const compact = matchMedia('(max-width: 1099px)').matches;
     let timer = 0, sayT = 0, on = false;
+    const shur = () => {
+      peek.classList.add('say-shur');
+      timer = setTimeout(() => { peek.classList.remove('say-shur'); timer = setTimeout(show, 600); }, SHUR);
+    };
     const show = () => {
       peek.classList.add('is-out');
       // слева здоровается, когда уже выглянул, и замолкает до того, как спрячется
@@ -4050,17 +4140,15 @@
       peek.classList.remove('is-out', 'say-hi');
       // сторону меняем, пока он за папкой; справа сначала «шур-шур»
       timer = setTimeout(() => {
-        if (peek.classList.toggle('is-right')) {
-          peek.classList.add('say-shur');
-          timer = setTimeout(() => { peek.classList.remove('say-shur'); timer = setTimeout(show, 600); }, SHUR);
-        } else show();
+        if (compact || peek.classList.toggle('is-right')) shur();
+        else show();
       }, IN);
     };
     new IntersectionObserver(([e]) => {
       if (e.isIntersecting === on) return;
       on = e.isIntersecting;
       clearTimeout(timer); clearTimeout(sayT);
-      if (on) timer = setTimeout(show, 1200);
+      if (on) timer = setTimeout(compact ? shur : show, compact ? 600 : 1200);
       else peek.classList.remove('is-out', 'is-right', 'say-hi', 'say-shur');
     }, { threshold: 0.35 }).observe(document.getElementById('casesWin'));
   })();
