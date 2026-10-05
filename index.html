@@ -1280,6 +1280,32 @@
         cursor: pointer;
       }
       .mcases__more[hidden] { display: none; }
+      /* титульный кадр, раскрытый под плашкой */
+      /* кадр, под ним ладошка и надпись: подсказка не закрывает картинку */
+      .mcases__shot { display: flex; flex-direction: column; align-items: center; margin: 2px 0 18px; }
+      .mcases__shot img, .mcases__shot video {
+        display: block; width: 100%; height: auto; pointer-events: none;
+        border-radius: 10px; box-shadow: 0 10px 26px -12px rgba(26,26,26,0.4);
+      }
+      /* ладошка — как иконки в карточках услуг: зелёный контур,
+         так же прочерчивается при появлении */
+      .mcases__hand { display: flex; margin-top: 14px; color: var(--accent); }
+      .mcases__hand svg {
+        width: 28px; height: 28px;
+        fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+      }
+      .mcases__hand path { stroke-dasharray: 220; animation: hand-draw 1.1s ease .2s backwards; }
+      @keyframes hand-draw { from { stroke-dashoffset: 220; } to { stroke-dashoffset: 0; } }
+      @media (prefers-reduced-motion: reduce) { .mcases__hand path { animation: none; } }
+      /* надпись как «Смотреть больше» на странице работы */
+      .mcases__hint {
+        margin-top: 8px;
+        font: 500 15px/1.4 var(--font-body);
+        color: var(--accent);
+        text-decoration: underline;
+        text-underline-offset: 3px;
+        white-space: nowrap;
+      }
     }
     @media (min-width: 560px) and (max-width: 767px) {
       /* экран пошире: робот в 42% уже великоват */
@@ -2422,6 +2448,131 @@
     .cw.is-empty .cw__empty { display: flex; }
 
 
+    /* ── Робот выглядывает из-за папки (только ПК) ──
+       Размер — как робот в услугах: голова того же размера, 154px ширины.
+       На узком ПК меньше, чтобы влезал в поле слева от папки (920px) */
+    .cw__peek { display: none; }
+    @media (min-width: 1100px) {
+      .cw__peek {
+        --pk: min(154px, calc((100vw - 920px) / 2 - 14px));
+        /* Срез туловища — ровно по внешней тёмной линии рамки: она на 2px
+           левее коробки папки. Правее срез ложился на светлую рамку и был
+           виден, а под рамкой робот просвечивал сквозь стекло */
+        --ov: -2px;
+        display: block;
+        position: absolute;
+        /* без z-index и transform: туловище встаёт под стекло папки,
+           а пальцы — над ним, в общем слое папки */
+        /* справа — повыше, чтобы не прятался за плашкой cookie */
+        top: 22%;
+        right: calc(100% - var(--ov));
+        width: var(--pk);
+        aspect-ratio: 608 / 1061;
+        pointer-events: none;
+      }
+      /* слева ниже, чем справа: над ним место под мысль-надпись */
+      .cw__peek:not(.is-right) { top: 42%; }
+      /* справа — зеркально: срез туловища у правого края папки */
+      .cw__peek.is-right { right: auto; left: calc(100% - var(--ov)); }
+      /* туловище за краем папки: обёртка режет всё, что правее среза */
+      .cw__peek-body { position: absolute; inset: 0; z-index: 6; overflow: hidden; }
+      .cw__peek.is-right .cw__peek-body { transform: scaleX(-1); }
+      .cw__peek-body img {
+        display: block; width: 100%; height: 100%;
+        transform: translateX(101%);
+        transform-origin: 100% 85%;
+        transition: transform .55s cubic-bezier(.5,0,.75,0);
+      }
+      /* Выезжает плавно, без качания и перелёта: при наклоне и заходе
+         дальше края из-за папки показывался срез туловища */
+      .cw__peek.is-out .cw__peek-body img {
+        transform: translateX(0);
+        transition: transform 1.3s cubic-bezier(.25,.8,.3,1);
+      }
+      /* пальцы на краю папки: появляются, когда туловище уже выглянуло */
+      .cw__peek-hand {
+        position: absolute;
+        z-index: 6;
+        left: 100%;
+        top: 73.2%;
+        width: 12.7%;
+        height: auto;
+        opacity: 0;
+        transform: translateX(-60%);
+        transition: opacity .2s ease, transform .2s ease;
+      }
+      .cw__peek.is-out .cw__peek-hand {
+        opacity: 1; transform: none;
+        transition: opacity .3s ease .7s, transform .35s cubic-bezier(.2,.9,.3,1) .7s;
+      }
+      .cw__peek.is-right .cw__peek-hand { left: auto; right: 100%; transform: translateX(60%) scaleX(-1); }
+      .cw__peek.is-right.is-out .cw__peek-hand { transform: scaleX(-1); }
+    }
+    /* Реплики рукописным шрифтом сайта, как подписи от руки. Только на
+       широком ПК: на узком над роботом им не хватает места */
+    .cw__say { display: none; }
+    @media (min-width: 1400px) {
+      .cw__say {
+        display: block;
+        position: absolute;
+        z-index: 6;
+        bottom: 100%;
+        margin-bottom: 4px;
+        font: 44px/1 var(--font-script);
+        color: #3c3c3c;
+        white-space: nowrap;
+        opacity: 0;
+        transform: translateY(6px) rotate(-6deg);
+        transition: opacity .5s ease, transform .5s ease;
+      }
+      /* слева — над роботом, к краю папки; справа — зеркально */
+      /* привет — его мысль: выше и дальше от папки, к голове ведут
+         три кружка, от большого к маленькому */
+      .cw__say--hi { right: 46%; margin-bottom: 46px; }
+      .cw__say--hi i {
+        position: absolute;
+        border: 1.5px solid #3c3c3c;
+        border-radius: 50%;
+        opacity: 0;
+        transition: opacity .3s ease;
+      }
+      /* столбик кружков стоит над серединой головы (она на 46% ширины
+         робота от среза — ровно там, где правый край надписи) */
+      .cw__say--hi i:nth-child(1) { right: -2px; top: 58px; width: 12px; height: 9px; }
+      .cw__say--hi i:nth-child(2) { right: 1px;  top: 80px; width: 9px;  height: 7px; }
+      .cw__say--hi i:nth-child(3) { right: 3px;  top: 98px; width: 6px;  height: 5px; }
+      /* кружки «всплывают» от головы к надписи */
+      .cw__peek.say-hi .cw__say--hi i { opacity: 1; }
+      .cw__peek.say-hi .cw__say--hi i:nth-child(3) { transition-delay: 0s; }
+      .cw__peek.say-hi .cw__say--hi i:nth-child(2) { transition-delay: .15s; }
+      .cw__peek.say-hi .cw__say--hi i:nth-child(1) { transition-delay: .3s; }
+      .cw__peek.is-right .cw__say { right: auto; left: 24%; transform: translateY(6px) rotate(6deg); }
+      /* «шур-шур» из-за папки: крупнее, дальше и ниже, по кусочку —
+         «шур-», потом «шур», потом многоточие */
+      .cw__say--shur { right: 24%; font-size: 58px; }
+      .cw__peek.is-right .cw__say--shur { left: 40%; bottom: 52%; }
+      .cw__say--shur b { display: inline-block; font-weight: inherit; opacity: 0; transition: opacity .6s ease; }
+      /* пока висит, кусочки мелко шевелятся вразнобой — будто шуршит */
+      .cw__peek.say-shur .cw__say--shur b { animation: shur-shake .5s ease-in-out infinite alternate; }
+      .cw__peek.say-shur .cw__say--shur b:nth-child(2) { animation-duration: .43s; animation-delay: -.2s; }
+      .cw__peek.say-shur .cw__say--shur b:nth-child(3) { animation-duration: .57s; animation-delay: -.35s; }
+      @keyframes shur-shake {
+        0%   { transform: translate(0, 0) rotate(-3deg); }
+        50%  { transform: translate(1.5px, -2px) rotate(2deg); }
+        100% { transform: translate(-1px, 1px) rotate(-1deg); }
+      }
+      @media (prefers-reduced-motion: reduce) { .cw__say--shur b { animation: none !important; } }
+      .cw__peek.say-shur .cw__say--shur b { opacity: 1; }
+      .cw__peek.say-shur .cw__say--shur b:nth-child(2) { transition-delay: .7s; }
+      .cw__peek.say-shur .cw__say--shur b:nth-child(3) { transition-delay: 1.4s; }
+      .cw__peek.say-hi .cw__say--hi,
+      .cw__peek.say-shur .cw__say--shur { opacity: 1; transform: rotate(-6deg); }
+      .cw__peek.is-right.say-shur .cw__say--shur { transform: rotate(6deg); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .cw__peek { display: none !important; }
+    }
+
     /* ── подвал окна ── */
     .cw__foot {
       display: grid;
@@ -2854,6 +3005,17 @@
 
       <!-- курсор-подсказка: на обложке сам «тыкает» во вкладку -->
       <svg class="cw__hint" id="cwHint" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 2l16 11.2-7 1.3 4 7.6-3 1.5-4-7.6L4.6 21z"/></svg>
+
+      <!-- Робот выглядывает из-за папки: то слева, то справа (скрипт меняет
+           сторону, пока он спрятан). Туловище выезжает из-за края, пальцы
+           отдельным слоем ложатся поверх папки -->
+      <div class="cw__peek" id="cwPeek" aria-hidden="true">
+        <div class="cw__peek-body"><img src="robot-peek.webp" width="308" height="537" alt="" loading="lazy" decoding="async" /></div>
+        <img class="cw__peek-hand" src="robot-peek-hand.webp" width="39" height="112" alt="" loading="lazy" decoding="async" />
+        <!-- реплики: «привет» после выхода слева, «шур-шур» перед выходом справа -->
+        <span class="cw__say cw__say--hi">Привет, я Гриша!<i></i><i></i><i></i></span>
+        <span class="cw__say cw__say--shur"><b>шур-</b><b>шур</b><b>…</b></span>
+      </div>
     </div>
 
     <!-- Телефон: вместо папки робот с табличкой и список работ.
@@ -3441,6 +3603,28 @@
         plate.innerHTML = '<span class="case-plate__text"></span>';
         plate.firstChild.textContent = btn.querySelector('.cw__fname').textContent;
         li.appendChild(plate);
+        // Первый тап по плашке раскрывает под ней титульный кадр, тап по кадру
+        // ведёт на страницу работы. Тап по открытой плашке её сворачивает
+        const tit = (btn.dataset.shots || '').split(',')[0];
+        if (!btn.dataset.wip && tit) plate.addEventListener('click', (e) => {
+          e.preventDefault();
+          const open = list.querySelector('.mcases__shot');
+          if (open) { open.previousElementSibling.classList.remove('is-active'); open.remove(); }
+          if (open && open._li === li) return;
+          const shot = document.createElement('a');
+          shot.className = 'mcases__shot';
+          shot._li = li;
+          shot.href = plate.href;
+          shot.innerHTML = (tit.endsWith('.mp4')
+            ? '<video src="' + tit + '" poster="' + tit.replace('.mp4', '-poster.webp') + '" muted loop playsinline autoplay disablepictureinpicture></video>'
+            : '<img src="' + tit + '" alt="" decoding="async" />')
+            + '<span class="mcases__hand" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M18 11a2 2 0 1 1 4 0v3a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L6 15V4a2 2 0 0 1 4 0v5.5V9a2 2 0 0 1 4 0v1a2 2 0 0 1 4 0z"/><path d="M10 9.5V13M14 10v3M18 11v2"/></svg></span>'
+            + '<span class="mcases__hint">Нажмите, чтобы смотреть больше</span>';
+          li.appendChild(shot);
+          plate.classList.add('is-active');
+          shot.querySelector('video')?.play().catch(() => {});
+          shot.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        });
         list.appendChild(li);
         if (back && back[1] === id) target = plate;
         n++;
@@ -3833,6 +4017,45 @@
       });
     }, { threshold: 0.3 });
     io.observe(win);
+  })();
+
+  // Робот из-за папки: папка на экране — выглядывает слева, сидит, прячется,
+  // выглядывает справа, и так по кругу. Ушла с экрана — прячется и ждёт
+  (function () {
+    const peek = document.getElementById('cwPeek');
+    if (!peek || !('IntersectionObserver' in window)) return;
+    const OUT = 7200, IN = 1600;   // сколько сидит снаружи и сколько спрятан
+    const SHUR = 4800;             // «шур-шур» появляется по кусочку (2s) и висит ещё ~3s до выхода справа
+    let timer = 0, sayT = 0, on = false;
+    const show = () => {
+      peek.classList.add('is-out');
+      // слева здоровается, когда уже выглянул, и замолкает до того, как спрячется
+      if (!peek.classList.contains('is-right')) {
+        sayT = setTimeout(() => {
+          peek.classList.add('say-hi');
+          // мысль висит около пяти секунд
+          sayT = setTimeout(() => peek.classList.remove('say-hi'), 5000);
+        }, 1100);
+      }
+      timer = setTimeout(hide, OUT);
+    };
+    const hide = () => {
+      peek.classList.remove('is-out', 'say-hi');
+      // сторону меняем, пока он за папкой; справа сначала «шур-шур»
+      timer = setTimeout(() => {
+        if (peek.classList.toggle('is-right')) {
+          peek.classList.add('say-shur');
+          timer = setTimeout(() => { peek.classList.remove('say-shur'); timer = setTimeout(show, 600); }, SHUR);
+        } else show();
+      }, IN);
+    };
+    new IntersectionObserver(([e]) => {
+      if (e.isIntersecting === on) return;
+      on = e.isIntersecting;
+      clearTimeout(timer); clearTimeout(sayT);
+      if (on) timer = setTimeout(show, 1200);
+      else peek.classList.remove('is-out', 'is-right', 'say-hi', 'say-shur');
+    }, { threshold: 0.35 }).observe(document.getElementById('casesWin'));
   })();
 
   // Скролл: полоска прогресса в шапке + скрытие стрелки-подсказки
