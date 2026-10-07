@@ -2683,15 +2683,20 @@
     .mcases__reviews { display: none; }
     @media (max-width: 767px) {
       /* телефон: кнопка как у прайсов, с отступом от списка работ */
+      /* один в один кнопки прайсов на телефоне */
       .mcases__reviews {
         display: flex;
         justify-content: center;
-        margin-top: 28px;
+        text-align: center;
+        width: 100%;
+        margin: 36px 0 0;
         padding: 14px 20px;
         border: 1.5px solid var(--border);
         border-radius: 8px;
         background: #fff;
-        font: 500 15px var(--font-body);
+        font-family: var(--font-body);
+        font-size: 15px;
+        font-weight: 500;
         color: var(--text);
         box-shadow: none;
       }
@@ -2839,6 +2844,7 @@
           <a href="price-tech.html">Прайс на технические задачи</a>
           <a href="price-web.html">Прайс на сайты и дизайн</a>
           <a href="reviews.html">Отзывы</a>
+          <a href="bonus.html">Бонусы</a>
           <a href="#contacts">Контакты</a>
           <a href="404.html">Страница 404 (чтоб полюбоваться)</a>
         </nav>
@@ -3176,8 +3182,6 @@
       </div>
       <ul class="mcases__list" id="mCasesList"></ul>
       <button type="button" class="mcases__more" id="mCasesMore" aria-expanded="false" hidden>Смотреть больше ...</button>
-      <!-- отзывы на телефоне — кнопкой, как прайсы -->
-      <a class="case-plate mcases__reviews" href="reviews.html"><span class="case-plate__text">Отзывы</span></a>
     </div>
   </div>
   <!-- Подпись под портфолио: сайт собран руками, а не в конструкторе.
@@ -3192,6 +3196,8 @@
     </p>
     <!-- Ладошки под строкой: проявляются, когда фраза допечаталась -->
     <img class="cases__signature-hands" src="hands.webp" width="186" height="128" alt="" decoding="async" />
+    <!-- телефон: отзывы кнопкой после ладошек, как прайсы -->
+    <a class="case-plate mcases__reviews" href="reviews.html"><span class="case-plate__text">Отзывы</span></a>
   </div>
 </section>
 
@@ -3293,6 +3299,7 @@
         <nav aria-label="Прайсы">
           <a href="price-tech.html">Технические задачи</a>
           <a href="price-web.html">Сайты и дизайн</a>
+          <a href="bonus.html">Бонусы</a>
         </nav>
       </div>
 
