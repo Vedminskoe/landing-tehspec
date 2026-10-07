@@ -2644,6 +2644,60 @@
       .cw__peek { display: none !important; }
     }
 
+    /* ── Вкладыш «Отзывы» под папкой ──
+       Перевёрнутая вкладка: то же матовое стекло и тот же значок в зелёном
+       квадратике, что у вкладок сверху. Заходит под нижний край рамки */
+    .cw__under {
+      position: absolute;
+      left: 50%;
+      top: calc(100% - 4px);
+      z-index: 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 30px 12px;
+      transform: translateX(-50%);
+      border: 1px solid rgba(255,255,255,0.8);
+      border-top: none;
+      border-radius: 0 0 16px 16px;
+      background: linear-gradient(180deg, rgba(224,224,222,0.55), rgba(250,250,249,0.6));
+      -webkit-backdrop-filter: blur(6px) saturate(1.4);
+      backdrop-filter: blur(6px) saturate(1.4);
+      box-shadow: 0 10px 22px -12px rgba(15,15,15,0.45), inset 0 -1px 0 rgba(255,255,255,0.9);
+      font: 500 15px/1 var(--font-body);
+      color: var(--cw-ink);
+      transition: padding-top .4s cubic-bezier(.3,1.45,.45,1), color var(--transition);
+    }
+    .cw__under svg {
+      flex: none;
+      box-sizing: content-box;
+      width: 18px; height: 18px;
+      padding: 7px;
+      border-radius: 8px;
+      box-shadow: inset 0 1px 0 #fff, 0 1px 2px rgba(30,30,30,0.15);
+      background: var(--accent-light);
+      color: var(--accent);
+      fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+    }
+    .cw__under:hover { padding-top: 20px; color: var(--accent); }
+    .mcases__reviews { display: none; }
+    @media (max-width: 767px) {
+      /* телефон: кнопка как у прайсов, с отступом от списка работ */
+      .mcases__reviews {
+        display: flex;
+        justify-content: center;
+        margin-top: 28px;
+        padding: 14px 20px;
+        border: 1.5px solid var(--border);
+        border-radius: 8px;
+        background: #fff;
+        font: 500 15px var(--font-body);
+        color: var(--text);
+        box-shadow: none;
+      }
+      .mcases__reviews::before, .mcases__reviews::after { content: none; }
+    }
+
     /* ── подвал окна ── */
     .cw__foot {
       display: grid;
@@ -2784,6 +2838,7 @@
           <a href="#cases">Портфолио</a>
           <a href="price-tech.html">Прайс на технические задачи</a>
           <a href="price-web.html">Прайс на сайты и дизайн</a>
+          <a href="reviews.html">Отзывы</a>
           <a href="#contacts">Контакты</a>
           <a href="404.html">Страница 404 (чтоб полюбоваться)</a>
         </nav>
@@ -3062,7 +3117,7 @@
               <li><button type="button" class="cw__file" data-shots="img/albom/tit.jpg"><span class="cw__num">03</span><span class="cw__fname">Вёрстка альбома ландшафтного проекта</span></button></li>
               <li><button type="button" class="cw__file" data-shots="img/kupon/tit.jpg"><span class="cw__num">04</span><span class="cw__fname">Подарочные купоны для UNUM</span></button></li>
               <li><button type="button" class="cw__file" data-shots="img/vk-unum/tit.jpg"><span class="cw__num">05</span><span class="cw__fname">Группа ВКонтакте студии дизайна</span></button></li>
-              <li><button type="button" class="cw__file" data-shots="img/vk-univet/tit.jpg"><span class="cw__num">06</span><span class="cw__fname">Группа ВКонтакте ветклиники «ЮниВет»</span></button></li>
+              <li><button type="button" class="cw__file" data-shots="img/vk-univet/tit.jpg"><span class="cw__num">06</span><span class="cw__fname">Дизайн для ветеринарной клиники ЮниВЕТ</span></button></li>
               <li><button type="button" class="cw__file" data-shots="img/pechat/tit.jpg"><span class="cw__num">07</span><span class="cw__fname">Графика на заказ</span></button></li>
             </ul>
           </nav>
@@ -3096,6 +3151,9 @@
       <!-- курсор-подсказка: на обложке сам «тыкает» во вкладку -->
       <svg class="cw__hint" id="cwHint" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 2l16 11.2-7 1.3 4 7.6-3 1.5-4-7.6L4.6 21z"/></svg>
 
+      <!-- Вкладыш «Отзывы» снизу папки: перевёрнутая вкладка, ведёт на страницу отзывов -->
+      <a class="cw__under" href="reviews.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 9h8M8 13h5"/></svg>Отзывы</a>
+
       <!-- Робот выглядывает из-за папки: то слева, то справа (скрипт меняет
            сторону, пока он спрятан). Туловище выезжает из-за края, пальцы
            отдельным слоем ложатся поверх папки -->
@@ -3118,6 +3176,8 @@
       </div>
       <ul class="mcases__list" id="mCasesList"></ul>
       <button type="button" class="mcases__more" id="mCasesMore" aria-expanded="false" hidden>Смотреть больше ...</button>
+      <!-- отзывы на телефоне — кнопкой, как прайсы -->
+      <a class="case-plate mcases__reviews" href="reviews.html"><span class="case-plate__text">Отзывы</span></a>
     </div>
   </div>
   <!-- Подпись под портфолио: сайт собран руками, а не в конструкторе.
@@ -3223,6 +3283,7 @@
           <a href="#services">Услуги</a>
           <a href="#process">Как я работаю</a>
           <a href="#cases">Портфолио</a>
+          <a href="reviews.html">Отзывы</a>
           <a href="#contacts">Контакты</a>
         </nav>
       </div>

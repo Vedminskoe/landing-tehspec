@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Отзывы — Катерина Степанова</title>
+  <meta name="description" content="Отзывы о работе: сайты, чат-боты, интеграции и графический дизайн." />
+  <link rel="canonical" href="https://landing.vedminskoe.ru/reviews.html" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Катерина Степанова" />
+  <meta property="og:locale" content="ru_RU" />
+  <meta property="og:url" content="https://landing.vedminskoe.ru/reviews.html" />
+  <meta property="og:title" content="Отзывы — Катерина Степанова" />
+  <meta property="og:image" content="https://landing.vedminskoe.ru/og.jpg" />
+  <meta name="theme-color" content="#417339" />
+  <link rel="icon" href="favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" href="favicon-32.png" sizes="32x32" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <!-- фон-фреска, шрифты, лист и бейдж — общие с прайсами -->
+  <link rel="stylesheet" href="price.css" />
+  <style>
+    @font-face {
+      font-family: 'Vasek';
+      src: url('Vasek-Italic.woff2') format('woff2');
+      font-display: swap;
+    }
+    :root { --accent-soft: #81B470; --font-script: 'Vasek', cursive; }
+    /* у прайсов щелчок по пустому месту закрывает страницу — здесь форма,
+       так нельзя, поэтому курсор обычный и выход — ссылкой наверху */
+    body { cursor: auto; }
+    /* страница отзывов шире прайсов: три карточки в ряд должны дышать */
+    .wrap { max-width: 1280px; padding: clamp(40px, 11vh, 150px) 32px clamp(56px, 9vh, 120px); }
+    @media (max-width: 720px) { .wrap { padding-left: 14px; padding-right: 14px; } }
+    .back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 22px;
+      font-size: 15px;
+      color: var(--accent-hover);
+    }
+    .back:hover { color: var(--accent2-hover); }
+
+    /* ── форма ── */
+    .rf { margin-top: 8px; }
+    .rf__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+    .field__label { font-size: 13px; font-weight: 600; letter-spacing: 0.03em; }
+    .field__label-row { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+    .field__required { color: var(--accent2); }
+    .field__optional { color: var(--text-muted); font-weight: 400; font-size: 12px; }
+    .field__count { font-size: 12px; color: var(--text-muted); }
+    .field__count.is-ok { color: var(--accent); }
+    .field__input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font: 15px/1.5 var(--font-body);
+      color: var(--text);
+      background: var(--bg);
+      outline: none;
+      appearance: none;
+      transition: border-color var(--transition), box-shadow var(--transition);
+    }
+    .field__input::placeholder { color: #A9AFB8; }
+    .field__input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(65,115,57,0.12); }
+    .field__input:user-invalid { border-color: #D95252; }
+    select.field__input {
+      padding-right: 40px;
+      background: var(--bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23417339' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") right 16px center no-repeat;
+      cursor: pointer;
+    }
+    .field__textarea { resize: vertical; min-height: 140px; }
+    .field__error { display: none; font-size: 12px; color: #D95252; }
+    .field__input:user-invalid ~ .field__error { display: block; }
+    .field__consent { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: var(--text-muted); line-height: 1.5; cursor: pointer; }
+    .field__consent input { flex: none; width: 17px; height: 17px; margin-top: 2px; accent-color: var(--accent); cursor: pointer; }
+    .field__consent a { color: var(--accent); text-decoration: underline; }
+    /* honeypot: люди не видят, боты заполняют */
+    .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+    .rf__foot { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; margin-top: 22px; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      padding: 14px 28px;
+      border: none;
+      border-radius: 8px;
+      font: 500 15px var(--font-body);
+      color: #fff;
+      background: linear-gradient(120deg, var(--accent), var(--accent-soft), var(--accent));
+      background-size: 200% 100%;
+      animation: btn-flow 7s ease-in-out infinite;
+      cursor: pointer;
+      transition: transform var(--transition);
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn:disabled { opacity: .6; cursor: default; transform: none; }
+    @keyframes btn-flow { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+    .rf__status { font-size: 14px; color: #D95252; }
+    .rf__done { display: none; padding: 26px 28px; border-radius: var(--radius); background: var(--accent-light); }
+    .rf__done-title { font: 500 22px/1.3 var(--font-heading); margin-bottom: 6px; }
+    .rf__done p { color: var(--text-muted); font-size: 15px; }
+    .rf.is-sent form { display: none; }
+    .rf.is-sent .rf__done { display: block; }
+
+    /* ── Две колонки: слева форма, справа отзывы листаются по четыре ── */
+    .rx {
+      display: grid;
+      grid-template-columns: minmax(0, 520px) minmax(0, 1fr);
+      gap: 48px;
+      align-items: start;
+    }
+    .rf-sheet { padding: 30px 34px 32px; background: #fff; }
+    /* оба заголовка колонок одинаковые: лист формы и отзывы начинаются на одной линии */
+    .rx__title, .rv__title {
+      font: 500 clamp(26px, 3vw, 34px)/1.2 var(--font-heading);
+      margin: 0 0 22px;
+    }
+    .rf__lead { margin-bottom: 16px; font-size: 14px; color: var(--text-muted); }
+    .rf-sheet .field { margin-bottom: 12px; }
+    .rf-sheet .field__input { padding: 10px 14px; }
+    .rf-sheet .field__textarea { min-height: 96px; }
+    .rf-sheet .rf__foot { margin-top: 16px; }
+
+    .rv { padding-top: 0; }
+    .rv__title { margin-left: 60px; }
+    .rv__empty { font: 30px/1 var(--font-script); color: var(--text-muted); margin-left: 60px; }
+    /* стрелки по бокам сетки 2×2 */
+    .rv__slider { display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; gap: 16px; align-items: center; }
+    .rv__list { grid-column: 2; grid-row: 1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    .rv__arrow {
+      display: grid; place-items: center;
+      width: 44px; height: 44px; padding: 0;
+      border: 1.5px solid var(--accent2);
+      border-radius: 50%;
+      background: #fff;
+      color: var(--accent2-hover);
+      cursor: pointer;
+      box-shadow: 0 6px 16px -8px rgba(26,26,26,0.35);
+      transition: background var(--transition), color var(--transition), transform var(--transition);
+    }
+    .rv__arrow svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+    .rv__arrow:hover:not(:disabled) { background: var(--accent2); color: #fff; transform: scale(1.06); }
+    .rv__arrow:disabled { opacity: .3; cursor: default; }
+    .rv__arrow[hidden] { display: grid; visibility: hidden; }
+    .rv__arrow--prev { grid-column: 1; grid-row: 1; }
+    .rv__arrow--next { grid-column: 3; grid-row: 1; }
+    .rv__pages { margin: 14px 0 0; text-align: center; font-size: 13px; color: var(--text-muted); letter-spacing: .08em; }
+    .rv__card {
+      display: flex;
+      flex-direction: column;
+      aspect-ratio: 1 / 0.95;
+      padding: 18px 20px 16px;
+      border-radius: var(--radius);
+      border-top: 3px solid var(--accent2);
+      background: #fff;
+      box-shadow: 0 1px 2px rgba(26,26,26,0.06), 0 14px 32px -18px rgba(26,26,26,0.35);
+      animation: rv-in .45s ease both;
+    }
+    @keyframes rv-in { from { opacity: 0; transform: translateY(8px); } }
+    .rv__q { font: 600 48px/0.6 var(--font-heading); color: var(--accent2); height: 22px; flex: none; }
+    .rv__text {
+      margin-bottom: 12px;
+      font-size: 14px; line-height: 1.55;
+      white-space: pre-line;
+      display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 6; overflow: hidden;
+    }
+    .rv__sign {
+      flex: none;
+      margin-top: auto;
+      padding-top: 10px;
+      border-top: 1px dashed rgba(65,115,57,0.35);
+      font-size: 11.5px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+    .rv__sign b { font-weight: 600; }
+    .rv__sign a { text-transform: none; letter-spacing: 0; text-decoration: underline; text-underline-offset: 2px; }
+    /* «Закрыть» на телефоне — не вплотную к углу */
+    .close-btn { top: max(18px, env(safe-area-inset-top)); right: max(18px, env(safe-area-inset-right)); }
+    .rx__home { display: flex; justify-content: center; margin-top: clamp(56px, 9vh, 110px); }
+    .rx__home .btn { gap: 8px; }
+    /* узко: форма сверху, отзывы под ней */
+    @media (max-width: 1100px) {
+      .rx { grid-template-columns: 1fr; gap: 48px; max-width: 760px; margin: 0 auto; }
+    }
+
+    @media (max-width: 720px) {
+      .rf-sheet { padding: 26px 18px 28px; }
+      .rf__grid { grid-template-columns: 1fr; gap: 0; }
+      /* телефон: по одному отзыву, стрелки под карточкой */
+      .rv__title, .rv__empty { margin-left: 0; text-align: center; }
+      .rx__title { text-align: center; }
+      .rv__slider { row-gap: 14px; }
+      .rv__list { grid-column: 1 / -1; grid-template-columns: 1fr; }
+      .rv__arrow--prev, .rv__arrow--next { grid-row: 2; }
+      .rv__card { aspect-ratio: auto; min-height: 220px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="page-bg" aria-hidden="true"></div>
+
+<!-- на тач-экране: «Закрыть» в правом верхнем углу, как у прайсов -->
+<button type="button" class="close-btn" id="closeBtn" aria-label="Закрыть" onclick="location.href='index.html'">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+  <span>Закрыть</span>
+</button>
+
+<div class="wrap">
+  <div class="rx">
+  <div class="rx__col">
+  <!-- заголовок над листом, как «Что обо мне говорят» над отзывами -->
+  <h1 class="rx__title">Оставить свой отзыв</h1>
+  <div class="sheet rf-sheet">
+    <p class="rf__lead">Расскажите, как всё прошло.<br />Отзыв появится на сайте после проверки.</p>
+
+    <section class="rf" id="rf" aria-label="Оставить отзыв">
+      <form id="reviewForm" novalidate>
+        <div class="rf__grid">
+          <div class="field">
+            <label class="field__label" for="rName">Как вас зовут <span class="field__required">*</span></label>
+            <input class="field__input" id="rName" name="name" type="text" maxlength="100" autocomplete="given-name" placeholder="Имя" required />
+            <p class="field__error">Пожалуйста, введите имя</p>
+          </div>
+          <div class="field">
+            <label class="field__label" for="rRole">Кто вы <span class="field__required">*</span></label>
+            <select class="field__input" id="rRole" name="role" required>
+              <option>Клиент</option>
+              <option>Владелец онлайн-бизнеса</option>
+              <option>Эксперт</option>
+              <option>Руководитель проекта</option>
+              <option>Маркетолог</option>
+              <option>Продюсер</option>
+              <option>Дизайнер</option>
+              <option>Архитектор</option>
+              <option>Куратор</option>
+              <option>Специалист</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label class="field__label" for="rContact">Ник в Telegram или ВК <span class="field__optional">(необязательно)</span></label>
+          <input class="field__input" id="rContact" name="contact" type="text" maxlength="200" autocomplete="off" placeholder="@ник или ссылка"
+                 pattern="\s*(@[A-Za-z0-9_]{3,32}|(https?://)?(www\.)?t\.me/[A-Za-z0-9_]{3,32}/?|(https?://)?(m\.|www\.)?vk\.(com|ru)/[A-Za-z0-9_.]{3,50}/?)\s*" />
+          <p class="field__error">Не похоже на ник. Примеры: @ник, t.me/ник, vk.ru/ник</p>
+        </div>
+        <div class="field">
+          <div class="field__label-row">
+            <label class="field__label" for="rText">Текст отзыва <span class="field__required">*</span></label>
+            <span class="field__count" id="rCount">минимум 45 символов</span>
+          </div>
+          <textarea class="field__input field__textarea" id="rText" name="text" minlength="45" maxlength="3000" placeholder="Какая была задача, что получилось" required></textarea>
+          <p class="field__error">Отзыв короче 45 символов</p>
+        </div>
+        <div class="hp" aria-hidden="true">
+          <label>Сайт <input type="text" name="website" tabindex="-1" autocomplete="off" /></label>
+        </div>
+        <label class="field__consent">
+          <input type="checkbox" id="rConsent" required />
+          <span>Согласен(на) на публикацию отзыва на сайте и на <a href="privacy.html" target="_blank">обработку персональных данных</a></span>
+        </label>
+        <div class="rf__foot">
+          <button type="submit" class="btn" id="rSubmit">Отправить отзыв</button>
+          <span class="rf__status" id="rStatus" role="status"></span>
+        </div>
+      </form>
+      <div class="rf__done">
+        <div class="rf__done-title">Спасибо за отзыв!</div>
+        <p>Он появится на странице после проверки.</p>
+      </div>
+    </section>
+  </div>
+
+  </div>
+  <section class="rv" aria-labelledby="rvTitle">
+    <h2 class="rv__title" id="rvTitle">Что обо мне говорят</h2>
+    <p class="rv__empty" id="rvEmpty">Здесь появятся отзывы</p>
+    <div class="rv__slider">
+      <button type="button" class="rv__arrow rv__arrow--prev" id="rvPrev" aria-label="Предыдущие отзывы" hidden><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <div class="rv__list" id="rvList"></div>
+      <button type="button" class="rv__arrow rv__arrow--next" id="rvNext" aria-label="Следующие отзывы" hidden><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
+    </div>
+    <p class="rv__pages" id="rvPages"></p>
+  </section>
+  </div>
+  <!-- на главную — кнопкой внизу по центру -->
+  <div class="rx__home"><a class="btn" href="index.html"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>На главную</a></div>
+</div>
+
+<script>
+  (function () {
+    const $ = (id) => document.getElementById(id);
+    const form = $('reviewForm');
+    const MIN = 45;
+
+    // счётчик символов: зелёный, когда хватает
+    const text = $('rText'), count = $('rCount');
+    // «минимум 45 символов» → «ещё 7 символов» → «достаточно»
+    const plural = (n) => n % 10 === 1 && n % 100 !== 11 ? 'символ'
+      : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 'символа' : 'символов';
+    const upd = () => {
+      const n = text.value.trim().length, left = MIN - n;
+      count.textContent = n === 0 ? 'минимум ' + MIN + ' символов'
+        : left > 0 ? 'ещё ' + left + ' ' + plural(left) : 'достаточно';
+      count.classList.toggle('is-ok', left <= 0);
+    };
+    text.addEventListener('input', upd);
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      $('rStatus').textContent = '';
+      if (!form.checkValidity() || text.value.trim().length < MIN) { form.reportValidity(); return; }
+      const btn = $('rSubmit');
+      btn.disabled = true;
+      try {
+        const res = await fetch('/review', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: form.elements.name.value.trim(),
+            role: form.elements.role.value,
+            contact: form.elements.contact.value.trim(),
+            text: text.value.trim(),
+            website: form.elements.website.value.trim()
+          })
+        });
+        if (!res.ok) throw new Error(res.status);
+        $('rf').classList.add('is-sent');
+      } catch (err) {
+        $('rStatus').textContent = 'Не получилось отправить. Попробуйте ещё раз или напишите мне в Telegram @vedminskoe';
+        btn.disabled = false;
+      }
+    });
+
+    // опубликованные отзывы отдаёт бот
+    const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    const link = (c) => {
+      const v = c.trim();
+      if (/^@/.test(v)) return '<a href="https://t.me/' + esc(v.slice(1)) + '" target="_blank" rel="noopener nofollow">' + esc(v) + '</a>';
+      const u = /^https?:\/\//.test(v) ? v : 'https://' + v;
+      return '<a href="' + esc(u) + '" target="_blank" rel="noopener nofollow">' + esc(v.replace(/^https?:\/\/(www\.)?/, '')) + '</a>';
+    };
+    // ДЕМО: при открытии файла с диска показываем выдуманные отзывы,
+    // чтобы посмотреть вёрстку. На сайте (http/https) их нет
+    const DEMO = { reviews: [
+      { name: 'Марина', role: 'Эксперт', contact: '@marina_demo', text: 'Пример отзыва. Нужно было собрать бота с оплатой и закрытым каналом, всё сделали за неделю. Подписчики заходят сами, я больше не проверяю оплаты руками.' },
+      { name: 'Игорь', role: 'Руководитель проекта', contact: '', text: 'Пример отзыва. Настроили интеграцию CRM с сайтом и рассылкой, заявки теперь не теряются. Всё объяснили простыми словами.' },
+      { name: 'Ольга', role: 'Архитектор', contact: 'vk.ru/olga_demo', text: 'Пример отзыва. Сделали сайт-портфолио, красиво и быстро работает.' },
+      { name: 'Светлана', role: 'Маркетолог', contact: '@sveta_demo', text: 'Пример отзыва подлиннее, чтобы посмотреть, как карточка обрезает текст. Работали над запуском курса: воронка в Salebot, прогрев, напоминания, оплаты, выдача доступа. Каждый этап проговаривали, правки вносились быстро, после запуска ещё неделю была на связи и докручивала мелочи, которые всплыли по ходу. Рекомендую.' },
+      { name: 'Денис', role: 'Клиент', contact: '', text: 'Пример отзыва. Оформление группы ВК, всё в одном стиле.' },
+      { name: 'Анна', role: 'Куратор', contact: '@anna_demo', text: 'Пример отзыва. Помогли разобраться с ботом-опросником, теперь результаты считаются сами.' }
+    ] };
+    (location.protocol === 'file:' ? Promise.resolve(DEMO) : fetch('/reviews', { cache: 'no-store' })
+      .then(r => r.ok ? r.json() : { reviews: [] }))
+      .then(({ reviews }) => {
+        if (!reviews || !reviews.length) return;
+        $('rvEmpty').hidden = true;
+        const card = (r) =>
+          '<article class="rv__card"><div class="rv__q" aria-hidden="true">“</div>' +
+          '<p class="rv__text">' + esc(r.text) + '</p>' +
+          '<p class="rv__sign"><b>' + esc(r.name) + '</b>' + (r.contact ? ' · ' + link(r.contact) : '') + ' · ' + esc(r.role) + '</p></article>';
+        // листание: по четыре (2×2), на телефоне по одному
+        const phone = matchMedia('(max-width: 720px)');
+        let page = 0;
+        const show = () => {
+          const n = phone.matches ? 1 : 4, total = Math.ceil(reviews.length / n);
+          page = Math.max(0, Math.min(page, total - 1));
+          $('rvList').innerHTML = reviews.slice(page * n, page * n + n).map(card).join('');
+          $('rvPrev').hidden = $('rvNext').hidden = total < 2;
+          $('rvPrev').disabled = page === 0;
+          $('rvNext').disabled = page === total - 1;
+          $('rvPages').textContent = total > 1 ? (page + 1) + ' / ' + total : '';
+        };
+        $('rvPrev').addEventListener('click', () => { page--; show(); });
+        $('rvNext').addEventListener('click', () => { page++; show(); });
+        phone.addEventListener('change', show);
+        show();
+      })
+      .catch(() => {});
+  })();
+</script>
+</body>
+</html>
