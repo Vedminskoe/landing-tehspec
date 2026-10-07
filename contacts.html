@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Бонусы — Катерина Степанова</title>
-  <meta name="description" content="Бонусы на сервисы, с которыми я работаю: Tilda, Salebot, Vakas-tools." />
-  <link rel="canonical" href="https://landing.vedminskoe.ru/bonus.html" />
+  <title>Контакты — Катерина Степанова</title>
+  <meta name="description" content="Как связаться с Катериной Степановой: Telegram, ВКонтакте, почта или заявка на сайте." />
+  <link rel="canonical" href="https://landing.vedminskoe.ru/contacts.html" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Катерина Степанова" />
   <meta property="og:locale" content="ru_RU" />
-  <meta property="og:url" content="https://landing.vedminskoe.ru/bonus.html" />
-  <meta property="og:title" content="Бонусы — Катерина Степанова" />
+  <meta property="og:url" content="https://landing.vedminskoe.ru/contacts.html" />
+  <meta property="og:title" content="Контакты — Катерина Степанова" />
   <meta property="og:image" content="https://landing.vedminskoe.ru/og.jpg" />
   <meta name="theme-color" content="#417339" />
   <link rel="icon" href="favicon.ico" sizes="any" />
@@ -93,6 +93,34 @@
 
     @media (max-width: 960px) { .bn { grid-template-columns: 1fr; max-width: 560px; margin: 0 auto; } }
   </style>
+  <style>
+    .ct__icon {
+      display: grid; place-items: center;
+      width: 46px; height: 46px; margin-bottom: 14px;
+      border-radius: 10px;
+      background: var(--accent-light);
+      color: var(--accent);
+    }
+    .ct__icon svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .ct__value { font-size: 17px; font-weight: 500; margin-bottom: 6px; word-break: break-word; }
+    .bn__card .bn__what { margin-bottom: 18px; }
+    .ct__note { margin-top: 56px; text-align: center; color: var(--text-muted); font-size: 15px; }
+    /* кнопки друг над другом: золотая «к форме заявки», под ней «На главную» */
+    .ct__btns { flex-direction: column; align-items: center; gap: 14px; margin-top: 22px; }
+    /* золотая — как «Смотреть портфолио» на главной */
+    .bn__home a.ct__gold {
+      background: var(--accent2-light);
+      color: var(--accent2-hover);
+      border: 1.5px solid var(--accent2-hover);
+      animation: none;
+      transition: background var(--transition), color var(--transition);
+    }
+    .bn__home a.ct__gold:hover { background: var(--accent2); border-color: var(--accent2); color: #fff; }
+    /* На тач-экране наведения нет — золотая кнопка сразу в «наведённом»
+       виде, как на ПК под курсором: залита золотым, текст белый */
+    @media (hover: none) { .bn__home a.ct__gold { background: var(--accent2); border-color: var(--accent2); color: #fff; } }
+
+  </style>
 </head>
 <body>
 
@@ -106,56 +134,41 @@
 
 <div class="wrap">
   <header class="bn__head">
-    <h1 class="bn__title">Бонусы</h1>
-    <p class="bn__lead">Сервисы, с которыми я работаю сама. По этим ссылкам у вас будет больше бесплатного времени, чтобы спокойно всё попробовать.</p>
+    <h1 class="bn__title">Контакты</h1>
+    <p class="bn__lead">Пишите, как вам удобнее. На связи с 8:00 до 19:00 по Москве.<br />Работаю удалённо, по времени +2 часа к Москве.</p>
   </header>
 
   <div class="bn">
     <article class="bn__card">
-      <h2 class="bn__name">Tilda</h2>
-      <p class="bn__what">Конструктор сайтов</p>
-      <p class="bn__gift"><b>+1 месяц бесплатно</b> после первой оплаты тарифа Personal или Business. Только для новых аккаунтов.</p>
-      <div class="bn__foot">
-        <p class="bn__promo">Чтобы бонус зачислился автоматически, зарегистрируйтесь по ссылке ниже:</p>
-        <a class="bn__go" href="https://tilda.ru/?r=a2gapd0" target="_blank" rel="noopener">Перейти в Tilda</a>
-      </div>
+      <div class="ct__icon"><svg viewBox="0 0 24 24"><path d="M21 4L3 11l6 2 2 6 3-4 5 4z"/><path d="M9 13l8-6"/></svg></div>
+      <h2 class="bn__name">Telegram</h2>
+      <p class="ct__value">@vedminskoe</p>
+      <p class="bn__what">Самый быстрый способ: отвечаю здесь в первую очередь.</p>
+      <div class="bn__foot"><a class="bn__go" href="https://t.me/vedminskoe" target="_blank" rel="noopener">Написать в Telegram</a></div>
     </article>
 
     <article class="bn__card">
-      <h2 class="bn__name">Salebot</h2>
-      <p class="bn__what">Конструктор чат-ботов и воронок</p>
-      <p class="bn__gift"><b>7 дней бесплатного доступа</b> к тарифу «Инфобиз».</p>
-      <div class="bn__foot">
-        <p class="bn__promo">Чтобы бонус зачислился автоматически, зарегистрируйтесь по ссылке ниже:</p>
-        <a class="bn__go" href="https://salebot.pro/l/428266" target="_blank" rel="noopener">Перейти в Salebot</a>
-      </div>
+      <div class="ct__icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><path d="M7 9c.5 4 2.5 6 5.5 6.5V13c1.5.2 2.7 1.3 3 2.5M16.5 9c-.4 1.4-1.6 2.7-4 3.5V9"/></svg></div>
+      <h2 class="bn__name">ВКонтакте</h2>
+      <p class="ct__value">vk.ru/vedminskoe_techspec</p>
+      <p class="bn__what">Можно написать в сообщения группы или в личные сообщения.</p>
+      <div class="bn__foot"><a class="bn__go" href="https://vk.ru/vedminskoe_techspec" target="_blank" rel="noopener">Открыть ВКонтакте</a></div>
     </article>
 
     <article class="bn__card">
-      <h2 class="bn__name">Vakas-tools</h2>
-      <p class="bn__what">Интеграции сервисов для онлайн-школ</p>
-      <p class="bn__gift"><b>14 дней теста</b> и <b>1000 контактов</b> в тестовом периоде.</p>
-      <div class="bn__foot">
-        <p class="bn__promo">Промокод при регистрации <button type="button" class="bn__code" data-code="BUDZFIMZDD" title="Скопировать">BUDZFIMZDD</button><br />или перейдите по ссылке:</p>
-        <a class="bn__go" href="https://vakas-tools.ru/?ref=BUDZFIMZDD" target="_blank" rel="noopener">Перейти в Vakas-tools</a>
-      </div>
+      <div class="ct__icon"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></div>
+      <h2 class="bn__name">Почта</h2>
+      <p class="ct__value">vedminskoe@yandex.ru</p>
+      <p class="bn__what">Для документов, договоров и подробных писем.</p>
+      <div class="bn__foot"><a class="bn__go" href="mailto:vedminskoe@yandex.ru">Написать письмо</a></div>
     </article>
   </div>
 
-  <div class="bn__home"><a href="index.html"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>На главную</a></div>
-</div>
+  <p class="ct__note">Или оставьте заявку на сайте:<br />опишите задачу, и я свяжусь с вами сама.</p>
 
-<script>
-  // промокод копируется по нажатию
-  document.querySelectorAll('.bn__code').forEach(b => b.addEventListener('click', () => {
-    const done = () => {
-      b.classList.add('is-copied');
-      b.textContent = 'Скопировано';
-      setTimeout(() => { b.classList.remove('is-copied'); b.textContent = b.dataset.code; }, 1600);
-    };
-    if (navigator.clipboard) navigator.clipboard.writeText(b.dataset.code).then(done, () => {});
-  }));
-</script>
+  <div class="bn__home ct__btns">
+    <a class="ct__gold" href="index.html#contacts">Перейти к форме заявки<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a><a href="index.html"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>На главную</a></div>
+</div>
 <script src="metrika.js" defer></script>
 </body>
 </html>

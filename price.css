@@ -449,6 +449,23 @@ html { scrollbar-gutter: stable; }
 }
 .foot__links a { color: var(--accent-hover); text-decoration: underline; }
 .foot__links a:hover { color: var(--accent2-hover); }
+/* строка про бонусы под контактами */
+.foot__bonus { margin-top: 14px; font-size: 15px; color: var(--text-muted); }
+.foot__bonus a { color: var(--accent2-hover); text-decoration: underline; text-underline-offset: 3px; }
+.foot__bonus a:hover { color: var(--accent-hover); }
+/* кнопка «На главную» под листом */
+.home-btn { display: flex; justify-content: center; margin-top: 40px; }
+.home-btn a {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 14px 28px; border-radius: 8px;
+  font: 500 15px var(--font-body); color: #fff;
+  background: linear-gradient(120deg, var(--accent), #81B470, var(--accent));
+  background-size: 200% 100%;
+  animation: home-flow 7s ease-in-out infinite;
+  transition: transform var(--transition);
+}
+.home-btn a:hover { transform: translateY(-1px); }
+@keyframes home-flow { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
 .foot__note {
   margin-top: 26px;
   font-size: 12.5px;

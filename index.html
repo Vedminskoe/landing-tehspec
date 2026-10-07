@@ -125,7 +125,10 @@
     /* Единый фон: рисунок тянется от шапки до подвала на всю высоту страницы.
        auto 100% — высота по странице, пропорции не плывут (края чуть обрезаются).
        Лёгкая бледность — через --bg-art-opacity, подмешивает белый фон body. */
-    body { position: relative; }
+    /* Блоки во всю ширину окна считают её через 100vw, а в Windows 100vw
+       включает полосу прокрутки — на 17px шире видимого. Отсюда была
+       прокрутка вбок на ПК. clip, а не hidden: шапка остаётся липкой */
+    body { position: relative; overflow-x: clip; }
     .page-bg {
       position: absolute;
       inset: 0;
@@ -243,6 +246,11 @@
       background: var(--accent2);
       border-color: var(--accent2);
       color: #fff;
+    }
+    /* На тач-экране наведения нет — золотая кнопка сразу в «наведённом»
+       виде, как на ПК под курсором: залита золотым, текст белый */
+    @media (hover: none) {
+      .btn--gold, .mcases__hint { background: var(--accent2); border-color: var(--accent2); color: #fff; }
     }
     /* Магнитные кнопки: плавный «пружинистый» возврат при уходе курсора */
     .magnetic {
@@ -613,7 +621,7 @@
       width: 100%;
       height: auto;
       display: block;
-      filter: grayscale(100%);
+      /* фото цветное (2c.webp); ч/б версия — 2.webp с filter: grayscale(100%) */
     }
     /* лёгкая внутренняя тень по периметру — фото будто утоплено в экран */
     .hero__photo::after {
@@ -1199,6 +1207,16 @@
        и работы списком плашек. Плашка ведёт на страницу работы, как кадр
        в папке на ПК. Плашки собирает скрипт из списков папки */
     .mcases { display: none; }
+    .cases__lead { display: none; }
+    @media (max-width: 767px) {
+      .cases__lead {
+        display: block;
+        margin-top: 10px;
+        font-size: 15px;
+        line-height: 1.5;
+        color: var(--text-muted);
+      }
+    }
     @keyframes stub-swing {
       0%, 100% { transform: rotate(-3deg); }
       50%      { transform: rotate(3deg); }
@@ -1297,15 +1315,24 @@
       .mcases__hand path { stroke-dasharray: 220; animation: hand-draw 1.1s ease .2s backwards; }
       @keyframes hand-draw { from { stroke-dashoffset: 220; } to { stroke-dashoffset: 0; } }
       @media (prefers-reduced-motion: reduce) { .mcases__hand path { animation: none; } }
-      /* надпись как «Смотреть больше» на странице работы */
+      /* подсказка под кадром — золотой кнопкой, как «Открыть работу» на ПК,
+         стрелка «тычет», чтобы её заметили */
       .mcases__hint {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
         margin-top: 8px;
-        font: 500 15px/1.4 var(--font-body);
-        color: var(--accent);
-        text-decoration: underline;
-        text-underline-offset: 3px;
+        padding: 11px 18px;
+        border: 1.5px solid var(--accent2-hover);
+        border-radius: 8px;
+        background: var(--accent2-light);
+        box-shadow: 0 8px 20px -10px rgba(15,15,15,0.45);
+        font: 500 15px/1 var(--font-body);
+        color: var(--accent2-hover);
         white-space: nowrap;
       }
+      .mcases__hint svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; animation: open-nudge 2.6s ease-in-out 1s infinite; }
+      @media (prefers-reduced-motion: reduce) { .mcases__hint svg { animation: none; } }
     }
     @media (min-width: 560px) and (max-width: 767px) {
       /* экран пошире: робот в 42% уже великоват */
@@ -1754,18 +1781,19 @@
       right: 100px;
       bottom: 24px;
       z-index: 900;
-      width: 46px;
-      height: 46px;
+      width: 52px;
+      height: 52px;
       display: flex;
       align-items: center;
       justify-content: center;
-      border: 1px solid var(--border);
+      /* золотая, как «Смотреть портфолио»: на светлом подвале белая
+         терялась. Золотое свечение — чтобы кнопку замечали */
+      border: 1.5px solid var(--accent2-hover);
       border-radius: 50%;
-      background: rgba(255,255,255,0.85);
-      backdrop-filter: blur(6px);
-      color: var(--accent);
+      background: var(--accent2-light);
+      color: var(--accent2-hover);
       cursor: pointer;
-      box-shadow: 0 6px 18px rgba(26,26,26,0.10);
+      box-shadow: 0 6px 18px rgba(26,26,26,0.14), 0 0 0 0 rgba(232,168,0,0.45);
       opacity: 0;
       visibility: hidden;
       transition: opacity var(--transition), visibility var(--transition),
@@ -1775,7 +1803,7 @@
       opacity: 1;
       visibility: visible;
       /* ненавязчивое парение, как у робота в услугах */
-      animation: to-top-float 4.5s ease-in-out infinite;
+      animation: to-top-float 4.5s ease-in-out infinite, to-top-glow 2.4s ease-out infinite;
     }
     /* пока висит cookie-баннер — кнопка «наверх» не мешается под ним */
     body.cookie-visible.is-bottom .to-top {
@@ -1783,7 +1811,12 @@
       visibility: hidden;
       animation: none;
     }
-    .to-top:hover { color: var(--accent-hover); border-color: var(--accent); }
+    .to-top:hover { background: var(--accent2); border-color: var(--accent2); color: #fff; }
+    @keyframes to-top-glow {
+      0%   { box-shadow: 0 6px 18px rgba(26,26,26,0.14), 0 0 0 0 rgba(232,168,0,0.45); }
+      70%  { box-shadow: 0 6px 18px rgba(26,26,26,0.14), 0 0 0 12px rgba(232,168,0,0); }
+      100% { box-shadow: 0 6px 18px rgba(26,26,26,0.14), 0 0 0 0 rgba(232,168,0,0); }
+    }
     @keyframes to-top-float {
       0%, 100% { transform: translateY(0); }
       50%      { transform: translateY(-8px); }
@@ -1902,7 +1935,9 @@
       /* «КАТЕРИНА» набрана в 60px и на экранах уже 380px не помещалась в
          строку — эти пара букв за краем и давали странице ход вбок.
          min() ужимает имя только там, где оно не влезает */
-      .hero__name { font-size: min(60px, 15.2vw); }
+      /* 14vw, а не 15.2: в Safari на айфоне буквы шире, чем в Chrome, и при
+         15.2vw последняя «А» упиралась в край экрана и обрезалась */
+      .hero__name { font-size: min(60px, 14vw); }
       .hero__scroll { display: none; }
       .process__steps { grid-template-columns: repeat(2, 1fr); }
       /* круглая кнопка «наверх» на телефоне только мешается поверх контента */
@@ -1936,12 +1971,18 @@
       .header__tagline { display: none; }
       /* Меню на телефоне раскрывается во всю ширину контейнера, пункты
          крупные и с воздухом — попадать пальцем, а не ногтем */
+      /* пунктов стало десять: по 26px сверху и снизу последние уходили за
+         экран. Теперь все влезают даже на маленьком айфоне, а если нет —
+         меню прокручивается само, страница под ним стоит */
       .header__dropdown {
         width: calc(100vw - 48px);
         max-width: none;
+        max-height: calc(100svh - 90px);
+        overflow-y: auto;
+        overscroll-behavior: contain;
       }
       .header__dropdown a {
-        padding: 26px 18px;
+        padding: 13px 18px;
         font-size: 15px;
         white-space: normal;
         border-bottom: 1px solid var(--border);
@@ -2225,6 +2266,24 @@
 
     /* ── боковая панель ── */
     .cw__side { position: relative; min-width: 0; }
+    /* ПК: высоту папки задаёт только экран. Длинный список (у «Дизайна»
+       семь работ в две строки) раньше вытягивал папку, она прыгала по высоте,
+       а вместе с ней ехал фон страницы. Теперь список прокручивается внутри */
+    @media (min-width: 901px) {
+      .cw.is-open .cw__main { align-items: stretch; }
+      .cw.is-open .cw__files.is-current {
+        position: absolute;
+        inset: 0;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(47,47,45,0.25) transparent;
+        padding-right: 4px;
+        gap: 2px;
+      }
+      /* пункты плотнее, чтобы семь работ «Дизайна» влезали без прокрутки */
+      .cw.is-open .cw__file { padding-top: 7px; padding-bottom: 7px; }
+    }
     .cw__files { display: none; list-style: none; margin: 0; padding: 0; }
     .cw__files.is-current { display: flex; flex-direction: column; gap: 4px; }
     .cw__files li {
@@ -2415,6 +2474,36 @@
       /* за курсором — без задержки, иначе подпись отстаёт */
       transition: opacity 0.2s;
     }
+    .cw__open {
+      right: 16px; bottom: 16px;
+      z-index: 3;
+      display: none;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border: 1.5px solid var(--accent2-hover);
+      border-radius: 8px;
+      background: var(--accent2-light);
+      box-shadow: 0 8px 22px -8px rgba(15,15,15,0.55);
+      font: 500 14px/1 var(--font-body);
+      color: var(--accent2-hover);
+      cursor: pointer;
+      animation: open-nudge 2.6s ease-in-out 1.2s infinite;
+      transition: background var(--transition), color var(--transition);
+    }
+    .cw__open svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+    .cw__open:hover { background: var(--accent2); color: #fff; animation: none; }
+    .cw.is-open.is-shot .cw__open, .cw.is-open.is-video .cw__open { display: inline-flex; }
+    /* лёгкий «тычок» стрелкой, чтобы кнопку заметили */
+    @keyframes open-nudge {
+      0%, 70%, 100% { transform: none; }
+      80% { transform: translateX(4px); }
+      90% { transform: translateX(-1px); }
+    }
+    @media (prefers-reduced-motion: reduce) { .cw__open { animation: none; } }
+    /* кнопка на кадре есть — подпись у курсора лишняя */
+    .cw__tip { display: none; }
+    @media (max-width: 900px) { .cw__open { right: 10px; bottom: 10px; padding: 8px 12px; font-size: 13px; } }
     /* смена кадра: старый гаснет в дымку, новый проявляется из неё */
     .cw.is-shot .cw__shot.is-loading { opacity: 0; filter: blur(8px); transform: scale(1.015); }
 
@@ -2691,13 +2780,14 @@
         width: 100%;
         margin: 36px 0 0;
         padding: 14px 20px;
-        border: 1.5px solid var(--border);
+        /* золотая, залитая — как золотые кнопки на телефоне */
+        border: 1.5px solid var(--accent2);
         border-radius: 8px;
-        background: #fff;
+        background: var(--accent2);
         font-family: var(--font-body);
         font-size: 15px;
         font-weight: 500;
-        color: var(--text);
+        color: #fff;
         box-shadow: none;
       }
       .mcases__reviews::before, .mcases__reviews::after { content: none; }
@@ -2845,7 +2935,7 @@
           <a href="price-web.html">Прайс на сайты и дизайн</a>
           <a href="reviews.html">Отзывы</a>
           <a href="bonus.html">Бонусы</a>
-          <a href="#contacts">Контакты</a>
+          <a href="contacts.html">Контакты</a>
           <a href="404.html">Страница 404 (чтоб полюбоваться)</a>
         </nav>
       </div>
@@ -2854,7 +2944,7 @@
         <button type="button" class="header__logo" id="contactToggle" aria-expanded="false" aria-haspopup="true">Связаться</button>
         <nav class="header__dropdown" aria-label="Контакты">
           <a href="https://t.me/vedminskoe" target="_blank" rel="noopener">Telegram — @vedminskoe</a>
-          <a href="https://vk.ru/vedminskoe_techspec_designer" target="_blank" rel="noopener">ВКонтакте</a>
+          <a href="https://vk.ru/vedminskoe_techspec" target="_blank" rel="noopener">ВКонтакте — vk.ru/vedminskoe_techspec</a>
           <a href="mailto:vedminskoe@yandex.ru">Почта — vedminskoe@yandex.ru</a>
         </nav>
       </div>
@@ -2894,7 +2984,7 @@
       <div class="hero__right hero-in">
         <div class="hero__right-inner">
           <div class="hero__photo">
-            <img src="2.webp" alt="Катерина Степанова" width="896" height="1184" fetchpriority="high" decoding="async" />
+            <img src="2c.webp" alt="Катерина Степанова" width="896" height="1184" fetchpriority="high" decoding="async" />
           </div>
         </div>
         <p class="hero__caption">технический специалист<br />графический дизайнер</p>
@@ -3001,6 +3091,8 @@
     <div class="cases__header">
       <p class="section-label">Кейсы</p>
       <h2 class="section-title" id="cases-title">Портфолио</h2>
+      <!-- телефон: подсказка, что за плашкой целая работа -->
+      <p class="cases__lead">Нажмите на работу, а потом на картинку, чтобы увидеть её целиком: все фото, видео и описание</p>
     </div>
 
     <!-- Окно-папка: четыре вкладки по видам услуг. До первого клика в окне
@@ -3140,6 +3232,9 @@
             <img class="cw__shot" id="cwShot" alt="" decoding="async" />
             <!-- подпись едет за курсором по кадру: клик ведёт на страницу работы -->
             <span class="cw__tip" id="cwTip" aria-hidden="true">Смотреть детали и описание</span>
+            <!-- Кнопка на кадре видна всегда, без наведения: подпись у курсора
+               замечали не все, и работу целиком почти не открывали -->
+            <button type="button" class="cw__open" id="cwOpen">Открыть работу и описание<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
             <div class="cw__video" id="cwVideo">
               <video playsinline muted loop preload="none" disablepictureinpicture disableremoteplayback></video>
             </div>
@@ -3216,7 +3311,7 @@
             <p class="contacts__direct">
               <a href="https://t.me/vedminskoe" target="_blank" rel="noopener">@vedminskoe</a>
               <span>·</span>
-              <a href="https://vk.ru/vedminskoe_techspec_designer" target="_blank" rel="noopener">ВКонтакте</a>
+              <a href="https://vk.ru/vedminskoe_techspec" target="_blank" rel="noopener">ВКонтакте</a>
               <span>·</span>
               <a href="mailto:vedminskoe@yandex.ru">vedminskoe@yandex.ru</a>
             </p>
@@ -3290,7 +3385,7 @@
           <a href="#process">Как я работаю</a>
           <a href="#cases">Портфолио</a>
           <a href="reviews.html">Отзывы</a>
-          <a href="#contacts">Контакты</a>
+          <a href="contacts.html">Контакты</a>
         </nav>
       </div>
 
@@ -3310,7 +3405,7 @@
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
             @vedminskoe
           </a>
-          <a href="https://vk.ru/vedminskoe_techspec_designer" target="_blank" rel="noopener">
+          <a href="https://vk.ru/vedminskoe_techspec" target="_blank" rel="noopener">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M13.162 18.994c.609 0 .858-.406.851-.915-.031-1.917.714-2.949 2.059-1.604 1.488 1.488 1.796 2.519 3.603 2.519h3.2c.808 0 1.126-.26 1.126-.668 0-.863-1.421-2.386-2.625-3.504-1.686-1.565-1.765-1.602-.313-3.486 1.801-2.339 4.157-5.336 2.073-5.336h-3.981c-.772 0-.828.435-1.103 1.083-.995 2.347-2.886 5.387-3.604 4.922-.751-.485-.407-2.406-.35-5.261.015-.754.011-1.271-1.141-1.539-.629-.145-1.241-.205-1.809-.205-2.273 0-3.841.953-2.95 1.119 1.571.293 1.42 3.692 1.054 5.16-.638 2.556-3.036-2.024-4.035-4.305-.241-.548-.315-.974-1.175-.974h-3.255c-.492 0-.787.16-.787.516 0 .602 2.96 6.72 5.786 9.77 2.756 2.975 5.48 2.808 7.376 2.808z"/></svg>
             ВКонтакте
           </a>
@@ -3776,10 +3871,12 @@
           shot._li = li;
           shot.href = plate.href;
           shot.innerHTML = (tit.endsWith('.mp4')
-            ? '<video src="' + tit + '" poster="' + tit.replace('.mp4', '-poster.webp') + '" muted loop playsinline autoplay disablepictureinpicture></video>'
+            ? (ready[tit] ? '' : '<video src="' + tit + '" poster="' + tit.replace('.mp4', '-poster.webp') + '" muted loop playsinline autoplay disablepictureinpicture></video>')
             : '<img src="' + tit + '" alt="" decoding="async" />')
             + '<span class="mcases__hand" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M18 11a2 2 0 1 1 4 0v3a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L6 15V4a2 2 0 0 1 4 0v5.5V9a2 2 0 0 1 4 0v1a2 2 0 0 1 4 0z"/><path d="M10 9.5V13M14 10v3M18 11v2"/></svg></span>'
-            + '<span class="mcases__hint">Нажмите, чтобы смотреть больше</span>';
+            + '<span class="mcases__hint">Смотреть все фото и описание<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>';
+          // ролик, скачанный заранее, ставим на место первым
+          if (ready[tit]) shot.prepend(ready[tit]);
           li.appendChild(shot);
           plate.classList.add('is-active');
           shot.querySelector('video')?.play().catch(() => {});
@@ -3790,6 +3887,27 @@
         n++;
       });
     });
+
+    // лёгкий титульный ролик для телефона качаем заранее, пока человек
+    // листает к портфолио, — к тапу он уже готов играть
+    const heavy = win.querySelector('.cw__file[data-tit-m]');
+    const ready = {};   // заранее созданные ролики: адрес → <video>
+    if (heavy && 'IntersectionObserver' in window) {
+      const pio = new IntersectionObserver(([e]) => {
+        if (!e.isIntersecting) return;
+        const src = heavy.dataset.titM;
+        const v = document.createElement('video');
+        v.muted = v.loop = v.playsInline = true;
+        v.setAttribute('playsinline', ''); v.setAttribute('disablepictureinpicture', '');
+        v.poster = src.replace('.mp4', '-poster.webp');
+        v.preload = 'auto';
+        v.src = src;
+        v.load();
+        ready[src] = v;
+        pio.disconnect();
+      }, { rootMargin: '600px 0px' });
+      pio.observe(box);
+    }
 
     if (n > SHOW) {
       more.hidden = false;
@@ -4080,6 +4198,7 @@
     const toCase = () => { const u = caseUrl(); if (u) location.href = u; };
     shot.addEventListener('click', toCase);
     vBox.addEventListener('click', toCase);
+    $('cwOpen').addEventListener('click', toCase);
 
     // Подпись «Смотреть детали и описание» едет за курсором. Только для мыши:
     // на телефоне наведения нет, там кадр открывается сразу по тапу
@@ -4165,6 +4284,23 @@
         requestAnimationFrame(() => win.scrollIntoView({ block: 'center' }));
         return;
       }
+    }
+
+    // Титульный ролик качаем заранее, пока папка подъезжает к экрану: иначе
+    // загрузка начиналась только по клику и долго стоял один постер
+    const warm = () => {
+      if (vid.dataset.src || isNarrow()) return;
+      const first = win.querySelector('.cw__file[data-shots$=".mp4"]');
+      if (!first) return;
+      const src = first.dataset.shots.split(',')[0];
+      vid.dataset.src = src;
+      vid.poster = src.replace('.mp4', '-poster.webp');
+      vid.preload = 'auto';
+      vid.src = src;
+    };
+    if ('IntersectionObserver' in window) {
+      const wio = new IntersectionObserver(([e]) => { if (e.isIntersecting) { warm(); wio.disconnect(); } }, { rootMargin: '600px 0px' });
+      wio.observe(win);
     }
 
     if (!('IntersectionObserver' in window)) { win.classList.add('is-live', 'is-settled'); return; }
