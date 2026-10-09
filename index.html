@@ -1135,10 +1135,6 @@
         color: var(--text-muted);
       }
     }
-    @keyframes stub-swing {
-      0%, 100% { transform: rotate(-3deg); }
-      50%      { transform: rotate(3deg); }
-    }
     @media (max-width: 767px) {
       /* только телефон: планшет с 768px видит папку, как ПК */
       /* Плашки до выхода стоят на ширину экрана правее. clip, а не
@@ -1147,31 +1143,46 @@
       /* с id: правило самой папки стоит ниже по файлу и перебило бы */
       #cases .cw { display: none; }
       .mcases { display: block; }
-      .mcases__robot {
-        position: relative;
-        width: 42%;
-        margin: 0 auto;
-        opacity: 0;
-        transition: opacity .9s ease .2s;
-      }
-      .mcases__robot img {
-        position: relative;
-        display: block;
-        width: 100%;
-        height: auto;
-        /* маятник: ноги стоят, корпус качается */
-        transform-origin: 50% 98%;
-        animation: stub-swing 3.0s ease-in-out infinite;
-      }
-      /* тень пятном на полу под ступнями */
-      .mcases__shadow {
+      /* Гриша выглядывает из-за правого края экрана, как на ПК из-за
+         папки. Виден сразу; рядом печатается его реплика и остаётся,
+         буквы подрагивают, как «шур-шур» у папки */
+      .mcases__peek { position: relative; height: 210px; }
+      .mcases__peek img {
         position: absolute;
-        left: 50%;
-        top: 98.1%;
-        width: 42%;
-        aspect-ratio: 16 / 1;
-        transform: translate(-50%, -50%);
-        background: radial-gradient(closest-side, rgba(26,26,26,0.20), rgba(26,26,26,0));
+        /* к самому краю экрана, мимо отступа контейнера */
+        right: calc((100% - 100vw) / 2);
+        bottom: 0;
+        height: 100%;
+        width: auto;
+      }
+      .mcases__say {
+        position: absolute;
+        left: 0;
+        right: 118px;
+        top: 50%;
+        transform: translateY(-50%) rotate(-5deg);
+        /* у Vasek мелкие строчные — кегль вдвое крупнее обычного текста */
+        font: 34px/1.05 var(--font-script);
+        color: #3c3c3c;
+        text-align: right;
+      }
+      .mcases__say > span { display: block; }
+      .mcases__say > span + span { margin-top: 10px; }
+      /* продолжение фразы — следующей строкой, без отступа и без паузы */
+      .mcases__say > span.is-cont { margin-top: 0; }
+      .mcases__say i { display: inline-block; font-style: normal; white-space: nowrap; }
+      .mcases__say b { display: inline-block; font-weight: inherit; opacity: 0; }
+      /* буквы по очереди: задержку --d ставит скрипт. Качаются все в одном
+         темпе, сдвиг по фазе тот же, что при печати, поэтому по строке
+         идёт ровная мягкая волна, а не дрожь вразнобой */
+      .mcases.is-said .mcases__say b {
+        animation: say-in .2s ease var(--d) both,
+                   say-sway 2.4s ease-in-out var(--d) infinite;
+      }
+      @keyframes say-in { from { opacity: 0; } to { opacity: 1; } }
+      @keyframes say-sway {
+        0%, 100% { transform: translateY(0) rotate(0); }
+        50%      { transform: translateY(-2px) rotate(-2deg); }
       }
       .mcases__list { margin: 16px 0 0; padding: 0; list-style: none; }
       .mcases__item {
@@ -1181,7 +1192,6 @@
         transition: transform 1.15s cubic-bezier(0.22, 0.9, 0.25, 1) calc(var(--in, 0) * 115ms),
                     opacity   .65s  ease                             calc(var(--in, 0) * 115ms);
       }
-      .mcases.is-live .mcases__robot { opacity: 1; }
       .mcases.is-live .mcases__item { transform: none; opacity: 1; }
       .mcases .case-plate {
         width: 100%;
@@ -1252,13 +1262,9 @@
       .mcases__hint svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; animation: open-nudge 2.6s ease-in-out 1s infinite; }
       @media (prefers-reduced-motion: reduce) { .mcases__hint svg { animation: none; } }
     }
-    @media (min-width: 560px) and (max-width: 767px) {
-      /* экран пошире: робот в 42% уже великоват */
-      .mcases__robot { width: 32%; }
-    }
     @media (prefers-reduced-motion: reduce) {
-      .mcases__robot img { animation: none; }
-      .mcases__robot, .mcases__item { transition: none; transform: none; opacity: 1; }
+      .mcases.is-said .mcases__say b { animation: none; opacity: 1; }
+      .mcases__item { transition: none; transform: none; opacity: 1; }
     }
     /* Подпись под портфолио. Текстовый шрифт, а не заголовочный: строка
        читается как реплика от себя, а не как ещё один заголовок.
@@ -2833,6 +2839,14 @@
       .cw.is-open .cw__back { display: inline-flex; }
     }
 
+  
+    /* Телефон: текст на кнопках крупнее, сами кнопки той же высоты —
+       высота строки зафиксирована прежней, растёт только буква */
+    @media (max-width: 767px) {
+      .btn:not(.cookie-banner .btn) { font-size: 17px; line-height: 20px; }
+      .hero__actions .btn:not(.cookie-banner .btn) { line-height: 24px; }
+      .prices__item .case-plate, .mcases__reviews { font-size: 17px; line-height: 18px; }
+    }
   </style>
 </head>
 <body>
@@ -3112,7 +3126,7 @@
               <li><button type="button" class="cw__file cw__file--dir" data-open="crm"><span class="cw__num">04</span><span class="cw__fname">Интеграции и CRM</span></button></li>
             </ul>
             <ul class="cw__files" data-list="sites">
-              <li><button type="button" class="cw__file" data-shots="img/sait-unumgarden/tit.mp4" data-tit-m="img/sait-unumgarden/tit-m.mp4"><span class="cw__num">01</span><span class="cw__fname">Сайт ландшафтного архитектора на Tilda</span></button></li>
+              <li><button type="button" class="cw__file" data-shots="img/sait-unumgarden/tit.mp4" data-tit-m="img/sait-unumgarden/tit-m.mp4"><span class="cw__num">01</span><span class="cw__fname">Сайт для Unum.garden на Tilda</span></button></li>
               <li><button type="button" class="cw__file" data-shots="img/sait-adminka/tit.jpg"><span class="cw__num">02</span><span class="cw__fname">Сайт-админка для досок референсов</span></button></li>
               <li><button type="button" class="cw__file" data-shots="img/sait-portfolio-unum/tit.jpg"><span class="cw__num">03</span><span class="cw__fname">Сайт-портфолио для ландшафтного архитектора</span></button></li>
             </ul>
@@ -3189,9 +3203,9 @@
          Плашки собирает скрипт из списков папки выше: название и номер
          работы правятся там, здесь ничего дублировать не надо -->
     <div class="mcases" id="mCases">
-      <div class="mcases__robot" aria-hidden="true">
-        <span class="mcases__shadow"></span>
-        <img src="robot-cases-m.webp?v=3" width="552" height="695" alt="" loading="lazy" decoding="async" />
+      <div class="mcases__peek" aria-hidden="true">
+        <p class="mcases__say"><span>Привет, я Гриша!</span><span>Кликайте по названиям</span><span class="is-cont">и картинкам, там интересно</span></p>
+        <img src="robot-peek.webp?v=3" width="308" height="537" alt="" loading="lazy" decoding="async" />
       </div>
       <ul class="mcases__list" id="mCasesList"></ul>
       <button type="button" class="mcases__more" id="mCasesMore" aria-expanded="false" hidden>Смотреть больше ...</button>
@@ -3836,21 +3850,37 @@
       });
     }
 
+    // Реплика Гриши: каждая буква — <b> со своей задержкой, слова — <i>,
+    // чтобы строка переносилась только между словами. Печатается один раз
+    // (класс is-said), дальше буквы плавно качаются
+    let k = 0;
+    box.querySelectorAll('.mcases__say > span').forEach((line, n) => {
+      if (n && !line.classList.contains('is-cont')) k += 8;   // пауза между фразами
+      line.innerHTML = line.textContent.split(' ').map(w =>
+        '<i>' + [...w].map(ch => '<b style="--d:' + (0.3 + k++ * 0.07).toFixed(2) + 's">' + ch + '</b>').join('') + '</i>'
+      ).join(' ');
+    });
+    const say = () => box.classList.add('is-said');
+
     const narrow = window.matchMedia('(max-width: 767px)').matches;
     // Возврат со страницы работы: список уже на месте, плашка подсвечена
     if (target && narrow) {
       box.classList.add('is-live');
+      say();
       target.classList.add('is-active');
       if (target.parentNode.classList.contains('is-more')) more.click();
       requestAnimationFrame(() => target.scrollIntoView({ block: 'center' }));
       return;
     }
 
-    if (!('IntersectionObserver' in window)) { box.classList.add('is-live'); return; }
-    // Робот проявляется, плашки въезжают справа по очереди — каждый раз,
-    // как блок заходит в кадр
+    if (!('IntersectionObserver' in window)) { box.classList.add('is-live'); say(); return; }
+    // Плашки въезжают справа по очереди — каждый раз, как блок заходит
+    // в кадр; Гриша начинает говорить при первом заходе
     const io = new IntersectionObserver((entries) => {
-      entries.forEach(e => box.classList.toggle('is-live', e.isIntersecting));
+      entries.forEach(e => {
+        box.classList.toggle('is-live', e.isIntersecting);
+        if (e.isIntersecting) say();
+      });
     }, { threshold: 0.15 });
     io.observe(box);
   })();

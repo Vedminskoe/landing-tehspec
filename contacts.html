@@ -120,6 +120,11 @@
        виде, как на ПК под курсором: залита золотым, текст белый */
     @media (hover: none) { .bn__home a.ct__gold { background: var(--accent2-fill); border-color: var(--accent2-fill); color: #fff; } }
 
+  
+    /* Телефон: текст на кнопках крупнее, как на главной, высота прежняя */
+    @media (max-width: 767px) {
+      .bn__go, .bn__home a { font-size: 17px; line-height: 20px; }
+    }
   </style>
 </head>
 <body>
