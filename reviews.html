@@ -12,7 +12,7 @@
   <meta property="og:url" content="https://landing.vedminskoe.ru/reviews.html" />
   <meta property="og:title" content="Отзывы — Катерина Степанова" />
   <meta property="og:image" content="https://landing.vedminskoe.ru/og.jpg" />
-  <meta name="theme-color" content="#417339" />
+  <meta name="theme-color" content="#475A3E" />
   <link rel="icon" href="favicon.ico" sizes="any" />
   <link rel="icon" type="image/png" href="favicon-32.png" sizes="32x32" />
   <link rel="apple-touch-icon" href="apple-touch-icon.png" />
@@ -25,7 +25,7 @@
       src: url('Vasek-Italic.woff2') format('woff2');
       font-display: swap;
     }
-    :root { --accent-soft: #81B470; --font-script: 'Vasek', cursive; }
+    :root { --accent-soft: #8EA475; --font-script: 'Vasek', cursive; }
     /* у прайсов щелчок по пустому месту закрывает страницу — здесь форма,
        так нельзя, поэтому курсор обычный и выход — ссылкой наверху */
     body { cursor: auto; }
@@ -47,6 +47,7 @@
     .rf__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
     .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
     .field__label { font-size: 13px; font-weight: 600; letter-spacing: 0.03em; }
+    .field__hint { font-weight: 400; color: var(--text-muted); }
     .field__label-row { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
     .field__required { color: var(--accent2); }
     .field__optional { color: var(--text-muted); font-weight: 400; font-size: 12px; }
@@ -65,7 +66,7 @@
       transition: border-color var(--transition), box-shadow var(--transition);
     }
     .field__input::placeholder { color: #A9AFB8; }
-    .field__input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(65,115,57,0.12); }
+    .field__input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(71,90,62,0.12); }
     .field__input:user-invalid { border-color: #D95252; }
     select.field__input {
       padding-right: 40px;
@@ -99,16 +100,16 @@
     .btn:disabled { opacity: .6; cursor: default; transform: none; }
     /* «Отправить отзыв» — золотая, как «Смотреть портфолио» */
     .btn--gold {
-      background: var(--accent2-light);
+      background: var(--accent2-rest);
       color: var(--accent2-hover);
-      border: 1.5px solid var(--accent2-hover);
+      border: 1.5px solid var(--accent2);
       animation: none;
       transition: background var(--transition), color var(--transition), transform var(--transition);
     }
-    .btn--gold:hover:not(:disabled) { background: var(--accent2); border-color: var(--accent2); color: #fff; }
+    .btn--gold:hover:not(:disabled) { background: var(--accent2-fill); border-color: var(--accent2-fill); color: #fff; }
     /* На тач-экране наведения нет — золотая кнопка сразу в «наведённом»
        виде, как на ПК под курсором: залита золотым, текст белый */
-    @media (hover: none) { .btn--gold { background: var(--accent2); border-color: var(--accent2); color: #fff; } }
+    @media (hover: none) { .btn--gold { background: var(--accent2-fill); border-color: var(--accent2-fill); color: #fff; } }
     @keyframes btn-flow { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
     .rf__status { font-size: 14px; color: #D95252; }
     .rf__done { display: none; padding: 26px 28px; border-radius: var(--radius); background: var(--accent-light); }
@@ -155,7 +156,7 @@
       transition: background var(--transition), color var(--transition), transform var(--transition);
     }
     .rv__arrow svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
-    .rv__arrow:hover:not(:disabled) { background: var(--accent2); color: #fff; transform: scale(1.06); }
+    .rv__arrow:hover:not(:disabled) { background: var(--accent2-fill); color: #fff; transform: scale(1.06); }
     .rv__arrow:disabled { opacity: .3; cursor: default; }
     .rv__arrow[hidden] { display: grid; visibility: hidden; }
     .rv__arrow--prev { grid-column: 1; grid-row: 1; }
@@ -182,7 +183,7 @@
       flex: none;
       margin-top: auto;
       padding-top: 10px;
-      border-top: 1px dashed rgba(65,115,57,0.35);
+      border-top: 1px dashed rgba(71,90,62,0.35);
       font-size: 11.5px;
       letter-spacing: 0.06em;
       text-transform: uppercase;
@@ -268,7 +269,7 @@
             <p class="field__error">Пожалуйста, введите имя</p>
           </div>
           <div class="field">
-            <label class="field__label" for="rRole">Кто вы <span class="field__required">*</span></label>
+            <label class="field__label" for="rRole">Кто вы <span class="field__hint">(выберите подходящее)</span> <span class="field__required">*</span></label>
             <select class="field__input" id="rRole" name="role" required>
               <option>Клиент</option>
               <option>Владелец онлайн-бизнеса</option>

@@ -18,7 +18,7 @@
   <meta property="og:image:height" content="630" />
   <meta property="og:image:alt" content="Катерина Степанова — техспец и графический дизайнер" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="theme-color" content="#417339" />
+  <meta name="theme-color" content="#475A3E" />
   <meta name="description" content="Верстка сайтов, Telegram-боты, интеграции и графический дизайн для онлайн-школ, экспертов и малого бизнеса. Тобольск, работаю удалённо." />
   <link rel="icon" href="favicon.ico" sizes="any" />
   <link rel="icon" type="image/png" href="favicon-32.png" sizes="32x32" />
@@ -79,15 +79,19 @@
       --font-heading: 'Spectral', Georgia, serif;
       --font-body:    'Involve', system-ui, sans-serif;
       --font-script:  'Vasek', cursive;
-      --accent:        #417339;
-      --accent-hover:  #325B2D;
-      --accent-light:  #EAF4E7;
-      --accent-soft:   #81B470;
-      --accent2:       #E8A800;
-      --accent2-hover: #C48900;
-      --accent2-light: #FFF8E0;
+      --accent:        #475A3E;
+      --accent-hover:  #36452F;
+      --accent-light:  #EDF0E6;
+      --accent-soft:   #8EA475;
+      --accent2:       #DC9E79;
+      --accent2-hover: #AD482A;
+      --accent2-light: #FBF3EF;
+      /* заливка персиковых кнопок при наведении и на телефоне */
+      --accent2-fill:  #DC9E79;
+      /* та же кнопка до наведения: 25% персика по белому */
+      --accent2-rest:  #F6E7DE;
       --bg:           #FFFFFF;
-      --bg-alt:       #F7F8F6;
+      --bg-alt:       #F5F1E7;
       --text:         #1A1A1A;
       --text-muted:   #525C68;
       --border:       #E5E7EB;
@@ -166,10 +170,10 @@
       font-weight: 600;
       letter-spacing: 0.12em;
       text-transform: uppercase;
-      color: var(--accent2);
-      background: #fff;
-      /* овальная рамка — как у бейджа «Открыта к новым проектам» в hero */
-      border: 1px solid rgba(232,168,0,0.3);
+      /* как персиковая кнопка до наведения: заливка, рамка, ржавый текст */
+      color: var(--accent2-hover);
+      background: var(--accent2-rest);
+      border: 1px solid var(--accent2);
       border-radius: 100px;
       padding: 4px 14px;
       margin-bottom: 14px;
@@ -238,19 +242,19 @@
     }
     /* «Смотреть портфолио»: залита сразу, как outline при наведении */
     .btn--gold {
-      background: var(--accent2-light);
-      color: var(--accent2);
-      border: 1.5px solid var(--accent2-hover);
+      background: var(--accent2-rest);
+      color: var(--accent2-hover);
+      border: 1.5px solid var(--accent2);
     }
     .btn--gold:hover {
-      background: var(--accent2);
-      border-color: var(--accent2);
+      background: var(--accent2-fill);
+      border-color: var(--accent2-fill);
       color: #fff;
     }
     /* На тач-экране наведения нет — золотая кнопка сразу в «наведённом»
        виде, как на ПК под курсором: залита золотым, текст белый */
     @media (hover: none) {
-      .btn--gold, .mcases__hint { background: var(--accent2); border-color: var(--accent2); color: #fff; }
+      .btn--gold, .mcases__hint { background: var(--accent2-fill); border-color: var(--accent2-fill); color: #fff; }
     }
     /* Магнитные кнопки: плавный «пружинистый» возврат при уходе курсора */
     .magnetic {
@@ -435,21 +439,21 @@
       align-items: center;
       gap: 6px;
       padding: 5px 12px;
-      background: #fff;
-      color: var(--accent2);
+      background: var(--accent2-rest);
+      color: var(--accent2-hover);
       border-radius: 100px;
       font-size: 11px;
       font-weight: 600;
       letter-spacing: 0.06em;
       text-transform: uppercase;
       margin-bottom: 28px;
-      border: 1px solid rgba(232,168,0,0.3);
+      border: 1px solid var(--accent2);
     }
     .hero__badge::before {
       content: '';
       width: 5px; height: 5px;
       border-radius: 50%;
-      background: var(--accent2);
+      background: var(--accent2-hover);
       flex-shrink: 0;
     }
     .hero__greeting {
@@ -468,93 +472,16 @@
       letter-spacing: 0.02em;
       margin-bottom: 18px;
       margin-left: -5px;
+      /* Почти чёрная печать: тёплый чёрный с мелким светлым зерном, как
+         оттиск на старой бумаге, в пару к ретро-фото. Без глянца и бликов */
       color: transparent;
-      /* реальная фактура crushed velvet заливает буквы */
-      background-color: #0b0b0f;
-      background-image: url('velvet.webp');
-      background-size: 140% auto;
-      background-position: 50% 40%;
+      background-color: #141312;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .42 0 0 0 0 .4 0 0 0 0 .38 0 0 0 .7 -.45'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 160px;
       -webkit-background-clip: text;
       background-clip: text;
       -webkit-text-fill-color: transparent;
-      /* мягкий ворсистый ореол по краям */
-      filter: drop-shadow(0 1px 1px rgba(0,0,0,.55))
-              drop-shadow(0 0 5px rgba(120,110,150,.2));
-    }
-    /* ::before — бегущий диагональный блик (свет по бархату) */
-    /* ::after — россыпь искр, вспыхивают как снег на солнце */
-    .hero__name::before,
-    .hero__name::after,
-    .cw__title::before,
-    .cw__title::after {
-      content: attr(data-text);
-      position: absolute;
-      left: 0; top: 0;
-      pointer-events: none;
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-      color: transparent;
-      background-repeat: no-repeat;
-    }
-    .hero__name::before,
-    .cw__title::before {
-      /* та же механика, что у .btn--primary (btn-flow): градиент 200% перетекает 0→100→0 */
-      background-image: linear-gradient(120deg,
-        rgba(255,255,255,0)   35%,
-        rgba(210,205,235,.18) 47%,
-        rgba(255,255,255,.4)  50%,
-        rgba(210,205,235,.18) 53%,
-        rgba(255,255,255,0)   65%);
-      background-size: 200% 100%;
-      background-position: 0% 50%;
-      mix-blend-mode: screen;
-      animation: velvetGlint 7s ease-in-out infinite;
-    }
-    .hero__name::after,
-    .cw__title::after {
-      background-image:
-        radial-gradient(circle, #fff 0%, rgba(255,255,255,0) 55%),
-        radial-gradient(circle, #eaf3ff 0%, rgba(234,243,255,0) 55%),
-        radial-gradient(circle, #fff 0%, rgba(255,255,255,0) 55%),
-        radial-gradient(circle, #fff 0%, rgba(255,255,255,0) 55%),
-        radial-gradient(circle, #d9e6ff 0%, rgba(217,230,255,0) 55%),
-        radial-gradient(circle, #fff 0%, rgba(255,255,255,0) 55%),
-        radial-gradient(circle, #fff 0%, rgba(255,255,255,0) 55%),
-        radial-gradient(circle, #fff 0%, rgba(255,255,255,0) 55%),
-        radial-gradient(circle, #eaf3ff 0%, rgba(234,243,255,0) 55%),
-        radial-gradient(circle, #fff 0%, rgba(255,255,255,0) 55%),
-        radial-gradient(circle, #d9e6ff 0%, rgba(217,230,255,0) 55%),
-        radial-gradient(circle, #fff 0%, rgba(255,255,255,0) 55%),
-        radial-gradient(circle, #fff 0%, rgba(255,255,255,0) 55%),
-        radial-gradient(circle, #fff 0%, rgba(255,255,255,0) 55%);
-      background-size:
-        4px 4px, 3px 3px, 5px 5px, 3px 3px, 4px 4px, 3px 3px, 5px 5px,
-        3px 3px, 4px 4px, 5px 5px, 3px 3px, 4px 4px, 3px 3px, 5px 5px;
-      background-position:
-        10% 32%, 24% 68%, 40% 22%, 55% 60%, 68% 40%, 82% 72%, 92% 30%,
-        6% 78%, 18% 15%, 33% 50%, 48% 85%, 62% 18%, 76% 55%, 88% 88%;
-      mix-blend-mode: screen;
-      animation: velvetSnow 2s steps(1) infinite;
-    }
-    @keyframes velvetGlint {
-      0%   { background-position: 0% 50%; }
-      50%  { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-    @keyframes velvetSnow {
-      0%, 100% { opacity: .2; }
-      25%      { opacity: 1; }
-      50%      { opacity: .35; }
-      75%      { opacity: .85; }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .hero__name::before,
-      .hero__name::after,
-      .cw__title::before,
-      .cw__title::after { animation: none; }
-      .hero__name::before,
-      .cw__title::before { opacity: 0; }
+      filter: drop-shadow(0 0 .5px rgba(20,19,18,.6));
     }
     .hero__caption {
       font-family: var(--font-script);
@@ -621,16 +548,7 @@
       width: 100%;
       height: auto;
       display: block;
-      /* фото цветное (2c.webp); ч/б версия — 2.webp с filter: grayscale(100%) */
-    }
-    /* лёгкая внутренняя тень по периметру — фото будто утоплено в экран */
-    .hero__photo::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      border-radius: inherit;
-      pointer-events: none;
-      box-shadow: inset 0 0 22px rgba(26,26,26,0.22);
+      /* фото 2c.webp: тёплое ч/б пополам с цветом, ретро-зерно и пылинки */
     }
 
     /* ── Services ── */
@@ -854,7 +772,7 @@
     }
     .service-card:hover {
       border-color: var(--accent);
-      box-shadow: 0 8px 32px rgba(65,115,57,0.12);
+      box-shadow: 0 8px 32px rgba(71,90,62,0.12);
       transform: translateY(-2px);
     }
     /* 3D-наклон и подсветка за курсором.
@@ -880,8 +798,8 @@
       transition: opacity .3s ease;
       background: radial-gradient(
         260px circle at var(--mx, 50%) var(--my, 50%),
-        rgba(129,180,112,0.22),
-        rgba(129,180,112,0) 70%
+        rgba(142,164,117,0.22),
+        rgba(142,164,117,0) 70%
       );
     }
     .service-card--tilt.is-tilting::after { opacity: 1; }
@@ -979,26 +897,26 @@
         z-index: 0;
         transform: translateY(0);
         border-color: transparent;
-        box-shadow: 0 14px 30px rgba(65,115,57,0);
+        box-shadow: 0 14px 30px rgba(71,90,62,0);
       }
       4%, 21% {
         z-index: 2;
         transform: translateY(-4px);
         /* тот же насыщенный зелёный контур, что у карточек услуг на наведении */
         border-color: var(--accent);
-        box-shadow: 0 12px 26px rgba(65,115,57,0.10);
+        box-shadow: 0 12px 26px rgba(71,90,62,0.10);
       }
     }
     @keyframes num-glow {
       0%, 25%, 100% {
         background: var(--bg);
         color: var(--accent);
-        box-shadow: 0 0 0 5px rgba(65,115,57,0.08);
+        box-shadow: 0 0 0 5px rgba(71,90,62,0.08);
       }
       4%, 21% {
         background: var(--accent-light);
         color: var(--accent);
-        box-shadow: 0 0 0 7px rgba(65,115,57,0.10);
+        box-shadow: 0 0 0 7px rgba(71,90,62,0.10);
       }
     }
     /* курсор в блоке — цикл выключаем целиком, чтобы hover снова работал */
@@ -1042,7 +960,7 @@
       pointer-events: none;
       opacity: 0;
       filter: blur(18px);
-      background: rgba(129,180,112,0.45);
+      background: rgba(142,164,117,0.45);
     }
     .process-step::after {
       content: '';
@@ -1062,7 +980,7 @@
     .process-step:hover {
       transform: translateY(-4px);
       border-color: var(--accent-light);
-      box-shadow: 0 14px 30px rgba(65,115,57,0.16);
+      box-shadow: 0 14px 30px rgba(71,90,62,0.16);
     }
     .process-step__num {
       width: 56px; height: 56px;
@@ -1077,7 +995,7 @@
       color: var(--accent);
       margin-bottom: 18px;
       flex-shrink: 0;
-      box-shadow: 0 0 0 5px rgba(65,115,57,0.08);
+      box-shadow: 0 0 0 5px rgba(71,90,62,0.08);
       transition: background var(--transition), color var(--transition), box-shadow var(--transition),
                   transform .5s cubic-bezier(.34,1.56,.64,1);
       /* «щелчок»: цифра выпрыгивает, когда шаг появляется в поле зрения */
@@ -1091,7 +1009,7 @@
     .process-step:hover .process-step__num {
       background: var(--accent);
       color: #fff;
-      box-shadow: 0 0 0 6px rgba(65,115,57,0.15);
+      box-shadow: 0 0 0 6px rgba(71,90,62,0.15);
     }
     .process-step__title {
       font-family: var(--font-heading);
@@ -1156,7 +1074,7 @@
       inset: 0;
       pointer-events: none;
       border: 1px solid transparent;
-      border-image: linear-gradient(90deg, var(--accent) 0 28%, rgba(65,115,57,0) 68%) 1;
+      border-image: linear-gradient(90deg, var(--accent) 0 28%, rgba(71,90,62,0) 68%) 1;
       opacity: 0;
       transition: opacity var(--transition);
     }
@@ -1174,7 +1092,7 @@
       transform: scale(1.02);
       box-shadow:
         0 8px 22px rgba(26,26,26,0.16),      /* вес: отрывает белое от фото */
-        0 0 18px 2px rgba(129,180,112,0.38); /* зелёный ореол, --accent-soft */
+        0 0 18px 2px rgba(142,164,117,0.38); /* зелёный ореол, --accent-soft */
     }
     /* наведённая перекрывает открытую, если это разные плашки */
     .case-plate:hover { z-index: 2; }
@@ -1436,7 +1354,7 @@
     .field__input::placeholder { color: #A9AFB8; }
     .field__input:focus {
       border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(65,115,57,0.12);
+      box-shadow: 0 0 0 3px rgba(71,90,62,0.12);
     }
     /* Ошибки показывает браузер по required. :user-invalid загорается только
        после попытки отправить или ухода из поля — пока человек печатает, красного нет */
@@ -1730,8 +1648,8 @@
       animation: status-pulse 2.4s ease-in-out infinite;
     }
     @keyframes status-pulse {
-      0%, 100% { opacity: 1;   box-shadow: 0 0 0 0 rgba(65,115,57,0.35); }
-      50%      { opacity: .55; box-shadow: 0 0 0 5px rgba(65,115,57,0); }
+      0%, 100% { opacity: 1;   box-shadow: 0 0 0 0 rgba(71,90,62,0.35); }
+      50%      { opacity: .55; box-shadow: 0 0 0 5px rgba(71,90,62,0); }
     }
     @media (prefers-reduced-motion: reduce) {
       .contacts__status::before { animation: none; }
@@ -1793,7 +1711,7 @@
       background: var(--accent2-light);
       color: var(--accent2-hover);
       cursor: pointer;
-      box-shadow: 0 6px 18px rgba(26,26,26,0.14), 0 0 0 0 rgba(232,168,0,0.45);
+      box-shadow: 0 6px 18px rgba(26,26,26,0.14), 0 0 0 0 rgba(220,158,121,0.45);
       opacity: 0;
       visibility: hidden;
       transition: opacity var(--transition), visibility var(--transition),
@@ -1811,11 +1729,11 @@
       visibility: hidden;
       animation: none;
     }
-    .to-top:hover { background: var(--accent2); border-color: var(--accent2); color: #fff; }
+    .to-top:hover { background: var(--accent2-fill); border-color: var(--accent2-fill); color: #fff; }
     @keyframes to-top-glow {
-      0%   { box-shadow: 0 6px 18px rgba(26,26,26,0.14), 0 0 0 0 rgba(232,168,0,0.45); }
-      70%  { box-shadow: 0 6px 18px rgba(26,26,26,0.14), 0 0 0 12px rgba(232,168,0,0); }
-      100% { box-shadow: 0 6px 18px rgba(26,26,26,0.14), 0 0 0 0 rgba(232,168,0,0); }
+      0%   { box-shadow: 0 6px 18px rgba(26,26,26,0.14), 0 0 0 0 rgba(220,158,121,0.45); }
+      70%  { box-shadow: 0 6px 18px rgba(26,26,26,0.14), 0 0 0 12px rgba(220,158,121,0); }
+      100% { box-shadow: 0 6px 18px rgba(26,26,26,0.14), 0 0 0 0 rgba(220,158,121,0); }
     }
     @keyframes to-top-float {
       0%, 100% { transform: translateY(0); }
@@ -2007,7 +1925,7 @@
     }
     /* ── Анимации не крутятся за краем экрана ──
        Бесконечные анимации браузер честно проигрывает и когда их не видно.
-       Две из них (velvetGlint у заголовка и btn-flow у кнопок) двигают
+       Одна из них (btn-flow у кнопок) двигает
        background-position — это свойство не композитится, то есть каждый кадр
        перерисовывается заново. Класс вешает наблюдатель ниже; paused, а не
        none: кадр замирает на месте и с него же продолжается при возврате,
@@ -2381,20 +2299,17 @@
       font: 600 clamp(40px, 7.5vw, 96px)/0.85 var(--font-heading);
       letter-spacing: 0.02em;
       text-transform: uppercase;
-      /* Чёрный бархат — тот же, что у «КАТЕРИНА» в первом экране: имя и
-         название папки рифмуются, у блока появляется тёмный якорь.
-         Блик и искры — общие ::before/::after с .hero__name */
+      /* Та же печать, что у «КАТЕРИНА» в первом экране: имя и название
+         папки рифмуются, у блока появляется тёмный якорь */
       position: relative;
       color: transparent;
-      background-color: #0b0b0f;
-      background-image: url('velvet.webp');
-      background-size: 140% auto;
-      background-position: 50% 40%;
+      background-color: #141312;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .42 0 0 0 0 .4 0 0 0 0 .38 0 0 0 .7 -.45'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 160px;
       -webkit-background-clip: text;
               background-clip: text;
       -webkit-text-fill-color: transparent;
-      filter: drop-shadow(0 1px 1px rgba(0,0,0,.55))
-              drop-shadow(0 0 5px rgba(120,110,150,.2));
+      filter: drop-shadow(0 0 .5px rgba(20,19,18,.6));
       /* светлая подсветка текста обложки просвечивала бы сквозь
          прозрачные буквы и красила бархат в серый */
       text-shadow: none;
@@ -2492,7 +2407,7 @@
       transition: background var(--transition), color var(--transition);
     }
     .cw__open svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
-    .cw__open:hover { background: var(--accent2); color: #fff; animation: none; }
+    .cw__open:hover { background: var(--accent2-fill); color: #fff; animation: none; }
     .cw.is-open.is-shot .cw__open, .cw.is-open.is-video .cw__open { display: inline-flex; }
     /* лёгкий «тычок» стрелкой, чтобы кнопку заметили */
     @keyframes open-nudge {
@@ -2781,9 +2696,9 @@
         margin: 36px 0 0;
         padding: 14px 20px;
         /* золотая, залитая — как золотые кнопки на телефоне */
-        border: 1.5px solid var(--accent2);
+        border: 1.5px solid var(--accent2-fill);
         border-radius: 8px;
-        background: var(--accent2);
+        background: var(--accent2-fill);
         font-family: var(--font-body);
         font-size: 15px;
         font-weight: 500;
@@ -2791,6 +2706,9 @@
         box-shadow: none;
       }
       .mcases__reviews::before, .mcases__reviews::after { content: none; }
+      /* от кнопки до контактов — только верхний отступ контактов,
+         двойной (низ портфолио + верх контактов) выходил слишком большим */
+      #cases { padding-bottom: 0; }
     }
 
     /* ── подвал окна ── */
@@ -2984,7 +2902,7 @@
       <div class="hero__right hero-in">
         <div class="hero__right-inner">
           <div class="hero__photo">
-            <img src="2c.webp" alt="Катерина Степанова" width="896" height="1184" fetchpriority="high" decoding="async" />
+            <img src="2c.webp?v=3" alt="Катерина Степанова" width="896" height="1184" fetchpriority="high" decoding="async" />
           </div>
         </div>
         <p class="hero__caption">технический специалист<br />графический дизайнер</p>
@@ -3048,7 +2966,7 @@
     </ul>
     <!-- Робот вынесен из карточки: иначе наклон/подсветка карточки его обрежут
          и перевернут. Позиционируется от .container, как и раньше на ПК -->
-    <img class="services__robot" src="4.webp" alt="" aria-hidden="true" width="1280" height="714" decoding="async" />
+    <img class="services__robot" src="4.webp?v=3" alt="" aria-hidden="true" width="1280" height="714" decoding="async" />
   </div>
 </section>
 
@@ -3259,8 +3177,8 @@
            сторону, пока он спрятан). Туловище выезжает из-за края, пальцы
            отдельным слоем ложатся поверх папки -->
       <div class="cw__peek" id="cwPeek" aria-hidden="true">
-        <div class="cw__peek-body"><img src="robot-peek.webp" width="308" height="537" alt="" loading="lazy" decoding="async" /></div>
-        <img class="cw__peek-hand" src="robot-peek-hand.webp" width="39" height="112" alt="" loading="lazy" decoding="async" />
+        <div class="cw__peek-body"><img src="robot-peek.webp?v=3" width="308" height="537" alt="" loading="lazy" decoding="async" /></div>
+        <img class="cw__peek-hand" src="robot-peek-hand.webp?v=3" width="39" height="112" alt="" loading="lazy" decoding="async" />
         <!-- реплики: «привет» после выхода слева, «шур-шур» перед выходом справа -->
         <span class="cw__say cw__say--hi"><b>Привет,</b> <b>я</b> <b>Гриша!</b><i></i><i></i><i></i></span>
         <span class="cw__say cw__say--shur"><b>шур-</b><b>шур</b><b>…</b></span>
@@ -3273,7 +3191,7 @@
     <div class="mcases" id="mCases">
       <div class="mcases__robot" aria-hidden="true">
         <span class="mcases__shadow"></span>
-        <img src="robot-cases-m.webp?v=2" width="552" height="695" alt="" loading="lazy" decoding="async" />
+        <img src="robot-cases-m.webp?v=3" width="552" height="695" alt="" loading="lazy" decoding="async" />
       </div>
       <ul class="mcases__list" id="mCasesList"></ul>
       <button type="button" class="mcases__more" id="mCasesMore" aria-expanded="false" hidden>Смотреть больше ...</button>
@@ -3290,7 +3208,7 @@
       <span class="cases__signature-live">{Сей сайт написан кодом, дизайн и вёрстка — всё моими ручками}</span>
     </p>
     <!-- Ладошки под строкой: проявляются, когда фраза допечаталась -->
-    <img class="cases__signature-hands" src="hands.webp" width="186" height="128" alt="" decoding="async" />
+    <img class="cases__signature-hands" src="hands.webp?v=3" width="186" height="128" alt="" decoding="async" />
     <!-- телефон: отзывы кнопкой после ладошек, как прайсы -->
     <a class="case-plate mcases__reviews" href="reviews.html"><span class="case-plate__text">Отзывы</span></a>
   </div>
@@ -3428,7 +3346,7 @@
     <div class="footer__bottom">
       <!-- Робот сидит на линии-разделителе. Отражён по горизонтали, чтобы
            смотреть в подпись, а не за край экрана. Только для телефона -->
-      <img class="footer__robot" src="robot-podval.webp" alt="" aria-hidden="true" width="600" height="856" loading="lazy" decoding="async" />
+      <img class="footer__robot" src="robot-podval.webp?v=3" alt="" aria-hidden="true" width="600" height="856" loading="lazy" decoding="async" />
       <!-- разбито на части ради мобильной раскладки: род занятий уходит
            второй строкой под имя, тире там прячется -->
       <div class="footer__copy"><span class="footer__copy-year">© 2026</span> <span class="footer__copy-name">Катерина Степанова</span><span class="footer__copy-dash"> — </span><span class="footer__copy-role">техспец &amp; граф.дизайнер</span></div>
@@ -3444,7 +3362,7 @@
 
 <!-- Cookie-уведомление -->
 <div class="cookie-banner" id="cookieBanner" role="dialog" aria-labelledby="cookieTitle" hidden>
-  <img class="cookie-banner__icon" src="robot-cookie.webp" width="300" height="363" alt="" aria-hidden="true" loading="lazy" decoding="async" />
+  <img class="cookie-banner__icon" src="robot-cookie.webp?v=3" width="300" height="363" alt="" aria-hidden="true" loading="lazy" decoding="async" />
   <div class="cookie-banner__body">
     <h3 id="cookieTitle">Печенье — на ваших условиях</h3>
     <p>Обязательное храню всегда: язык, отправленные формы и вот этот выбор. Статистику посещений — только с вашего согласия. Рекламы и передачи данных на сторону нет. Подробности — в <a href="privacy.html" target="_blank" rel="noopener">Политике обработки персональных данных</a>.</p>
@@ -4517,7 +4435,7 @@
   (function () {
     if (!('IntersectionObserver' in window)) return;
     const targets = document.querySelectorAll(
-      '.hero__name, .cw__title, .hero__scroll, .services__robot,' +
+      '.hero__scroll, .services__robot,' +
       '.contacts__status, .cases__signature-live, .btn--primary'
     );
     if (!targets.length) return;
